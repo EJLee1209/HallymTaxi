@@ -85,6 +85,7 @@ class WelcomeViewModel(
                     return@addOnCompleteListener
                 }
                 fireStore.collection("User").document(user.uid).set(user)
+                
                 _isCreatedUser.value = true
             }else{
                 _isCreatedUser.value = false
@@ -99,6 +100,7 @@ class WelcomeViewModel(
         }
         auth.signInWithEmailAndPassword("$email@hallym.ac.kr", password).addOnSuccessListener {
             val uid = auth.currentUser?.uid
+
             context.getSharedPreferences("login", Context.MODE_PRIVATE)
                 .edit()
                 .putString("uid", uid)

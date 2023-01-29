@@ -102,6 +102,13 @@ class HistoryFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
+
+        viewModel.allListenerRemove()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
         viewModel.allListenerRemove()
     }
 }

@@ -216,7 +216,7 @@ class ChatRoomFragment: Fragment() {
     override fun onDetach() {
         super.onDetach()
         KeyboardUtils.removeKeyboardToggleListener(keyboardStateListener)
+        Log.d("testt", "ChatRoomFragment onDetach: ")
         viewModel.allListenerRemove()
     }
-
 }
