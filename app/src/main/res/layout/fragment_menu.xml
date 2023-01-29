@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="user"
+            type="com.dldmswo1209.hallymtaxi.model.User" />
+        <variable
+            name="fragment"
+            type="com.dldmswo1209.hallymtaxi.ui.MenuFragment" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="90dp"
+        android:background="@color/hallym_white_ffffff">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/top_bar"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:background="@color/hallym_blue_3351b9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <TextView
+                style="@style/Text20.White.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menu"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="50dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tv_hello"
+            style="@style/Text32.Black.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="36dp"
+            android:text="@{@string/hello_user_format(user.name)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/top_bar"
+            tools:text="안녕하세요,\n곽도철님" />
+
+        <TextView
+            android:id="@+id/tv_user_email"
+            style="@style/TextSubTitle.667080"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@{user.email}"
+            app:layout_constraintStart_toStartOf="@id/tv_hello"
+            app:layout_constraintTop_toBottomOf="@id/tv_hello"
+            tools:text="20185158@hallym.ac.kr" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_logout"
+            style="@style/Text13.White"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/background_blue_r10"
+            android:text="로그아웃"
+            android:onClick="@{()->fragment.onClickLogout()}"
+            app:layout_constraintStart_toStartOf="@id/tv_user_email"
+            app:layout_constraintTop_toBottomOf="@id/tv_user_email" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

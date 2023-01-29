@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="fragment"
+            type="com.dldmswo1209.hallymtaxi.ui.welcome.EmailVerifyFragment" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img_welcome_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="11dp"
+            android:layout_marginTop="46dp"
+            android:background="@null"
+            android:onClick="@{()->fragment.clickBackBtn()}"
+            android:src="@drawable/ic_left_arrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_register_title"
+            style="@style/TextTitle.White.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="86dp"
+            android:text="@string/btn_register"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_back" />
+
+        <View
+            android:id="@+id/bottom_background"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/background_white_r40"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_register_title" />
+
+        <TextView
+            android:id="@+id/tv_register_subtitle"
+            style="@style/TextHeadline5.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="27dp"
+            android:text="@string/student_verify"
+            app:layout_constraintStart_toStartOf="@+id/bottom_background"
+            app:layout_constraintTop_toTopOf="@+id/bottom_background" />
+
+        <TextView
+            android:id="@+id/tv_guide"
+            style="@style/TextHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/email_verify_guide"
+            app:layout_constraintStart_toStartOf="@id/tv_register_subtitle"
+            app:layout_constraintTop_toBottomOf="@id/tv_register_subtitle" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/email_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="33dp"
+            android:background="@drawable/background_grey_r10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_guide">
+
+            <EditText
+                android:id="@+id/et_email"
+                style="@style/TextHint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="17dp"
+                android:background="@null"
+                android:hint="@string/hint_mail"
+                android:maxLength="16"
+                android:maxLines="1"
+                android:textColorHint="@color/hallym_grey_D9D9D9"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_email_format"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_email_format"
+                style="@style/TextHint.d9d9d9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/hallym_ac_kr"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_verify"
+            style="@style/TextSubTitle.White.Bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="47dp"
+            android:background="@drawable/selector_button"
+            android:enabled="false"
+            android:onClick="@{()->fragment.clickVerifyBtn()}"
+            android:text="@string/verify"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_loading"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:padding="80dp"
+            android:background="#99000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/taxi_anim" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="fragment"
+            type="com.dldmswo1209.hallymtaxi.ui.carpool.ChatRoomFragment" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/hallym_blue_3351b9">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="42dp"
+            android:background="@null"
+            android:onClick="@{()->fragment.onClickBack()}"
+            android:padding="10dp"
+            android:src="@drawable/ic_left_arrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_room_title"
+            style="@style/Text20.White.Bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toStartOf="@id/btn_menu"
+            app:layout_constraintStart_toEndOf="@id/btn_back"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="한림대학교 - 춘천역 경춘선" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:background="@null"
+            android:onClick="@{()->fragment.onClickMenu()}"
+            android:padding="10dp"
+            android:src="@drawable/more_vertical"
+            app:layout_constraintBottom_toBottomOf="@id/tv_room_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_room_title" />
+
+        <View
+            android:id="@+id/bg_white"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/background_bottom_navigation"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_room_title" />
+
+        <TextView
+            android:id="@+id/tv_user_count"
+            style="@style/TextSubTitle.Black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="13dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/bg_white"
+            tools:text="인원 4명" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_message"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:paddingHorizontal="21dp"
+            android:paddingVertical="32dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_user_count" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="11dp"
+            android:layout_marginBottom="27dp"
+            android:background="@drawable/background_f5f5f5_r30"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <EditText
+                android:id="@+id/et_msg"
+                style="@style/Text14.Black"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="@string/chat_hint"
+                android:maxLines="3"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="10dp" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btn_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:padding="10dp"
+                android:src="@drawable/arrow_up_circle"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

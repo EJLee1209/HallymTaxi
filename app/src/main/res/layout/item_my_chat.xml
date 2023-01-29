@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="chat"
+            type="com.dldmswo1209.hallymtaxi.model.Chat" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="14dp">
+
+        <TextView
+            style="@style/Text12.Blue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            time="@{chat.dateTime}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_message"
+            app:layout_constraintEnd_toStartOf="@id/tv_message"
+            tools:text="오후 3:11" />
+
+        <TextView
+            android:id="@+id/tv_message"
+            style="@style/Text13.White"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/my_chat_background"
+            android:maxWidth="300dp"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
+            android:text="@{chat.msg}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="안녕하세요~ 지금 어디신가요????????????????????????????????????????????????????" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

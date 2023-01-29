@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="room"
+            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
+        <variable
+            name="fragment"
+            type="com.dldmswo1209.hallymtaxi.ui.map.MapFragment" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/parent_constraint_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/init_search_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="13dp"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/background_white_r20"
+            android:elevation="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/et_init_search"
+                style="@style/TextSubTitle.Black"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="@string/destination"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingHorizontal="14dp"
+                android:textColorHint="@color/hallym_grey_D9D9D9"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iv_init_search_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.utils.widget.ImageFilterView
+                android:id="@+id/iv_init_search_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="13dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_search"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/search_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="13dp"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/background_white_r20"
+            android:elevation="10dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/et_start_point"
+                style="@style/TextSubTitle.Black"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:layout_marginStart="9dp"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/background_grey_r15"
+                android:hint="@string/start_point"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="11dp"
+                android:textColorHint="@color/hallym_grey_D9D9D9"
+                app:layout_constraintEnd_toStartOf="@id/iv_search_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/et_end_point"
+                style="@style/TextSubTitle.Black"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:layout_marginStart="9dp"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/background_grey_r15"
+                android:hint="@string/destination"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="11dp"
+                android:textColorHint="@color/hallym_grey_D9D9D9"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iv_search_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_start_point" />
+
+            <androidx.constraintlayout.utils.widget.ImageFilterView
+                android:id="@+id/iv_search_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="13dp"
+                android:layout_marginEnd="21dp"
+                android:src="@drawable/ic_search"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <net.daum.mf.map.api.MapView
+            android:id="@+id/mapview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <HorizontalScrollView
+            android:id="@+id/shortcut_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            android:paddingHorizontal="12dp"
+            app:layout_constraintTop_toBottomOf="@id/init_search_layout"
+            android:scrollbarSize="0dp"
+            android:clipToPadding="false">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="9dp"
+                android:clipToPadding="false">
+
+                <TextView
+                    android:id="@+id/btn_short_cut_chuncheon_station"
+                    style="@style/Text14.Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/selector_toggle_button"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="6dp"
+                    android:text="춘천역"
+                    android:elevation="8dp"/>
+
+                <TextView
+                    android:id="@+id/btn_short_cut_hallym"
+                    style="@style/Text14.Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/selector_toggle_button"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="6dp"
+                    android:text="한림대"
+                    android:elevation="8dp"/>
+
+                <TextView
+                    android:id="@+id/btn_short_cut_myeong_dong"
+                    style="@style/Text14.Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/selector_toggle_button"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="6dp"
+                    android:text="명동입구"
+                    android:elevation="8dp"/>
+
+                <TextView
+                    android:id="@+id/btn_short_cut_bus_terminal"
+                    style="@style/Text14.Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/selector_toggle_button"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="6dp"
+                    android:text="버스터미널"
+                    android:elevation="8dp"/>
+
+                <TextView
+                    android:id="@+id/btn_short_cut_kangwon_univ"
+                    style="@style/Text14.Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/selector_toggle_button"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="6dp"
+                    android:text="강원대학교"
+                    android:elevation="8dp"/>
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </HorizontalScrollView>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/view_current_my_room"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_grey_r10"
+            android:backgroundTint="@color/hallym_blue_3351b9"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginHorizontal="21dp"
+            android:layout_marginBottom="102dp"
+            android:elevation="10dp"
+            android:visibility="gone"
+            android:onClick="@{()->fragment.onClickViewMyCurrentRoom()}">
+
+            <TextView
+                style="@style/TextSubTitle.White.Bold"
+                android:id="@+id/tv_place_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="한림대학교 대학본부"
+                android:text="@{room.startPlace.place_name}"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_down_right_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/corner_down_right_white"
+                app:layout_constraintTop_toBottomOf="@id/tv_place_name"
+                app:layout_constraintStart_toStartOf="@id/tv_place_name"
+                android:layout_marginTop="2dp"/>
+
+            <TextView
+                style="@style/TextSubTitle.White.Bold"
+                android:id="@+id/tv_end_place_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="춘천역 경춘선"
+                android:text="@{room.endPlace.place_name}"
+                app:layout_constraintTop_toBottomOf="@id/tv_place_name"
+                app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
+                android:layout_marginTop="3dp"
+                android:layout_marginStart="6dp"
+                android:paddingBottom="12dp"/>
+
+            <TextView
+                style="@style/Text12.White"
+                android:id="@+id/tv_start_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="오후 2:40"
+                android:text="@{room.departureTime}"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                style="@style/TextHeadline5.White.Bold"
+                android:id="@+id/tv_user_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_start_time"
+                android:layout_marginEnd="19dp"
+                android:paddingBottom="11dp"
+                tools:text="2/4"
+                android:text="@{@string/room_count_format(room.userCount, room.userMaxCount)}"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

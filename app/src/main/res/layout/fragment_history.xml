@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="room"
+            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
+
+        <variable
+            name="fragment"
+            type="com.dldmswo1209.hallymtaxi.ui.history.HistoryFragment" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/hallym_white_ffffff">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/top_bar"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:background="@color/hallym_blue_3351b9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <TextView
+                style="@style/Text20.White.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:text="@string/history"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_current_joined_room"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="@{()->fragment.onClickJoinedRoom()}"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/top_bar"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/tv_start_place_name"
+                style="@style/TextSubTitle.Black.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="18dp"
+                android:text="@{room.startPlace.place_name}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="한림대학교 대학본부" />
+
+            <androidx.constraintlayout.utils.widget.ImageFilterView
+                android:id="@+id/iv_down_right_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/corner_down_right_blue"
+                android:tint="@color/hallym_grey_667080"
+                app:layout_constraintStart_toStartOf="@id/tv_start_place_name"
+                app:layout_constraintTop_toBottomOf="@id/tv_start_place_name" />
+
+            <TextView
+                android:id="@+id/tv_end_place_name"
+                style="@style/TextSubTitle.Black.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1.4dp"
+                android:text="@{room.endPlace.place_name}"
+                app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
+                app:layout_constraintTop_toBottomOf="@id/tv_start_place_name"
+                tools:text="춘천역 경춘선" />
+
+            <TextView
+                android:id="@+id/tv_last_msg"
+                style="@style/Text14.667080"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginTop="8.6dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingBottom="17dp"
+                android:text="@{room.lastMsg}"
+                app:layout_constraintEnd_toStartOf="@id/iv_new_chat"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_end_place_name"
+                tools:text="안녕하세요. 반갑습니다!" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_new_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="14dp"
+                android:layout_marginBottom="17dp"
+                android:src="@drawable/ic_new"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tv_last_time"
+                style="@style/Text14.d9d9d9.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="17dp"
+                android:layout_marginEnd="14dp"
+                time="@{room.lastReceiveMsgDateTime}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="오후 03:12" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:background="@color/hallym_grey_f5f5f5"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <View
+                android:id="@+id/view_pin"
+                android:layout_width="4dp"
+                android:layout_height="0dp"
+                android:background="@drawable/stick"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_history"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipToPadding="true"
+            android:paddingBottom="90dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_current_joined_room"
+            tools:listitem="@layout/item_history" />
+
+        <TextView
+            android:id="@+id/tv_no_pool_room"
+            style="@style/Text14.Black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_join_room"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/top_bar" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="fragment"
+            type="com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeFragment" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img_welcome_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_welcome_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="137dp"
+            android:text="@string/welcome_title"
+            style="@style/TextTitle.White.Bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/welcome_subtitle"
+            style="@style/TextSubTitle.White"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_welcome_title" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_register"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="78dp"
+            android:layout_marginBottom="105dp"
+            android:background="@drawable/background_white_r100"
+            android:paddingVertical="16dp"
+            android:text="@string/btn_register"
+            style="@style/TextSubTitle.Blue"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:onClick="@{()->fragment.clickRegisterBtn()}"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_login"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="78dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/background_blue_r100"
+            android:paddingVertical="16dp"
+            android:text="@string/btn_login"
+            style="@style/TextSubTitle.White"
+            app:layout_constraintBottom_toTopOf="@id/btn_register"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:onClick="@{()->fragment.clickLoginBtn()}"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

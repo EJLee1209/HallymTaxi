@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="room"
+            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
+
+        <variable
+            name="distance"
+            type="Integer" />
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:padding="4dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/item_layout"
+            android:layout_width="180dp"
+            android:layout_height="260dp"
+            android:background="@drawable/background_white_r10"
+            android:elevation="4dp">
+
+            <TextView
+                android:id="@+id/tv_start_place_name"
+                style="@style/Text20.Black.Bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="14dp"
+                android:layout_marginTop="15dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="@{room.startPlace.place_name}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="춘천역 경춘선" />
+
+            <ImageView
+                android:id="@+id/iv_down_right_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="13dp"
+                android:src="@drawable/corner_down_right_blue"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_start_place_name" />
+
+            <TextView
+                android:id="@+id/tv_end_place_name"
+                style="@style/Text20.Black.Bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="14dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="@{room.endPlace.place_name}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
+                app:layout_constraintTop_toBottomOf="@id/tv_start_place_name"
+                tools:text="한림대학교 대학본부" />
+
+            <TextView
+                android:id="@+id/tv_gender_option"
+                style="@style/Text13.Black"
+                genderOption="@{room.genderOption}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="13dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_end_place_name"
+                tools:text="남자끼리 탑승하기" />
+
+            <TextView
+                android:id="@+id/tv_start_time"
+                style="@style/Text13.Black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{room.departureTime}"
+                app:layout_constraintStart_toStartOf="@id/tv_gender_option"
+                app:layout_constraintTop_toBottomOf="@id/tv_gender_option"
+                tools:text="오후 2:40" />
+
+            <TextView
+                android:id="@+id/tv_distance"
+                style="@style/Text13.Black"
+                distance="@{distance}"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tv_start_time"
+                app:layout_constraintTop_toBottomOf="@id/tv_start_time"
+                tools:text="내 목적지와 거리 : 214m" />
+
+            <TextView
+                android:id="@+id/tv_user_count"
+                style="@style/Text36.Blue.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="9dp"
+                android:text="@{@string/room_count_format(room.userCount, room.userMaxCount)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="2/4" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="chat"
+            type="com.dldmswo1209.hallymtaxi.model.Chat" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="14dp">
+
+        <TextView
+            style="@style/Text11.667080"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center"
+            android:maxLines="1"
+            tools:text="- 사용자 3님이 나갔습니다 -"
+            android:text="@{@string/exit_message_format(chat.userInfo.name)}"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

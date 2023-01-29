@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="fragment"
+            type="com.dldmswo1209.hallymtaxi.ui.carpool.CreateRoomFragment" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/hallym_blue_3351b9">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="42dp"
+            android:background="@null"
+            android:padding="10dp"
+            android:src="@drawable/ic_left_arrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="@{()->fragment.onClickBack()}"/>
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/Text20.White.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="@string/create_room"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/search_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="13dp"
+            android:background="@drawable/background_white_r20"
+            android:elevation="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_title">
+
+            <EditText
+                android:id="@+id/et_start_point"
+                style="@style/TextSubTitle.Black"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:layout_marginStart="9dp"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/background_grey_r15"
+                android:hint="@string/start_point"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="11dp"
+                android:textColorHint="@color/hallym_grey_D9D9D9"
+                app:layout_constraintEnd_toStartOf="@id/iv_search_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/et_end_point"
+                style="@style/TextSubTitle.Black"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:layout_marginStart="9dp"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/background_grey_r15"
+                android:hint="@string/destination"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="11dp"
+                android:textColorHint="@color/hallym_grey_D9D9D9"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iv_search_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_start_point" />
+
+            <androidx.constraintlayout.utils.widget.ImageFilterView
+                android:id="@+id/iv_search_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="13dp"
+                android:layout_marginEnd="21dp"
+                android:src="@drawable/ic_search"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/bg_white"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/background_bottom_navigation"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+        <TextView
+            android:id="@+id/tv_max_count_title"
+            style="@style/Text14.Black.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="36dp"
+            android:text="최대 인원수"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_layout" />
+
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_max_count_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="50dp"
+            android:background="@null"
+            android:src="@drawable/ic_minus_circle"
+            app:layout_constraintEnd_toStartOf="@id/tv_max_count"
+            app:layout_constraintTop_toBottomOf="@id/tv_max_count_title"
+            android:onClick="@{()->fragment.onClickMaxCountDown()}"/>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_max_count_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="21dp"
+            android:background="@null"
+            android:src="@drawable/ic_plus_circle"
+            app:layout_constraintStart_toEndOf="@id/tv_max_count"
+            app:layout_constraintTop_toBottomOf="@id/tv_max_count_title"
+            android:onClick="@{()->fragment.onClickMaxCountUp()}"/>
+
+        <TextView
+            android:id="@+id/tv_max_count"
+            style="@style/TextTitle.Black.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_max_count_title" />
+
+        <View
+            android:id="@+id/max_count_under_line"
+            android:layout_width="40dp"
+            android:layout_height="5dp"
+            android:background="@color/hallym_blue_3351b9"
+            app:layout_constraintEnd_toEndOf="@id/tv_max_count"
+            app:layout_constraintStart_toStartOf="@id/tv_max_count"
+            app:layout_constraintTop_toBottomOf="@id/tv_max_count" />
+
+        <TextView
+            android:id="@+id/tv_start_time_title"
+            style="@style/Text14.Black.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="25dp"
+            android:text="출발시간"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/max_count_under_line" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginHorizontal="65dp"
+            android:background="@drawable/background_grey_r10"
+            app:layout_constraintBottom_toBottomOf="@id/time_picker"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/time_picker" />
+
+
+        <TimePicker
+            android:id="@+id/time_picker"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:selectionDividerHeight="0.1dp"
+            android:theme="@style/NumberPickerStyle"
+            android:timePickerMode="spinner"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_start_time_title" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/gender_option_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/time_picker"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="25dp"
+            android:layout_marginHorizontal="20dp">
+
+            <TextView
+                android:id="@+id/tv_gender_option_title"
+                style="@style/Text14.Black.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="탑승 옵션"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_gender_option"
+                style="@style/Text14.Black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                tools:text="남자끼리 탑승하기"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_gender_option_title" />
+
+            <CheckBox
+                android:id="@+id/checkbox_gender_option"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/selector_checkbox"
+                android:button="@android:color/transparent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_gender_option_title" />
+
+            <TextView
+                android:id="@+id/tv_gender_option_guide"
+                style="@style/Text11.Red"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gender_option_false_guide_text"
+                app:layout_constraintTop_toBottomOf="@id/checkbox_gender_option"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="6dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_create"
+            style="@style/TextSubTitle.White.Bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="47dp"
+            android:background="@drawable/selector_button"
+            android:text="@string/complete"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:onClick="@{()->fragment.onClickCreate()}"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
