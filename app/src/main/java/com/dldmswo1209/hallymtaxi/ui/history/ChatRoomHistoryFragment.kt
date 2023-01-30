@@ -53,8 +53,6 @@ class ChatRoomHistoryFragment: Fragment() {
                 submitList(it)
             }
         }
-
-
     }
 
     fun onClickBack(){
