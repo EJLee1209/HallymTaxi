@@ -3,11 +3,9 @@
 학생들의 택시비를 절약해주기 위한 택시 카풀 프로젝트 한림 택시 입니다.
 
 # 📝 한림대 학생들 대상 설문조사
-![image](https://user-images.githubusercontent.com/101651909/215445083-988a6676-8e69-4f2f-b496-de60b7ead792.png)
-
-![image](https://user-images.githubusercontent.com/101651909/215445192-486059fa-96a0-4692-8485-1624e8db1c0c.png)
-
-![image](https://user-images.githubusercontent.com/101651909/215445352-c8927287-8f27-45d1-97e5-663c06d47302.png)
+<img src="https://user-images.githubusercontent.com/101651909/215445083-988a6676-8e69-4f2f-b496-de60b7ead792.png" width="50%"/>
+<img src="https://user-images.githubusercontent.com/101651909/215445192-486059fa-96a0-4692-8485-1624e8db1c0c.png" width="50%"/>
+<img src="https://user-images.githubusercontent.com/101651909/215445352-c8927287-8f27-45d1-97e5-663c06d47302.png" width="50%"/>
  
 |학생 인증|지도 api를 활용해 장소검색 제공|채팅방 생성 및 참여 가능|
 |:-:|:-:|:-:|
