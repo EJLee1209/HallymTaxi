@@ -7,6 +7,7 @@
 <img src="https://user-images.githubusercontent.com/101651909/215445192-486059fa-96a0-4692-8485-1624e8db1c0c.png" width="50%"/>
 <img src="https://user-images.githubusercontent.com/101651909/215445352-c8927287-8f27-45d1-97e5-663c06d47302.png" width="50%"/>
  
+# 📱 주요 기능 및 인터페이스
 |학생 인증|지도 api를 활용해 장소검색 제공|채팅방 생성 및 참여 가능|
 |:-:|:-:|:-:|
 |<img src="https://user-images.githubusercontent.com/101651909/215319350-d00babae-28f4-4d78-b122-fe8973402b6b.jpeg">|<img src="https://user-images.githubusercontent.com/101651909/215319345-8294a388-87a7-47e7-ace8-d3ad20c39d19.jpeg"/>|<img src="https://user-images.githubusercontent.com/101651909/215319351-e37e077c-ec7d-4309-abab-5477de8bfd64.jpeg">|
