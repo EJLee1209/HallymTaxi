@@ -98,6 +98,11 @@ class EmailVerifyFragment: Fragment() {
 
     fun clickVerifyBtn(){
         binding.etEmail.clearFocusAndHideKeyboard(requireContext())
+
+        if(!getNetworkAvailable()){
+            CustomDialog.checkNetworkDialog(parentFragmentManager)
+            return
+        }
         email = "${binding.etEmail.text}@hallym.ac.kr"
         viewModel.sendVerifyMail(email)
         binding.lottieLoading.visibility = View.VISIBLE
@@ -109,6 +114,8 @@ class EmailVerifyFragment: Fragment() {
         binding.etEmail.clearFocusAndHideKeyboard(requireContext())
         findNavController().popBackStack()
     }
+
+    private fun getNetworkAvailable() : Boolean = (activity as WelcomeActivity).isNetworkActivate
 
     override fun onDetach() {
         super.onDetach()

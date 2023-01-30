@@ -15,6 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
+import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.HashKeyStore
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
@@ -34,6 +35,10 @@ class MainActivity : AppCompatActivity() {
     private var navController : NavController? = null
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(application) }
     var joinedRoom: CarPoolRoom? = null
+    val checkNetwork by lazy{
+        CheckNetwork(this)
+    }
+    var isNetworkActivate = false
 
     //권한 가져오기
     companion object{
@@ -43,7 +48,6 @@ class MainActivity : AppCompatActivity() {
         )
         const val PERMISSION_REQUEST_CODE = 99
     }
-
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,13 +60,16 @@ class MainActivity : AppCompatActivity() {
         getUserInfo()
         bottomNavigationSetup()
 
-        val key = HashKeyStore.getKeyHashBase64(this)
-        Log.d("testt", "key : ${key}")
+//        val key = HashKeyStore.getKeyHashBase64(this)
+//        Log.d("testt", "key : ${key}")
     }
 
     private fun setObserver(){
         viewModel.getFcmToken().observe(this){
             Log.d("testt", "fcm token : ${it}")
+        }
+        checkNetwork.isConnected.observe(this){
+            isNetworkActivate = it
         }
     }
     private fun getUserInfo(){
@@ -93,8 +100,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     fun detachUserInfo() : User{
         return user
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkNetwork.registerNetworkListener()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        checkNetwork.unRegisterNetworkListener()
+
     }
 }

@@ -15,10 +15,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.common.KeyboardUtils
-import com.dldmswo1209.hallymtaxi.common.MetricsUtil
-import com.dldmswo1209.hallymtaxi.common.ViewMarginDynamicChanger
-import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
+import com.dldmswo1209.hallymtaxi.common.*
+import com.dldmswo1209.hallymtaxi.common.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.databinding.FragmentRegisterBinding
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.ui.compose.RegisterScreen
@@ -89,7 +87,11 @@ class RegisterFragment: Fragment() {
 
             val isCreated = viewModel.isCreatedUser.observeAsState(initial = false)
             val registerButtonClickCallback : (User, String)->(Unit) = { user, password->
-                viewModel.createUser(user, password)
+                if(!getNetworkAvailable()){
+                    checkNetworkDialog(parentFragmentManager)
+                }else {
+                    viewModel.createUser(user, password)
+                }
             }
 
             RegisterScreen(email = email, isCreated = isCreated.value, onClickRegister = registerButtonClickCallback) {
@@ -103,6 +105,8 @@ class RegisterFragment: Fragment() {
         // 백버튼 클릭시 초기 화면으로 돌아감
         findNavController().navigate(R.id.action_navigation_register_to_navigation_welcome)
     }
+
+    private fun getNetworkAvailable() : Boolean = (activity as WelcomeActivity).isNetworkActivate
 
     override fun onDetach() {
         super.onDetach()

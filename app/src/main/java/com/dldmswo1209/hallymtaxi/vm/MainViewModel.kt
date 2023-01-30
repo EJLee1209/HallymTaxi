@@ -74,9 +74,7 @@ class MainViewModel(
             if (isStartPoint) _startPoint.postValue(repository.searchKeyword(keyword))
             else _endPoint.postValue(repository.searchKeyword(keyword))
         } catch (e: Exception) {
-            Toast.makeText(this@MainViewModel.context, "네트워크 연결상태를 확인해주세요", Toast.LENGTH_SHORT)
-                .show()
-            e.printStackTrace()
+            networkErrorMessage(e)
         }
     }
 
@@ -232,5 +230,16 @@ class MainViewModel(
         return token
     }
 
+    private fun networkErrorMessage(e: Exception){
+        Toast.makeText(this@MainViewModel.context, "네트워크 연결상태를 확인해주세요", Toast.LENGTH_SHORT)
+            .show()
+        e.printStackTrace()
+    }
+
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("testt", "onCleared: ")
+    }
 
 }

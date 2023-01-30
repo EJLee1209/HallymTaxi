@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.CustomDialog
+import com.dldmswo1209.hallymtaxi.common.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
@@ -30,7 +31,7 @@ class SplashActivity : AppCompatActivity() {
         if(checkNetwork.getCurrentNetworkHasTransport()){
             checkLoginInfo()
         }else {
-            checkNetworkDialog()
+            checkNetworkDialog(supportFragmentManager)
             setObserver()
         }
     }
@@ -47,13 +48,6 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkNetworkDialog(){
-        val networkDialog = CustomDialog(
-            title = "네트워크 연결 실패",
-            content = "셀룰러 또는 와이파이를 연결해주세요",
-        )
-        networkDialog.show(supportFragmentManager, networkDialog.tag)
-    }
 
     private fun setObserver(){
         checkNetwork.isConnected.observe(this) {

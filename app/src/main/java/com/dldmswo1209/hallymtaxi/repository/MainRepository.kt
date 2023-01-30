@@ -1,8 +1,10 @@
 package com.dldmswo1209.hallymtaxi.repository
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.Chat
 import com.dldmswo1209.hallymtaxi.model.User
@@ -18,6 +20,7 @@ class MainRepository {
 
     private val client = KakaoApiClient.create()
     private val fireStore = Firebase.firestore
+
     suspend fun searchKeyword(keyword: String) = client.getSearchKeyword(query = keyword)
 
     fun getUserInfo(uid: String) : LiveData<User>{

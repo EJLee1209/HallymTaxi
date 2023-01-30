@@ -13,10 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.dldmswo1209.hallymtaxi.common.KeyboardUtils
-import com.dldmswo1209.hallymtaxi.common.MetricsUtil
-import com.dldmswo1209.hallymtaxi.common.ViewMarginDynamicChanger
-import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
+import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentEmailVerifyCodeBinding
 import com.dldmswo1209.hallymtaxi.model.STATUS_FAIL
 import com.dldmswo1209.hallymtaxi.model.STATUS_OK
@@ -133,7 +130,10 @@ class EmailVerifyCodeFragment: Fragment() {
     }
 
     fun clickVerifyBtn(){
-        Log.d("testt", "email : ${email}, code: ${copyCode}")
+        if(!getNetworkAvailable()){
+            CustomDialog.checkNetworkDialog(parentFragmentManager)
+            return
+        }
         viewModel.requestVerify(email, copyCode)
     }
 
@@ -142,10 +142,16 @@ class EmailVerifyCodeFragment: Fragment() {
     }
 
     fun clickSendAgainBtn(){
+        if(!getNetworkAvailable()){
+            CustomDialog.checkNetworkDialog(parentFragmentManager)
+            return
+        }
         viewModel.sendVerifyMail(email)
         binding.tvSendAgain.visibility = View.GONE
         viewModel.resetTimer()
     }
+
+    private fun getNetworkAvailable() : Boolean = (activity as WelcomeActivity).isNetworkActivate
 
     override fun onDetach() {
         super.onDetach()

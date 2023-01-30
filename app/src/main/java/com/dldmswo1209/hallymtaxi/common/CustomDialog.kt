@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import com.dldmswo1209.hallymtaxi.databinding.DialogAlreadyExistEmailBinding
 
 class CustomDialog(
@@ -43,5 +44,14 @@ class CustomDialog(
         negativeCallback()
     }
 
+    companion object{
+        fun checkNetworkDialog(fragmentManager: FragmentManager){
+            val networkDialog = CustomDialog(
+                title = "네트워크 연결 실패",
+                content = "셀룰러 또는 와이파이를 연결해주세요",
+            )
+            networkDialog.show(fragmentManager, networkDialog.tag)
+        }
+    }
 
 }

@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.*
+import com.dldmswo1209.hallymtaxi.common.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.databinding.FragmentLoginBinding
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
@@ -65,11 +66,16 @@ class LoginFragment: Fragment() {
     }
 
     fun clickLoginBtn(){
+        binding.etEmail.clearFocusAndHideKeyboard(requireContext())
+        binding.etPassword.clearFocusAndHideKeyboard(requireContext())
+
+        if(!getNetworkAvailable()){
+            checkNetworkDialog(parentFragmentManager)
+            return
+        }
         val email = binding.etEmail.text.toString()
         val password = binding.etPassword.text.toString()
         viewModel.login(email, password)
-        binding.etEmail.clearFocusAndHideKeyboard(requireContext())
-        binding.etPassword.clearFocusAndHideKeyboard(requireContext())
     }
 
     fun clickBackBtn(){
@@ -77,6 +83,9 @@ class LoginFragment: Fragment() {
         binding.etEmail.clearFocusAndHideKeyboard(requireContext())
         binding.etPassword.clearFocusAndHideKeyboard(requireContext())
     }
+
+    private fun getNetworkAvailable() : Boolean = (activity as WelcomeActivity).isNetworkActivate
+
 
     override fun onDetach() {
         super.onDetach()
