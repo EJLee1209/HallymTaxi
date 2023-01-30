@@ -23,7 +23,9 @@ class LoginFragment: Fragment() {
         ViewMarginDynamicChanger(requireContext())
     }
     private val viewModel : WelcomeViewModel by viewModels { ViewModelFactory(application = requireActivity().application) }
-    private val mainViewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
+    private val loadingDialog by lazy{
+        LoadingDialog(requireContext())
+    }
 
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
@@ -54,6 +56,7 @@ class LoginFragment: Fragment() {
         binding.etEmail.setFocusAndShowKeyboard(requireContext())
 
         viewModel.loginResult.observe(viewLifecycleOwner){
+            loadingDialog.dismiss()
             if(it){
                 // 로그인 성공
                 startActivity(Intent(requireContext(), SplashActivity::class.java))
@@ -76,6 +79,7 @@ class LoginFragment: Fragment() {
         val email = binding.etEmail.text.toString()
         val password = binding.etPassword.text.toString()
         viewModel.login(email, password)
+        loadingDialog.show()
     }
 
     fun clickBackBtn(){

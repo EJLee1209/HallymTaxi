@@ -43,6 +43,9 @@ class RegisterFragment: Fragment() {
             }
         }
     }
+    private val loadingDialog by lazy{
+        LoadingDialog(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,11 +89,15 @@ class RegisterFragment: Fragment() {
         binding.composeViewRegisterArea.setContent {
 
             val isCreated = viewModel.isCreatedUser.observeAsState(initial = false)
+            if(isCreated.value){
+                loadingDialog.dismiss()
+            }
             val registerButtonClickCallback : (User, String)->(Unit) = { user, password->
                 if(!getNetworkAvailable()){
                     checkNetworkDialog(parentFragmentManager)
                 }else {
                     viewModel.createUser(user, password)
+                    loadingDialog.show()
                 }
             }
 

@@ -46,6 +46,9 @@ class EmailVerifyCodeFragment: Fragment() {
             }
         }
     }
+    private val loadingDialog by lazy{
+        LoadingDialog(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,6 +81,7 @@ class EmailVerifyCodeFragment: Fragment() {
 
     private fun setObserver(){
         viewModel.isVerified.observe(viewLifecycleOwner){
+            loadingDialog.dismiss()
             when(it.status){
                 STATUS_OK->{
                     if(it.message == "인증이 완료되었습니다."){
@@ -135,6 +139,7 @@ class EmailVerifyCodeFragment: Fragment() {
             return
         }
         viewModel.requestVerify(email, copyCode)
+        loadingDialog.show()
     }
 
     fun clickBackBtn(){

@@ -37,6 +37,9 @@ class EmailVerifyFragment: Fragment() {
             }
         }
     }
+    private val loadingDialog by lazy{
+        LoadingDialog(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,9 +93,7 @@ class EmailVerifyFragment: Fragment() {
                 findNavController().navigate(action)
             }
             isSentPrevious = true
-            binding.lottieLoading.visibility = View.GONE
-            binding.btnVerify.isEnabled = true
-            binding.btnBack.isEnabled = true
+            loadingDialog.dismiss()
         }
     }
 
@@ -105,9 +106,8 @@ class EmailVerifyFragment: Fragment() {
         }
         email = "${binding.etEmail.text}@hallym.ac.kr"
         viewModel.sendVerifyMail(email)
-        binding.lottieLoading.visibility = View.VISIBLE
-        binding.btnVerify.isEnabled = false
-        binding.btnBack.isEnabled = false
+        loadingDialog.show()
+
     }
 
     fun clickBackBtn(){
