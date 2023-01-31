@@ -177,9 +177,9 @@ class MainRepository {
         fireStore.collection("Room").document(room.roomId).update(updateMap)
     }
 
-    fun saveHistory(uid: String, room: CarPoolRoom, messageList: List<Chat>){
-        val ref = fireStore.collection("History").document(uid).collection("user_history").document(room.roomId)
-        ref.set(room).addOnSuccessListener {
+    fun saveHistory(uid: String, roomInfo: RoomInfo, messageList: List<Chat>){
+        val ref = fireStore.collection("History").document(uid).collection("user_history").document(roomInfo.roomId)
+        ref.set(roomInfo).addOnSuccessListener {
             messageList.forEach {chat->
                 ref.collection("Chat").document(chat.chat_key).set(chat)
             }

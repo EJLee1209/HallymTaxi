@@ -209,8 +209,8 @@ class MainViewModel(
         sharedPreferences.edit().putString("joinedRoom", "").apply()
     }
 
-    fun saveHistory(room: CarPoolRoom, messageList: List<Chat>) {
-        repository.saveHistory(uid, room, messageList)
+    fun saveHistory(roomInfo: RoomInfo, messageList: List<Chat>) {
+        repository.saveHistory(uid, roomInfo, messageList)
     }
 
     fun detachHistory(): LiveData<List<RoomInfo>> {

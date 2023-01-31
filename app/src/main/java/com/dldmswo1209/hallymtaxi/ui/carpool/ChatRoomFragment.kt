@@ -20,6 +20,7 @@ import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.Chat
+import com.dldmswo1209.hallymtaxi.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
@@ -107,8 +108,10 @@ class ChatRoomFragment: Fragment() {
 
     private fun setObserver(){
         viewModel.detachRoom(room.roomId).observe(viewLifecycleOwner){
-            binding.tvUserCount.text = "인원 ${it.userCount}명"
-            this.room = it
+            it?.let {
+                binding.tvUserCount.text = "인원 ${it.userCount}명"
+                this.room = it
+            }
         }
 
         binding.rvMessage.adapter = chatListAdapter.apply {
@@ -185,7 +188,9 @@ class ChatRoomFragment: Fragment() {
                             messages.forEach {chat->
                                 if(!chat.joinMsg && !chat.exitMsg && chat.userInfo.uid == currentUser.uid){
                                     // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
-                                    viewModel.saveHistory(room, messages)
+                                    val lastMsg = messages.last()
+                                    val roomInfo = RoomInfo(room.roomId, lastMsg.msg, lastMsg.dateTime, lastMsg.chat_key, room.startPlace, room.endPlace)
+                                    viewModel.saveHistory(roomInfo, messages)
                                     return@forEach
                                 }
                             }
