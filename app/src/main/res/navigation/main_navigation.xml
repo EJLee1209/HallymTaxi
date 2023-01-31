@@ -78,7 +78,7 @@
         android:name="com.dldmswo1209.hallymtaxi.ui.history.ChatRoomHistoryFragment"
         android:label="ChatRoomHistoryFragment" >
         <argument
-            android:name="room"
-            app:argType="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
+            android:name="roomInfo"
+            app:argType="com.dldmswo1209.hallymtaxi.model.RoomInfo" />
     </fragment>
 </navigation>

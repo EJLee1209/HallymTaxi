@@ -9,9 +9,6 @@ data class CarPoolRoom(
     var user2: User? = null,
     var user3: User? = null,
     var user4: User? = null,
-    var lastMsg: String = "", // 가장 최근에 받은 메세지
-    var lastReceiveMsgDateTime: String = "", // 가장 최근에 메세지를 받은 시간
-    var lastChatKey: String = "", // 가장 최근에 받은 메세지의 key (새로운 메세지가 왔는지 확인하기 위함)
     var userMaxCount : Int = 4, // 제한 인원
     var userCount: Int = 1, // 현재 참여 유저 수
     val startPlace: Place = Place(),

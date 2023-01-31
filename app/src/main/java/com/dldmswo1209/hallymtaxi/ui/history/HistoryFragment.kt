@@ -13,6 +13,7 @@ import com.dldmswo1209.hallymtaxi.common.TimeService
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentHistoryBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
+import com.dldmswo1209.hallymtaxi.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
@@ -50,23 +51,21 @@ class HistoryFragment : Fragment() {
 
     private fun setObservers() {
         joinedRoom?.let {
-            viewModel.detachRoom(it.roomId).observe(viewLifecycleOwner) { room ->
-                binding.room = room
+            viewModel.detachRoomInfo(it.roomId).observe(viewLifecycleOwner) { room ->
+                binding.roomInfo = room
                 binding.layoutCurrentJoinedRoom.visibility = View.VISIBLE
                 if (room.lastChatKey != lastChatKey) { // 새로운 메세지가 옴
                     binding.ivNewChat.visibility = View.VISIBLE
                 } else {
                     binding.ivNewChat.visibility = View.GONE
                 }
-
-                joinedRoom = room
             }
         }
 
-        HistoryListAdapter { room ->
+        HistoryListAdapter { roomInfo ->
             // 히스토리 클릭 이벤트
             val action =
-                HistoryFragmentDirections.actionNavigationHistoryToChatRoomHistoryFragment(room)
+                HistoryFragmentDirections.actionNavigationHistoryToChatRoomHistoryFragment(roomInfo)
             findNavController().navigate(action)
         }.apply {
             viewModel.detachHistory().observe(viewLifecycleOwner) { poolList ->
@@ -81,8 +80,8 @@ class HistoryFragment : Fragment() {
             }
         }
     }
-    private fun sortedWithDate(poolList: List<CarPoolRoom>) : List<CarPoolRoom>{
-        return poolList.sortedWith(compareBy<CarPoolRoom> {
+    private fun sortedWithDate(poolList: List<RoomInfo>) : List<RoomInfo>{
+        return poolList.sortedWith(compareBy<RoomInfo> {
             TimeService.dateTimeSplitHelper(it.lastReceiveMsgDateTime, "year")}
             .thenBy { TimeService.dateTimeSplitHelper(it.lastReceiveMsgDateTime, "month") }
             .thenBy { TimeService.dateTimeSplitHelper(it.lastReceiveMsgDateTime, "day") }

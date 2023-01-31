@@ -27,12 +27,11 @@ class RegisterFragment: Fragment() {
     private lateinit var binding: FragmentRegisterBinding
     private var email = ""
     private val viewModel : WelcomeViewModel by viewModels { ViewModelFactory(application = requireActivity().application) }
+    private lateinit var callback: OnBackPressedCallback
 
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
         ViewMarginDynamicChanger(requireContext())
     }
-    private lateinit var callback: OnBackPressedCallback
-
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드가 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {

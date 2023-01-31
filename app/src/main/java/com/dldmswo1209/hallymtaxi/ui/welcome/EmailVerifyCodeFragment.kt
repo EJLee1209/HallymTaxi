@@ -24,14 +24,14 @@ import kotlin.concurrent.timer
 
 class EmailVerifyCodeFragment: Fragment() {
     private lateinit var binding: FragmentEmailVerifyCodeBinding
-    private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
-        ViewMarginDynamicChanger(requireContext())
-    }
     private val viewModel : WelcomeViewModel by viewModels { ViewModelFactory(application = requireActivity().application) }
     private var email = ""
     private var copyCode = ""
     private var codeEffectiveTimer: Timer? = null
 
+    private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
+        ViewMarginDynamicChanger(requireContext())
+    }
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {

@@ -16,7 +16,6 @@ import com.dldmswo1209.hallymtaxi.model.User
 class ChatListAdapter(
     private val currentUser: User,
 ) : ListAdapter<Chat, RecyclerView.ViewHolder>(diffUtil) {
-
     override fun getItemViewType(position: Int): Int {
         val item = currentList[position]
         return when {

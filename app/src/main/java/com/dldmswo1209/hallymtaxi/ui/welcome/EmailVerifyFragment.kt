@@ -16,13 +16,15 @@ import com.dldmswo1209.hallymtaxi.vm.WelcomeViewModel
 
 class EmailVerifyFragment: Fragment() {
     private lateinit var binding: FragmentEmailVerifyBinding
-    private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
-        ViewMarginDynamicChanger(requireContext())
-    }
     private val viewModel : WelcomeViewModel by viewModels { ViewModelFactory(application = requireActivity().application) }
     private var email: String = ""
     private var isSentPrevious = false // 다음 화면으로 넘어갔다가 다시 돌아온 경우를 거르기 위한 플래그
-
+    private val loadingDialog by lazy{
+        LoadingDialog(requireContext())
+    }
+    private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
+        ViewMarginDynamicChanger(requireContext())
+    }
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드가 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {
@@ -36,9 +38,6 @@ class EmailVerifyFragment: Fragment() {
                 changeConstraintMarginTopBottom(binding.tvRegisterTitle,0,0,tvRegisterTitleOriginalTopMarginValue,tvRegisterTitleSmallTopMarginValue, isVisible)
             }
         }
-    }
-    private val loadingDialog by lazy{
-        LoadingDialog(requireContext())
     }
 
     override fun onCreateView(

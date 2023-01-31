@@ -7,16 +7,17 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dldmswo1209.hallymtaxi.databinding.ItemHistoryBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
+import com.dldmswo1209.hallymtaxi.model.RoomInfo
 
 class HistoryListAdapter(
-    val onClick: (CarPoolRoom)->Unit
-): ListAdapter<CarPoolRoom, HistoryListAdapter.HistoryViewHolder>(diffUtil) {
+    val onClick: (RoomInfo)->Unit
+): ListAdapter<RoomInfo, HistoryListAdapter.HistoryViewHolder>(diffUtil) {
 
     inner class HistoryViewHolder(val binding: ItemHistoryBinding) : RecyclerView.ViewHolder(binding.root){
-        fun bind(room: CarPoolRoom){
-            binding.room = room
+        fun bind(roomInfo: RoomInfo){
+            binding.roomInfo = roomInfo
             binding.root.setOnClickListener {
-                onClick(room)
+                onClick(roomInfo)
             }
             binding.executePendingBindings()
         }
@@ -31,12 +32,12 @@ class HistoryListAdapter(
     }
 
     companion object{
-        private val diffUtil = object: DiffUtil.ItemCallback<CarPoolRoom>(){
-            override fun areItemsTheSame(oldItem: CarPoolRoom, newItem: CarPoolRoom): Boolean {
+        private val diffUtil = object: DiffUtil.ItemCallback<RoomInfo>(){
+            override fun areItemsTheSame(oldItem: RoomInfo, newItem: RoomInfo): Boolean {
                 return oldItem.roomId == newItem.roomId
             }
 
-            override fun areContentsTheSame(oldItem: CarPoolRoom, newItem: CarPoolRoom): Boolean {
+            override fun areContentsTheSame(oldItem: RoomInfo, newItem: RoomInfo): Boolean {
                 return oldItem == newItem
             }
 

@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="room"
-            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
+            name="room_info"
+            type="com.dldmswo1209.hallymtaxi.model.RoomInfo" />
 
         <variable
             name="fragment"
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="18dp"
-                android:text="@{room.startPlace.place_name}"
+                android:text="@{room_info.startPlace.place_name}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="한림대학교 대학본부" />
@@ -77,7 +77,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1.4dp"
-                android:text="@{room.endPlace.place_name}"
+                android:text="@{room_info.endPlace.place_name}"
                 app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
                 app:layout_constraintTop_toBottomOf="@id/tv_start_place_name"
                 tools:text="춘천역 경춘선" />
@@ -92,7 +92,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:paddingBottom="17dp"
-                android:text="@{room.lastMsg}"
+                android:text="@{room_info.lastMsg}"
                 app:layout_constraintEnd_toStartOf="@id/iv_new_chat"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_end_place_name"
@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="17dp"
                 android:layout_marginEnd="14dp"
-                time="@{room.lastReceiveMsgDateTime}"
+                time="@{room_info.lastReceiveMsgDateTime}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="오후 03:12" />

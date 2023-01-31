@@ -85,7 +85,7 @@ class ChatRoomFragment: Fragment() {
             val msg = binding.etMsg.text.toString()
 
             val chat = Chat(userInfo = currentUser, msg= msg, dateTime = LocalDateTime.now().toString())
-            viewModel.sendMessage(room.roomId, chat)
+            viewModel.sendMessage(room, chat)
 
             binding.etMsg.text.clear()
         }
@@ -189,7 +189,7 @@ class ChatRoomFragment: Fragment() {
                                     return@forEach
                                 }
                             }
-                            viewModel.sendMessage(room.roomId, Chat(userInfo = currentUser, msg = "${currentUser.name}님이 나갔습니다", exitMsg = true, dateTime = LocalDateTime.now().toString()))
+                            viewModel.sendMessage(room, Chat(userInfo = currentUser, msg = "${currentUser.name}님이 나갔습니다", exitMsg = true, dateTime = LocalDateTime.now().toString()))
                             onClickBack()
                         }
                     )

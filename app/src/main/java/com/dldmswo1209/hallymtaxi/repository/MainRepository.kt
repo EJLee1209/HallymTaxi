@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.Chat
+import com.dldmswo1209.hallymtaxi.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.retrofit.KakaoApiClient
 import com.google.firebase.firestore.ktx.firestore
@@ -45,7 +46,7 @@ class MainRepository {
         room.roomId = ref.id
         ref.set(room).addOnSuccessListener {
             newRoom.value = room
-            sendMessage(roomId = room.roomId, chat = Chat(userInfo = user, joinMsg = true, dateTime = LocalDateTime.now().toString()))
+            sendMessage(room = room, chat = Chat(userInfo = user, joinMsg = true, dateTime = LocalDateTime.now().toString()))
         }
 
         return newRoom
@@ -108,7 +109,7 @@ class MainRepository {
                                     val fetchedRoom = it.result.toObject<CarPoolRoom>() ?: return@addOnCompleteListener
                                     if(fetchedRoom.user1?.uid == user.uid || fetchedRoom.user2?.uid == user.uid || fetchedRoom.user3?.uid == user.uid || fetchedRoom.user4?.uid == user.uid){
                                         result.postValue(true)
-                                        sendMessage(roomId = room.roomId, chat = Chat(userInfo = user, msg = "${user.name}님이 입장했습니다" ,joinMsg = true, dateTime = LocalDateTime.now().toString()))
+                                        sendMessage(room = room, chat = Chat(userInfo = user, msg = "${user.name}님이 입장했습니다" ,joinMsg = true, dateTime = LocalDateTime.now().toString()))
                                     }
 
                                     else result.postValue(false)
@@ -130,21 +131,28 @@ class MainRepository {
         return result
     }
 
-    fun sendMessage(roomId: String, chat: Chat){
+    fun sendMessage(room: CarPoolRoom, chat: Chat){
         val timeStamp = Timestamp(System.currentTimeMillis())
         val chatKey = java.lang.String.valueOf(timeStamp.time)
-        var updateRoomMap = mapOf<String, Any>(
-            "lastMsg" to chat.msg,
-            "lastReceiveMsgDateTime" to chat.dateTime,
-            "lastChatKey" to chatKey
+
+        val ref = fireStore.collection("Room").document(room.roomId).collection("Chat").document(chatKey)
+        chat.chat_key = chatKey
+        ref.set(chat)
+
+        updateRoomInfo(room, chat)
+    }
+
+    private fun updateRoomInfo(room: CarPoolRoom, chat: Chat){
+        val roomInfo = RoomInfo(
+            room.roomId,
+            chat.msg,
+            chat.dateTime,
+            chat.chat_key,
+            room.startPlace,
+            room.endPlace
         )
 
-        fireStore.collection("Room").document(roomId).update(updateRoomMap)
-
-        val ref = fireStore.collection("Room").document(roomId).collection("Chat").document(chatKey)
-        chat.chat_key = chatKey
-
-        ref.set(chat)
+        fireStore.collection("RoomInfo").document(room.roomId).set(roomInfo)
     }
 
     // 채팅방 삭제(모든 참여자가 퇴장한 경우)
@@ -178,16 +186,16 @@ class MainRepository {
         }
     }
 
-    fun detachHistory(uid: String) : LiveData<List<CarPoolRoom>>{
-        val historyList = MutableLiveData<List<CarPoolRoom>>()
+    fun detachHistory(uid: String) : LiveData<List<RoomInfo>>{
+        val historyList = MutableLiveData<List<RoomInfo>>()
         fireStore.collection("History").document(uid).collection("user_history").get().addOnSuccessListener {
             if(it == null){
                 Log.d("testt", "detachHistory: null")
                 return@addOnSuccessListener
             }
-            val dataList = mutableListOf<CarPoolRoom>()
+            val dataList = mutableListOf<RoomInfo>()
             it.forEach { data->
-                val room = data.toObject<CarPoolRoom>()
+                val room = data.toObject<RoomInfo>()
                 dataList.add(room)
             }
             Log.d("testt", "detachHistory()")

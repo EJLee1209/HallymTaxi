@@ -13,10 +13,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dldmswo1209.hallymtaxi.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.context
-import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
-import com.dldmswo1209.hallymtaxi.model.Chat
-import com.dldmswo1209.hallymtaxi.model.ResultSearchKeyword
-import com.dldmswo1209.hallymtaxi.model.User
+import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.repository.MainRepository
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.ktx.auth
@@ -41,6 +38,7 @@ class MainViewModel(
     private var messageListener: ListenerRegistration? = null
     private var historyMessageListener: ListenerRegistration? = null
     private var roomListener: ListenerRegistration? = null
+    private var roomInfoListener: ListenerRegistration? = null
 
 
     private var _startPoint = MutableLiveData<ResultSearchKeyword>()
@@ -112,8 +110,8 @@ class MainViewModel(
         }
     }
 
-    fun sendMessage(roomId: String, chat: Chat) {
-        repository.sendMessage(roomId, chat)
+    fun sendMessage(room: CarPoolRoom, chat: Chat) {
+        repository.sendMessage(room, chat)
     }
 
     fun detachRoom(roomId: String): LiveData<CarPoolRoom> { // 현재 내가 참여 중인 채팅방을 실시간으로 가져옴
@@ -137,7 +135,22 @@ class MainViewModel(
         return room
     }
 
+    fun detachRoomInfo(roomId: String) : LiveData<RoomInfo>{
+        val roomInfo = MutableLiveData<RoomInfo>()
 
+        roomInfoListener = fireStore.collection("RoomInfo").document(roomId).addSnapshotListener { value, error ->
+            if (error != null) {
+                Log.d("testt", "detachRoomInfo: ${error}")
+                return@addSnapshotListener
+            }
+            value?.let { snapshot ->
+                roomInfo.value = snapshot.toObject<RoomInfo>()
+            }
+
+            Log.d("testt", "detachRoomInfo")
+        }
+        return roomInfo
+    }
 
     fun getMessage(roomId: String): LiveData<List<Chat>> {
         val chatList = MutableLiveData<List<Chat>>()
@@ -200,8 +213,8 @@ class MainViewModel(
         repository.saveHistory(uid, room, messageList)
     }
 
-    fun detachHistory(): LiveData<List<CarPoolRoom>> {
-        val historyList = MutableLiveData<List<CarPoolRoom>>()
+    fun detachHistory(): LiveData<List<RoomInfo>> {
+        val historyList = MutableLiveData<List<RoomInfo>>()
 
         repository.detachHistory(uid).observeForever {
             historyList.postValue(it)
@@ -213,6 +226,7 @@ class MainViewModel(
         messageListener?.remove()
         roomListener?.remove()
         historyMessageListener?.remove()
+        roomInfoListener?.remove()
     }
 
     fun getFcmToken(): LiveData<String> {
@@ -240,6 +254,7 @@ class MainViewModel(
     override fun onCleared() {
         super.onCleared()
         Log.d("testt", "onCleared: ")
+        allListenerRemove()
     }
 
 }

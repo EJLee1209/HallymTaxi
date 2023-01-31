@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     private var navController : NavController? = null
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(application) }
     var joinedRoom: CarPoolRoom? = null
-    val checkNetwork by lazy{
+    private val checkNetwork by lazy{
         CheckNetwork(this)
     }
     var isNetworkActivate = false

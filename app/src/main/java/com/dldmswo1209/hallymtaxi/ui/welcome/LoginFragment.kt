@@ -19,14 +19,13 @@ import kotlinx.coroutines.*
 
 class LoginFragment: Fragment() {
     private lateinit var binding: FragmentLoginBinding
-    private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
-        ViewMarginDynamicChanger(requireContext())
-    }
     private val viewModel : WelcomeViewModel by viewModels { ViewModelFactory(application = requireActivity().application) }
     private val loadingDialog by lazy{
         LoadingDialog(requireContext())
     }
-
+    private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
+        ViewMarginDynamicChanger(requireContext())
+    }
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             val tvLoginTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireContext())
