@@ -7,5 +7,6 @@ data class User(
     var uid: String = "",
     val email: String = "",
     val name: String = "",
-    val gender: String = ""
+    val gender: String = "",
+    var fcmToken: String = "",
 ): java.io.Serializable

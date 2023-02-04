@@ -9,7 +9,6 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface MainServerApiClient {
-
     // 인증 요청 생성
     @POST("api/email/create")
     suspend fun sendVerifyMail(
@@ -30,13 +29,12 @@ interface MainServerApiClient {
     ): VerifyInfo
 
     companion object{
-        fun create() : MainServerApiClient{
+        fun create() : MainServerApiClient {
             return Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(MainServerApiClient::class.java)
         }
-
     }
 }

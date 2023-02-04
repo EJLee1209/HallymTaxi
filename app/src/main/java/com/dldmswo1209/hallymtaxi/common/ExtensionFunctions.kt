@@ -11,6 +11,8 @@ import android.widget.NumberPicker
 import android.widget.TimePicker
 import androidx.lifecycle.AndroidViewModel
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 fun EditText.setFocusAndShowKeyboard(context: Context) {
     this.requestFocus()
@@ -63,4 +65,10 @@ fun TimePicker.getMinute(): Int {
         picker.findViewById(Resources.getSystem().getIdentifier("minute", "id", "android"))
 
     return minutePicker.value * INTERVAL
+}
+
+
+fun Date.dateToString(format: String = "yyyy-MM-dd HH:mm:ss", local : Locale = Locale.getDefault()): String{
+    val formatter = SimpleDateFormat(format, local)
+    return formatter.format(this)
 }

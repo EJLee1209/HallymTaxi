@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.dldmswo1209.hallymtaxi.repository.MainRepository
+import com.dldmswo1209.hallymtaxi.repository.RoomRepository
 import com.dldmswo1209.hallymtaxi.repository.WelcomeRepository
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.dldmswo1209.hallymtaxi.vm.WelcomeViewModel
@@ -16,8 +17,9 @@ class ViewModelFactory(val application: Application):ViewModelProvider.Factory {
                 WelcomeViewModel(welcomeRepository, application) as T
             }
             modelClass.isAssignableFrom(MainViewModel::class.java) ->{
-                val mainRepository = MainRepository()
-                MainViewModel(mainRepository, application) as T
+                val mainRepository = MainRepository(application.applicationContext)
+                val roomRepository = RoomRepository(application.applicationContext)
+                MainViewModel(mainRepository, roomRepository, application) as T
             }
 
             else->{

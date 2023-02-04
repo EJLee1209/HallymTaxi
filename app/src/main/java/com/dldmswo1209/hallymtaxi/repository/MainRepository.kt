@@ -4,22 +4,20 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.dldmswo1209.hallymtaxi.common.CheckNetwork
-import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
-import com.dldmswo1209.hallymtaxi.model.Chat
-import com.dldmswo1209.hallymtaxi.model.RoomInfo
-import com.dldmswo1209.hallymtaxi.model.User
-import com.dldmswo1209.hallymtaxi.retrofit.KakaoApiClient
+import com.dldmswo1209.hallymtaxi.database.AppDatabase
+import com.dldmswo1209.hallymtaxi.model.*
+import com.dldmswo1209.hallymtaxi.retrofit.*
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
-import java.sql.Timestamp
 import java.time.LocalDateTime
 
-class MainRepository {
+class MainRepository(val context: Context) {
 
     private val client = KakaoApiClient.create()
+    private val fcmClient = FcmServerApiClient.create()
     private val fireStore = Firebase.firestore
 
     suspend fun searchKeyword(keyword: String) = client.getSearchKeyword(query = keyword)
@@ -46,7 +44,9 @@ class MainRepository {
         room.roomId = ref.id
         ref.set(room).addOnSuccessListener {
             newRoom.value = room
-            sendMessage(room = room, chat = Chat(userInfo = user, joinMsg = true, dateTime = LocalDateTime.now().toString()))
+            CoroutineScope(Dispatchers.Main).launch {
+                sendMessage(room = room, chat = Chat(roomId = room.roomId, userId = user.uid, messageType = CHAT_JOIN), user)
+            }
         }
 
         return newRoom
@@ -70,7 +70,6 @@ class MainRepository {
         }
 
         return rooms
-
     }
 
     fun joinRoom(room: CarPoolRoom, user: User): LiveData<Boolean>{
@@ -109,7 +108,9 @@ class MainRepository {
                                     val fetchedRoom = it.result.toObject<CarPoolRoom>() ?: return@addOnCompleteListener
                                     if(fetchedRoom.user1?.uid == user.uid || fetchedRoom.user2?.uid == user.uid || fetchedRoom.user3?.uid == user.uid || fetchedRoom.user4?.uid == user.uid){
                                         result.postValue(true)
-                                        sendMessage(room = room, chat = Chat(userInfo = user, msg = "${user.name}님이 입장했습니다" ,joinMsg = true, dateTime = LocalDateTime.now().toString()))
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            sendMessage(room = room, chat = Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user)
+                                        }
                                     }
 
                                     else result.postValue(false)
@@ -131,13 +132,39 @@ class MainRepository {
         return result
     }
 
-    fun sendMessage(room: CarPoolRoom, chat: Chat){
-        val timeStamp = Timestamp(System.currentTimeMillis())
-        val chatKey = java.lang.String.valueOf(timeStamp.time)
-
-        val ref = fireStore.collection("Room").document(room.roomId).collection("Chat").document(chatKey)
-        chat.chat_key = chatKey
+    suspend fun sendMessage(room: CarPoolRoom, chat: Chat, currentUser: User){
+        val ref = fireStore.collection("Room").document(room.roomId).collection("Chat").document()
+        chat.id = ref.id
         ref.set(chat)
+        CoroutineScope(Dispatchers.IO).launch {
+            RoomRepository(context).saveChat(chat)
+        }
+
+        val pushBody = PushBody(
+            token = "",
+            roomId = room.roomId,
+            userId = chat.userId,
+            userName = currentUser.name,
+            message = chat.msg,
+            id = chat.id,
+            messageType = chat.messageType,
+        )
+        if(room.user1 != null && room.user1?.uid != chat.userId){
+            pushBody.token = room.user1!!.fcmToken
+            sendPushMessage(pushBody)
+        }
+        if(room.user2 != null && room.user2?.uid != chat.userId){
+            pushBody.token = room.user2!!.fcmToken
+            sendPushMessage(pushBody)
+        }
+        if(room.user3 != null && room.user3?.uid != chat.userId){
+            pushBody.token = room.user3!!.fcmToken
+            sendPushMessage(pushBody)
+        }
+        if(room.user4 != null && room.user4?.uid != chat.userId){
+            pushBody.token = room.user4!!.fcmToken
+            sendPushMessage(pushBody)
+        }
 
         updateRoomInfo(room, chat)
     }
@@ -147,7 +174,7 @@ class MainRepository {
             room.roomId,
             chat.msg,
             chat.dateTime,
-            chat.chat_key,
+            chat.id,
             room.startPlace,
             room.endPlace
         )
@@ -156,8 +183,15 @@ class MainRepository {
     }
 
     // 채팅방 삭제(모든 참여자가 퇴장한 경우)
-    fun deleteRoom(roomId: String){
-        fireStore.collection("Room").document(roomId).delete()
+    private fun deleteRoom(roomId: String){
+        fireStore.collection("Room").document(roomId).delete().addOnSuccessListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                withContext(Dispatchers.Default) {
+                    delay(1000)
+                }
+                fireStore.collection("RoomInfo").document(roomId).delete()
+            }
+        }
     }
 
     // 채팅방 퇴장
@@ -181,7 +215,7 @@ class MainRepository {
         val ref = fireStore.collection("History").document(uid).collection("user_history").document(roomInfo.roomId)
         ref.set(roomInfo).addOnSuccessListener {
             messageList.forEach {chat->
-                ref.collection("Chat").document(chat.chat_key).set(chat)
+                ref.collection("Chat").document(chat.id).set(chat)
             }
         }
     }
@@ -204,4 +238,10 @@ class MainRepository {
 
         return historyList
     }
+
+    fun updateFcmToken(uid: String, token: String){
+        fireStore.collection("User").document(uid).update(mapOf("fcmToken" to token))
+    }
+
+    suspend fun sendPushMessage(pushBody: PushBody) = fcmClient.sendPushMessage(pushBody)
 }

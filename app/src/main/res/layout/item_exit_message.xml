@@ -24,7 +24,7 @@
             android:gravity="center"
             android:maxLines="1"
             tools:text="- 사용자 3님이 나갔습니다 -"
-            android:text="@{@string/exit_message_format(chat.userInfo.name)}"/>
+            android:text="@{chat.msg}"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,12 +10,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomHistoryBinding
-import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.ChatListAdapter
-import com.dldmswo1209.hallymtaxi.ui.carpool.ChatRoomFragmentArgs
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 
 class ChatRoomHistoryFragment: Fragment() {
@@ -47,12 +45,12 @@ class ChatRoomHistoryFragment: Fragment() {
 
         binding.tvRoomTitle.text = "${roomInfo.startPlace.place_name} - ${roomInfo.endPlace.place_name}"
 
-        ChatListAdapter(user).apply {
-            viewModel.getHistoryMessage(roomInfo.roomId).observe(viewLifecycleOwner){
-                binding.rvMessage.adapter = this
-                submitList(it)
-            }
-        }
+//        ChatListAdapter(user,).apply {
+//            viewModel.getHistoryMessage(roomInfo.roomId).observe(viewLifecycleOwner){
+//                binding.rvMessage.adapter = this
+//                submitList(it)
+//            }
+//        }
     }
 
     fun onClickBack(){

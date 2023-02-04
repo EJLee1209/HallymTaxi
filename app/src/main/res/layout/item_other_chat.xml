@@ -8,6 +8,9 @@
         <variable
             name="chat"
             type="com.dldmswo1209.hallymtaxi.model.Chat" />
+        <variable
+            name="user"
+            type="com.dldmswo1209.hallymtaxi.model.User" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,12 +23,13 @@
             style="@style/Text13.Black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{chat.userInfo.name}"
+            android:text="@{user.name}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="사용자1" />
 
         <TextView
+            android:id="@+id/tv_time"
             style="@style/Text12.Blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

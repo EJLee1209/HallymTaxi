@@ -5,24 +5,26 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Recycler
+import com.dldmswo1209.hallymtaxi.common.TimeService
+import com.dldmswo1209.hallymtaxi.common.dateToString
 import com.dldmswo1209.hallymtaxi.databinding.ItemExitMessageBinding
 import com.dldmswo1209.hallymtaxi.databinding.ItemJoinMessageBinding
 import com.dldmswo1209.hallymtaxi.databinding.ItemMyChatBinding
 import com.dldmswo1209.hallymtaxi.databinding.ItemOtherChatBinding
-import com.dldmswo1209.hallymtaxi.model.Chat
-import com.dldmswo1209.hallymtaxi.model.User
+import com.dldmswo1209.hallymtaxi.model.*
+
+// 유저리스트를 넣어주면 될듯
 
 class ChatListAdapter(
     private val currentUser: User,
+    var userList: List<User?>
 ) : ListAdapter<Chat, RecyclerView.ViewHolder>(diffUtil) {
     override fun getItemViewType(position: Int): Int {
         val item = currentList[position]
-        return when {
-            item.joinMsg -> JOINED_MESSAGE
-            item.exitMsg -> EXIT_MESSAGE
-            item.userInfo.uid == currentUser.uid -> MY_CHAT
-            item.userInfo.uid != currentUser.uid -> OTHER_CHAT
+        return when(item.messageType) {
+            CHAT_JOIN -> JOINED_MESSAGE
+            CHAT_EXIT -> EXIT_MESSAGE
+            CHAT_NORMAL -> if(item.userId == currentUser.uid) MY_CHAT else OTHER_CHAT
             else -> -1
         }
     }
@@ -31,6 +33,7 @@ class ChatListAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(chat: Chat) {
             binding.chat = chat
+//            binding.tvTime.text = TimeService.currentTime(chat.dateTime.toDate().dateToString())
             binding.executePendingBindings()
         }
     }
@@ -39,6 +42,13 @@ class ChatListAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(chat: Chat) {
             binding.chat = chat
+//            binding.tvTime.text = TimeService.currentTime(chat.dateTime.toDate().dateToString())
+            userList.forEach {
+                if(chat.userId == it?.uid) {
+                    binding.user = it
+                    return@forEach
+                }
+            }
             binding.executePendingBindings()
         }
     }
@@ -126,7 +136,7 @@ class ChatListAdapter(
 
         private val diffUtil = object : DiffUtil.ItemCallback<Chat>() {
             override fun areItemsTheSame(oldItem: Chat, newItem: Chat): Boolean {
-                return oldItem.chat_key == newItem.chat_key
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: Chat, newItem: Chat): Boolean {

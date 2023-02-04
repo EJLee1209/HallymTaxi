@@ -16,11 +16,12 @@
         android:paddingBottom="14dp">
 
         <TextView
+            android:id="@+id/tv_time"
             style="@style/Text12.Blue"
+            time="@{chat.dateTime}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
-            time="@{chat.dateTime}"
             app:layout_constraintBottom_toBottomOf="@id/tv_message"
             app:layout_constraintEnd_toStartOf="@id/tv_message"
             tools:text="오후 3:11" />

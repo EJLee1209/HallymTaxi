@@ -92,7 +92,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:layout_marginEnd="14dp"
-            time="@{room_info.lastReceiveMsgDateTime}"
+            time="@{room_info.lastReceiveMsgDateTime.toString()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_last_date"
             tools:text="오후 03:12" />
