@@ -24,7 +24,7 @@ class HistoryFragment : Fragment() {
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private lateinit var user: User
     private var joinedRoom: CarPoolRoom? = null
-    private var lastChatKey: String = ""
+    private var lastChatKey: Int = -1
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,7 +46,7 @@ class HistoryFragment : Fragment() {
         joinedRoom = (activity as MainActivity).joinedRoom
         binding.fragment = this
         val sharedPreference = requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
-        lastChatKey = sharedPreference.getString("lastChatKey", "").toString()
+        lastChatKey = sharedPreference.getInt("lastChatKey", -1)
     }
 
     private fun setObservers() {
@@ -62,23 +62,23 @@ class HistoryFragment : Fragment() {
             }
         }
 
-        HistoryListAdapter { roomInfo ->
-            // 히스토리 클릭 이벤트
-            val action =
-                HistoryFragmentDirections.actionNavigationHistoryToChatRoomHistoryFragment(roomInfo)
-            findNavController().navigate(action)
-        }.apply {
-            viewModel.detachHistory().observe(viewLifecycleOwner) { poolList ->
-                binding.rvHistory.adapter = this
-                val sortedList = sortedWithDate(poolList)
-                submitList(sortedList)
-                if (sortedList.isEmpty() && joinedRoom == null) {
-                    binding.tvNoPoolRoom.visibility = View.VISIBLE
-                } else {
-                    binding.tvNoPoolRoom.visibility = View.GONE
-                }
-            }
-        }
+//        HistoryListAdapter { roomInfo ->
+//            // 히스토리 클릭 이벤트
+//            val action =
+//                HistoryFragmentDirections.actionNavigationHistoryToChatRoomHistoryFragment(roomInfo)
+//            findNavController().navigate(action)
+//        }.apply {
+//            viewModel.detachHistory().observe(viewLifecycleOwner) { poolList ->
+//                binding.rvHistory.adapter = this
+//                val sortedList = sortedWithDate(poolList)
+//                submitList(sortedList)
+//                if (sortedList.isEmpty() && joinedRoom == null) {
+//                    binding.tvNoPoolRoom.visibility = View.VISIBLE
+//                } else {
+//                    binding.tvNoPoolRoom.visibility = View.GONE
+//                }
+//            }
+//        }
     }
     private fun sortedWithDate(poolList: List<RoomInfo>) : List<RoomInfo>{
         return poolList.sortedWith(compareBy<RoomInfo> {

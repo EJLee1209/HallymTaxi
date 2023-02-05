@@ -12,13 +12,13 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
-import java.time.LocalDateTime
 
 class MainRepository(val context: Context) {
 
     private val client = KakaoApiClient.create()
-    private val fcmClient = FcmServerApiClient.create()
+//    private val fcmClient = FcmServerApiClient.create()
     private val fireStore = Firebase.firestore
+    private val welcomeRepository = ServerRepository()
 
     suspend fun searchKeyword(keyword: String) = client.getSearchKeyword(query = keyword)
 
@@ -45,7 +45,7 @@ class MainRepository(val context: Context) {
         ref.set(room).addOnSuccessListener {
             newRoom.value = room
             CoroutineScope(Dispatchers.Main).launch {
-                sendMessage(room = room, chat = Chat(roomId = room.roomId, userId = user.uid, messageType = CHAT_JOIN), user)
+                sendMessage(roomId = room.roomId, chat = Chat(roomId = room.roomId, userId = user.uid, messageType = CHAT_JOIN), user.name, listOf())
             }
         }
 
@@ -81,19 +81,24 @@ class MainRepository(val context: Context) {
         }else{
             if(room.userMaxCount > room.userCount){
                 val updateMap = mutableMapOf<String, Any>()
+                val receiveTokens : List<String?>
                 if(room.user1 == null || room.user2 == null || room.user3 == null || room.user4 == null){
                     when{
                         room.user1 == null ->{
                             updateMap["user1"] = user
+                            receiveTokens = listOf( room.user2?.fcmToken, room.user3?.fcmToken, room.user4?.fcmToken)
                         }
                         room.user2 == null ->{
                             updateMap["user2"] = user
+                            receiveTokens = listOf( room.user1?.fcmToken, room.user3?.fcmToken, room.user4?.fcmToken)
                         }
                         room.user3 == null ->{
                             updateMap["user3"] = user
+                            receiveTokens = listOf( room.user1?.fcmToken, room.user2?.fcmToken, room.user4?.fcmToken)
                         }
                         else ->{
                             updateMap["user4"] = user
+                            receiveTokens = listOf( room.user1?.fcmToken, room.user2?.fcmToken, room.user3?.fcmToken)
                         }
                     }
                     updateMap["userCount"] = room.userCount + 1
@@ -109,7 +114,7 @@ class MainRepository(val context: Context) {
                                     if(fetchedRoom.user1?.uid == user.uid || fetchedRoom.user2?.uid == user.uid || fetchedRoom.user3?.uid == user.uid || fetchedRoom.user4?.uid == user.uid){
                                         result.postValue(true)
                                         CoroutineScope(Dispatchers.Main).launch {
-                                            sendMessage(room = room, chat = Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user)
+                                            sendMessage(roomId = room.roomId, chat = Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
                                         }
                                     }
 
@@ -132,54 +137,40 @@ class MainRepository(val context: Context) {
         return result
     }
 
-    suspend fun sendMessage(room: CarPoolRoom, chat: Chat, currentUser: User){
-        val ref = fireStore.collection("Room").document(room.roomId).collection("Chat").document()
-        chat.id = ref.id
-        ref.set(chat)
+    suspend fun sendMessage(roomId: String, chat: Chat, senderName: String, receiveTokens: List<String?>){
+//        val ref = fireStore.collection("Room").document(roomId).collection("Chat").document()
+//        chat.id = ref.id
+//        ref.set(chat)
+
         CoroutineScope(Dispatchers.IO).launch {
             RoomRepository(context).saveChat(chat)
         }
 
-        val pushBody = PushBody(
-            token = "",
-            roomId = room.roomId,
-            userId = chat.userId,
-            userName = currentUser.name,
-            message = chat.msg,
-            id = chat.id,
-            messageType = chat.messageType,
-        )
-        if(room.user1 != null && room.user1?.uid != chat.userId){
-            pushBody.token = room.user1!!.fcmToken
-            sendPushMessage(pushBody)
-        }
-        if(room.user2 != null && room.user2?.uid != chat.userId){
-            pushBody.token = room.user2!!.fcmToken
-            sendPushMessage(pushBody)
-        }
-        if(room.user3 != null && room.user3?.uid != chat.userId){
-            pushBody.token = room.user3!!.fcmToken
-            sendPushMessage(pushBody)
-        }
-        if(room.user4 != null && room.user4?.uid != chat.userId){
-            pushBody.token = room.user4!!.fcmToken
-            sendPushMessage(pushBody)
-        }
+        receiveTokens.forEach {
+            if(!it.isNullOrEmpty()){
+                welcomeRepository.sendPushMessage(it, chat.roomId, chat.userId, senderName, chat.msg, chat.messageType)
+            }
 
-        updateRoomInfo(room, chat)
+        }
+        updateRoomInfo(roomId, chat)
     }
 
-    private fun updateRoomInfo(room: CarPoolRoom, chat: Chat){
-        val roomInfo = RoomInfo(
-            room.roomId,
-            chat.msg,
-            chat.dateTime,
-            chat.id,
-            room.startPlace,
-            room.endPlace
+    private fun updateRoomInfo(roomId: String, chat: Chat){
+//        val roomInfo = RoomInfo(
+//            room.roomId,
+//            chat.msg,
+//            chat.dateTime,
+//            chat.id,
+//            room.startPlace,
+//            room.endPlace
+//        )
+        val updateRoomInfo = mapOf<String, Any>(
+            "msg" to chat.msg,
+            "dateTime" to chat.dateTime,
         )
 
-        fireStore.collection("RoomInfo").document(room.roomId).set(roomInfo)
+
+        fireStore.collection("RoomInfo").document(roomId).update(updateRoomInfo)
     }
 
     // 채팅방 삭제(모든 참여자가 퇴장한 경우)
@@ -211,37 +202,10 @@ class MainRepository(val context: Context) {
         fireStore.collection("Room").document(room.roomId).update(updateMap)
     }
 
-    fun saveHistory(uid: String, roomInfo: RoomInfo, messageList: List<Chat>){
-        val ref = fireStore.collection("History").document(uid).collection("user_history").document(roomInfo.roomId)
-        ref.set(roomInfo).addOnSuccessListener {
-            messageList.forEach {chat->
-                ref.collection("Chat").document(chat.id).set(chat)
-            }
-        }
-    }
-
-    fun detachHistory(uid: String) : LiveData<List<RoomInfo>>{
-        val historyList = MutableLiveData<List<RoomInfo>>()
-        fireStore.collection("History").document(uid).collection("user_history").get().addOnSuccessListener {
-            if(it == null){
-                Log.d("testt", "detachHistory: null")
-                return@addOnSuccessListener
-            }
-            val dataList = mutableListOf<RoomInfo>()
-            it.forEach { data->
-                val room = data.toObject<RoomInfo>()
-                dataList.add(room)
-            }
-            Log.d("testt", "detachHistory()")
-            historyList.postValue(dataList)
-        }
-
-        return historyList
-    }
 
     fun updateFcmToken(uid: String, token: String){
         fireStore.collection("User").document(uid).update(mapOf("fcmToken" to token))
     }
 
-    suspend fun sendPushMessage(pushBody: PushBody) = fcmClient.sendPushMessage(pushBody)
+
 }

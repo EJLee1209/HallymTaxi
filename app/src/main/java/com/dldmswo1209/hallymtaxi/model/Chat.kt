@@ -8,9 +8,9 @@ import com.google.firebase.Timestamp
 
 @Entity(tableName = "chat")
 data class Chat(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    var id: String = "", // primary key
+    var id: Int = 0, // primary key
     @ColumnInfo(name = "roomId")
     val roomId: String = "" ,
     @ColumnInfo(name = "userId")

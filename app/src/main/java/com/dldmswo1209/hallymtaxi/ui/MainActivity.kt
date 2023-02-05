@@ -1,13 +1,10 @@
 package com.dldmswo1209.hallymtaxi.ui
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
@@ -16,20 +13,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
-import com.dldmswo1209.hallymtaxi.common.HashKeyStore
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
-import com.dldmswo1209.hallymtaxi.common.dateToString
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.User
-import com.dldmswo1209.hallymtaxi.ui.map.MapFragmentDirections
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
-import com.google.firebase.Timestamp
-import kotlinx.coroutines.*
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
-import java.time.format.DateTimeFormatterBuilder
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -52,32 +40,31 @@ class MainActivity : AppCompatActivity() {
         const val PERMISSION_REQUEST_CODE = 99
     }
 
-    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기
-        viewModel.getFcmToken()
+        requestPermission()
         setObserver()
         getUserInfo()
         bottomNavigationSetup()
 
-//        val key = HashKeyStore.getKeyHashBase64(this)
-//        Log.d("testt", "key : ${key}")
-        Log.d("testt", "timestamp: ${Timestamp.now().toDate().dateToString("yyyy-MM-dd HH:mm:ss")}")
     }
 
+    private fun requestPermission(){
+        ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기
+    }
     private fun setObserver(){
+        viewModel.getFcmToken()
         checkNetwork.isConnected.observe(this){
             isNetworkActivate = it
         }
     }
     private fun getUserInfo(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            user = intent.getSerializableExtra("userInfo", User::class.java) as User
+        user = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("userInfo", User::class.java) as User
         }else{
-            user = intent.getSerializableExtra("userInfo") as User
+            intent.getSerializableExtra("userInfo") as User
         }
     }
 

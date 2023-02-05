@@ -9,15 +9,14 @@ import android.widget.Toast
 import androidx.lifecycle.*
 import com.dldmswo1209.hallymtaxi.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.context
-import com.dldmswo1209.hallymtaxi.common.dateToString
 import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.repository.MainRepository
 import com.dldmswo1209.hallymtaxi.repository.RoomRepository
-import com.dldmswo1209.hallymtaxi.retrofit.PushBody
-import com.google.firebase.Timestamp
+import com.dldmswo1209.hallymtaxi.repository.ServerRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
@@ -27,6 +26,7 @@ import kotlinx.coroutines.*
 class MainViewModel(
     private val mainRepository: MainRepository,
     private val roomRepository: RoomRepository,
+    private val serverRepository: ServerRepository,
     application: Application
 ) : AndroidViewModel(application) {
 
@@ -113,10 +113,13 @@ class MainViewModel(
         }
     }
 
-    fun sendMessage(room: CarPoolRoom, chat: Chat, currentUser: User) {
-        CoroutineScope(Dispatchers.Main).launch {
-            mainRepository.sendMessage(room, chat, currentUser)
+    suspend fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {
+        receiveTokens.forEach {
+            if(!it.isNullOrEmpty()){
+                serverRepository.sendPushMessage(token = it, roomId = chat.roomId, userId = chat.userId, userName = userName, message = chat.msg, messageType = chat.messageType, id = "")
+            }
         }
+        roomRepository.saveChat(chat)
     }
 
     fun detachRoom(roomId: String): LiveData<CarPoolRoom> { // 현재 내가 참여 중인 채팅방을 실시간으로 가져옴
@@ -157,99 +160,11 @@ class MainViewModel(
         return roomInfo
     }
 
-    fun getNewMessage(roomId: String): LiveData<Chat> {
-        val newMessage = MutableLiveData<Chat>()
-
-        messageListener = fireStore.collection("Room").document(roomId).collection("Chat").whereGreaterThanOrEqualTo("dateTime", Timestamp.now().toDate().dateToString()).orderBy("dateTime")
-            .addSnapshotListener { query, error ->
-                if (error != null) {
-                    Log.d("testt", "getMessage: ${error}")
-                    return@addSnapshotListener
-                }
-
-                query?.let {
-                    val source = if (query.metadata.isFromCache)
-                        "local cache"
-                    else
-                        "server"
-                    Log.d("testt", "Data fetched from $source")
-
-                    for (change in query.documentChanges){
-                        if(change.type == DocumentChange.Type.ADDED) {
-                            val chat = change.document.toObject<Chat>()
-                            newMessage.postValue(chat)
-                            Log.d("testt", "getMessage: ${chat}")
-                        }
-                    }
-                }
-
-                Log.d("testt", "메세지 가져오기!!")
-            }
-
-        return newMessage
-    }
-
-    fun roomAndChatListLiveData(roomId: String): LiveData<Pair<CarPoolRoom, Chat>> =
-        object: MediatorLiveData<Pair<CarPoolRoom, Chat>>() {
-            var room: CarPoolRoom? = null
-            var newChat: Chat? = null
-            init {
-                addSource(detachRoom(roomId)) { room ->
-                    this.room = room
-                    newChat?.let { value = room to it }
-                }
-                addSource(getNewMessage(roomId)){ chat ->
-                    this.newChat = chat
-                    room?.let { value = it to chat }
-                }
-
-            }
-        }
-
-    fun getHistoryMessage(roomId: String) : LiveData<List<Chat>> {
-        val chatList = MutableLiveData<List<Chat>>()
-
-        historyMessageListener = fireStore.collection("History").document(uid).collection("user_history").document(roomId)
-            .collection("Chat").addSnapshotListener { query, error ->
-            if (error != null) {
-                Log.d("testt", "getHistoryMessage: ${error}")
-                return@addSnapshotListener
-            }
-
-            query?.let {
-                val dataList = mutableListOf<Chat>()
-                it.forEach { data ->
-                    val chat = data.toObject<Chat>()
-                    dataList.add(chat)
-                }
-                if (dataList.size == 0) return@addSnapshotListener
-                chatList.postValue(dataList)
-            }
-
-            Log.d("testt", "이전 메세지 가져오기!!")
-        }
-
-        return chatList
-    }
-
     fun exitRoom(user: String, room: CarPoolRoom) {
         mainRepository.exitRoom(user, room)
         sharedPreferences.edit().putString("joinedRoom", "").apply()
     }
 
-    fun saveHistory(roomInfo: RoomInfo, messageList: List<Chat>) {
-        mainRepository.saveHistory(uid, roomInfo, messageList)
-    }
-
-    fun detachHistory(): LiveData<List<RoomInfo>> {
-        val historyList = MutableLiveData<List<RoomInfo>>()
-
-        mainRepository.detachHistory(uid).observeForever {
-            historyList.postValue(it)
-        }
-
-        return historyList
-    }
     fun allListenerRemove() {
         messageListener?.remove()
         roomListener?.remove()
@@ -270,14 +185,6 @@ class MainViewModel(
 
     private fun updateFcmToken(token: String){
         mainRepository.updateFcmToken(uid, token)
-    }
-
-    fun sendPushMessage(pushBody: PushBody) = viewModelScope.launch(Dispatchers.IO) {
-        mainRepository.sendPushMessage(pushBody)
-    }
-
-    fun saveChat(chat: Chat) = viewModelScope.launch(Dispatchers.IO) {
-        roomRepository.saveChat(chat)
     }
 
     fun detachChatList(roomId: String) = viewModelScope.launch(Dispatchers.IO) {

@@ -1,7 +1,10 @@
 package com.dldmswo1209.hallymtaxi.ui.carpool
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,7 +16,7 @@ import android.widget.PopupMenu
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.MutableLiveData
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.R
@@ -22,10 +25,7 @@ import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
 import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
-import com.google.firebase.Timestamp
 import kotlinx.coroutines.*
-
-import java.time.LocalDateTime
 
 class ChatRoomFragment: Fragment() {
 
@@ -36,6 +36,7 @@ class ChatRoomFragment: Fragment() {
     private var messages: MutableList<Chat> = mutableListOf()
     private lateinit var chatListAdapter: ChatListAdapter
     private lateinit var currentUser: User
+    private var tokenList = mutableListOf<String?>()
 
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
         ViewMarginDynamicChanger(requireContext())
@@ -68,6 +69,13 @@ class ChatRoomFragment: Fragment() {
         backPressedSetCallback()
         setObserver()
 
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(object: BroadcastReceiver(){
+            override fun onReceive(context: Context, intent: Intent) {
+                viewModel.detachChatList(room.roomId)
+            }
+
+        }, IntentFilter("newMessage"))
+
         binding.etMsg.addTextChangedListener(object: TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
@@ -84,7 +92,14 @@ class ChatRoomFragment: Fragment() {
             val msg = binding.etMsg.text.toString()
             val chat = Chat(roomId = room.roomId, userId = currentUser.uid, msg= msg, messageType = CHAT_NORMAL)
 
-            viewModel.sendMessage(room, chat, currentUser)
+            CoroutineScope(Dispatchers.IO).launch {
+                async {
+                    viewModel.sendMessage(chat, currentUser.name, tokenList.toList())
+                    delay(200)
+                }.await()
+                viewModel.detachChatList(room.roomId)
+            }
+
             binding.etMsg.text.clear()
         }
 
@@ -109,21 +124,27 @@ class ChatRoomFragment: Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     private fun setObserver(){
         viewModel.detachRoom(room.roomId).observe(viewLifecycleOwner){room ->
+            if(room == null) return@observe
+
             binding.tvUserCount.text = "인원 ${room.userCount}명"
             this.room = room
             val userList = listOf(room.user1, room.user2, room.user3, room.user4 )
+            tokenList = mutableListOf(
+                room.user1?.fcmToken,
+                room.user2?.fcmToken,
+                room.user3?.fcmToken,
+                room.user4?.fcmToken,
+            )
+            if(tokenList.contains(currentUser.fcmToken)) tokenList.remove(currentUser.fcmToken)
             chatListAdapter.userList = userList
             chatListAdapter.notifyDataSetChanged()
-        }
-        viewModel.getNewMessage(room.roomId).observe(viewLifecycleOwner){newChat->
-            messages.add(newChat)
-            chatListAdapter.submitList(messages)
-            scrollToLastItem()
         }
 
         viewModel.chatList.observe(viewLifecycleOwner){
             messages = it.toMutableList()
+            Log.d("testt", "messages: ${messages}")
             chatListAdapter.submitList(messages)
+            scrollToLastItem()
         }
 
     }
@@ -142,7 +163,7 @@ class ChatRoomFragment: Fragment() {
         if(messages.isNotEmpty()) {
             val sharedPreference =
                 requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
-            sharedPreference.edit().putString("lastChatKey", messages.last().id).apply()
+            sharedPreference.edit().putInt("lastChatKey", messages.last().id).apply()
         }
         findNavController().navigate(R.id.action_chatRoomFragment_to_navigation_map)
     }
@@ -179,11 +200,13 @@ class ChatRoomFragment: Fragment() {
                                     // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
                                     val lastMsg = messages.last()
                                     val roomInfo = RoomInfo(room.roomId, lastMsg.msg, lastMsg.dateTime, lastMsg.id, room.startPlace, room.endPlace)
-                                    viewModel.saveHistory(roomInfo, messages)
+//                                    viewModel.saveHistory(roomInfo, messages)
                                     return@forEach
                                 }
                             }
-                            viewModel.sendMessage(room, Chat(roomId = room.roomId, userId = currentUser.uid, msg = "${currentUser.name}님이 나갔습니다", messageType = CHAT_EXIT), currentUser)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                viewModel.sendMessage(Chat(roomId = room.roomId, userId = currentUser.uid, msg = "${currentUser.name}님이 나갔습니다", messageType = CHAT_EXIT), currentUser.name, tokenList)
+                            }
                             onClickBack()
                         }
                     )

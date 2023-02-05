@@ -1,10 +1,7 @@
 package com.dldmswo1209.hallymtaxi.common
 
-import com.google.firebase.Timestamp
-import java.time.LocalDateTime
 
 object TimeService {
-
     fun currentTime(timestamp: String) : String{
         val splitDateTime = timestamp.split(" ")
         val (hour, min) = splitDateTime[1].split(":")

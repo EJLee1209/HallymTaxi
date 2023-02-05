@@ -2,24 +2,20 @@ package com.dldmswo1209.hallymtaxi.vm
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dldmswo1209.hallymtaxi.common.context
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.model.VerifyInfo
-import com.dldmswo1209.hallymtaxi.repository.WelcomeRepository
-import com.dldmswo1209.hallymtaxi.ui.MainActivity
+import com.dldmswo1209.hallymtaxi.repository.ServerRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 class WelcomeViewModel(
-    private val welcomeRepository: WelcomeRepository,
+    private val welcomeRepository: ServerRepository,
     application: Application
 ): AndroidViewModel(application) {
 

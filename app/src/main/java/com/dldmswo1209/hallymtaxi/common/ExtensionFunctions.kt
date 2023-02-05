@@ -70,5 +70,7 @@ fun TimePicker.getMinute(): Int {
 
 fun Date.dateToString(format: String = "yyyy-MM-dd HH:mm:ss", local : Locale = Locale.getDefault()): String{
     val formatter = SimpleDateFormat(format, local)
+    formatter.timeZone = TimeZone.getTimeZone("Asia/Seoul")
     return formatter.format(this)
 }
+

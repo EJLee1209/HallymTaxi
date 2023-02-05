@@ -2,24 +2,35 @@ package com.dldmswo1209.hallymtaxi.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.dateToString
 import com.dldmswo1209.hallymtaxi.model.Chat
+import com.dldmswo1209.hallymtaxi.repository.MainRepository
 import com.dldmswo1209.hallymtaxi.repository.RoomRepository
 import com.google.firebase.Timestamp
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FcmService: FirebaseMessagingService() {
+    private var broadcaster: LocalBroadcastManager? = null
 
     companion object{
         const val CHANNEL_ID = "hallym_univ"
         const val CHANNEL_NAME = "hallym_univ"
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        broadcaster = LocalBroadcastManager.getInstance(this);
+    }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -29,7 +40,6 @@ class FcmService: FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        val id = System.currentTimeMillis().toInt()
 
         val notificationManager = NotificationManagerCompat.from(applicationContext)
 
@@ -40,24 +50,16 @@ class FcmService: FirebaseMessagingService() {
         val builder: NotificationCompat.Builder =
             NotificationCompat.Builder(applicationContext, CHANNEL_ID)
 
-        val chatId = remoteMessage.data["id"].toString()
         val roomId = remoteMessage.data["roomId"].toString()
         val userId = remoteMessage.data["userId"].toString()
         val userName = remoteMessage.data["userName"].toString()
         val message = remoteMessage.data["message"].toString()
         val messageType = remoteMessage.data["messageType"].toString()
-        val dateTime = Timestamp.now().toDate().dateToString()
-        val chat = Chat(chatId, roomId, userId, message, dateTime, messageType)
+        val dateTime = remoteMessage.data["dateTime"].toString()
+        val chat = Chat(roomId = roomId, userId = userId, msg = message, dateTime = dateTime, messageType = messageType)
 
         val roomRepo = RoomRepository(this)
         roomRepo.saveChat(chat) // 채팅 저장
-
-        Log.d("testt", "chatId: ${chatId}")
-        Log.d("testt", "userId: ${userId}")
-        Log.d("testt", "userName: ${userName}")
-        Log.d("testt", "message: ${message}")
-        Log.d("testt", "messageType: ${messageType}")
-        Log.d("testt", "dateTime: ${dateTime}")
 
         builder.setContentTitle(userName)
             .setContentText(message)
@@ -66,8 +68,12 @@ class FcmService: FirebaseMessagingService() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority = NotificationCompat.PRIORITY_HIGH
 
         val notification = builder.build()
-        notificationManager.notify(id, notification)
+        notificationManager.notify(1, notification)
+
+        val notificationMessage = Intent("newMessage")
+        broadcaster?.sendBroadcast(notificationMessage) // 브로드 캐스트 리시버를 통해 노티가 온 경우 알려준다.
     }
+
 
 
 }
