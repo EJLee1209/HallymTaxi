@@ -22,7 +22,7 @@ import com.google.api.ResourceDescriptor
 class HistoryFragment : Fragment() {
     private lateinit var binding: FragmentHistoryBinding
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
-    private lateinit var user: User
+    private var user: User? = null
     private var joinedRoom: CarPoolRoom? = null
     private var lastChatKey: Int = -1
     override fun onCreateView(

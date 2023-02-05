@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
@@ -41,7 +42,7 @@ class MapFragment: Fragment() {
     private var searchResultBottomSheet : SearchResultBottomSheetFragment? = null
     private var poolListBottomSheet : PoolListBottomSheetFragment? = null
     private var joinedRoom: CarPoolRoom? = null
-    private lateinit var user : User
+    private var user : User? = null
 
     companion object{
         const val SEARCH_RESULT_BOTTOM_SHEET_TAG = "SearchResultBottomSheetFragment"
@@ -137,8 +138,8 @@ class MapFragment: Fragment() {
 
         viewModel.poolList.observe(viewLifecycleOwner){ roomList->
             roomList.forEach { room->
-                if(room.user1?.uid == user.uid || room.user2?.uid == user.uid ||
-                    room.user3?.uid == user.uid || room.user4?.uid == user.uid ){
+                if(room.user1?.uid == user?.uid || room.user2?.uid == user?.uid ||
+                    room.user3?.uid == user?.uid || room.user4?.uid == user?.uid ){
                     // 내가 속한 방이 존재
                     binding.viewCurrentMyRoom.visibility = View.VISIBLE
                     binding.room = room
@@ -307,7 +308,7 @@ class MapFragment: Fragment() {
 
     fun onClickViewMyCurrentRoom(){
         joinedRoom?.let { room->
-            viewModel.joinRoom(room, user)
+            user?.let { viewModel.joinRoom(room, it) }
         }
     }
 

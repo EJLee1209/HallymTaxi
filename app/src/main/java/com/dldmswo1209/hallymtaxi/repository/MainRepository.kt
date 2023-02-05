@@ -22,20 +22,6 @@ class MainRepository(val context: Context) {
 
     suspend fun searchKeyword(keyword: String) = client.getSearchKeyword(query = keyword)
 
-    fun getUserInfo(uid: String) : LiveData<User>{
-        val user = MutableLiveData<User>()
-
-        fireStore.collection("User").document(uid).get().addOnSuccessListener {
-            if(it == null){
-                Log.d("testt", "getUserInfo: fail to get user info")
-                return@addOnSuccessListener
-            }
-            user.value = it.toObject<User>()
-            Log.d("testt", "getUserInfo()")
-        }
-
-        return user
-    }
 
     fun createRoom(room: CarPoolRoom, user: User) : LiveData<CarPoolRoom>{
         val newRoom = MutableLiveData<CarPoolRoom>()

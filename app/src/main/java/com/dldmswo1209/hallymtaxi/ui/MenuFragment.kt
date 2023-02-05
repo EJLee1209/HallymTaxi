@@ -13,7 +13,7 @@ import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 
 class MenuFragment: Fragment() {
     private lateinit var binding: FragmentMenuBinding
-    private lateinit var user: User
+    private var user: User? = null
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +36,7 @@ class MenuFragment: Fragment() {
     }
 
     fun onClickLogout(){
-        viewModel.logout(requireActivity())
+        user?.let { viewModel.logout(requireActivity(), it.uid) }
     }
 
 }

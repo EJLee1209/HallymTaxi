@@ -23,9 +23,8 @@ class PoolListBottomSheetFragment(
     private lateinit var binding: FragmentPoolListBottomSheetBinding
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private var joinedRoom: CarPoolRoom? = null
-    private var currentUser: User? = null
     private var room: CarPoolRoom? = null
-    private lateinit var user: User
+    private var user: User? = null
     private val loadingDialog by lazy{
         LoadingDialog(requireContext())
     }
@@ -54,7 +53,6 @@ class PoolListBottomSheetFragment(
     private fun init() {
         binding.fragment = this
         user = (activity as MainActivity).detachUserInfo()
-        currentUser = (activity as MainActivity).detachUserInfo()
     }
 
     private fun setObserver() {
@@ -95,8 +93,8 @@ class PoolListBottomSheetFragment(
 
     private fun checkMyRoom(roomList: List<CarPoolRoom>){
         roomList.forEach { room->
-            if(room.user1?.uid == user.uid || room.user2?.uid == user.uid ||
-                room.user3?.uid == user.uid || room.user4?.uid == user.uid ){
+            if(room.user1?.uid == user?.uid || room.user2?.uid == user?.uid ||
+                room.user3?.uid == user?.uid || room.user4?.uid == user?.uid ){
                 // 내가 속한 방이 존재
                 joinedRoom = room
             }
@@ -107,7 +105,7 @@ class PoolListBottomSheetFragment(
         val filteredRoomList = roomList.toMutableList()
 
         for(idx in filteredRoomList.size-1 downTo 0){
-            if(filteredRoomList[idx].genderOption != GENDER_OPTION_NONE && filteredRoomList[idx].genderOption != currentUser?.gender){
+            if(filteredRoomList[idx].genderOption != GENDER_OPTION_NONE && filteredRoomList[idx].genderOption != user?.gender){
                 filteredRoomList.remove(filteredRoomList[idx]) // 성별 조건에 부합 하지 않은 방을 필터링
             }
         }
@@ -149,7 +147,7 @@ class PoolListBottomSheetFragment(
             }
         }
 
-        currentUser?.let { user->
+        user?.let { user->
             viewModel.joinRoom(room,user)
         }
         loadingDialog.show()

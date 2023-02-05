@@ -35,7 +35,7 @@ class ChatRoomFragment: Fragment() {
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private var messages: MutableList<Chat> = mutableListOf()
     private lateinit var chatListAdapter: ChatListAdapter
-    private lateinit var currentUser: User
+    private var currentUser: User? = null
     private var tokenList = mutableListOf<String?>()
 
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
@@ -68,13 +68,7 @@ class ChatRoomFragment: Fragment() {
         init()
         backPressedSetCallback()
         setObserver()
-
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(object: BroadcastReceiver(){
-            override fun onReceive(context: Context, intent: Intent) {
-                viewModel.detachChatList(room.roomId)
-            }
-
-        }, IntentFilter("newMessage"))
+        registerBroadcastReceiver()
 
         binding.etMsg.addTextChangedListener(object: TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -89,12 +83,14 @@ class ChatRoomFragment: Fragment() {
         })
 
         binding.btnSend.setOnClickListener {
+            currentUser ?: return@setOnClickListener
+
             val msg = binding.etMsg.text.toString()
-            val chat = Chat(roomId = room.roomId, userId = currentUser.uid, msg= msg, messageType = CHAT_NORMAL)
+            val chat = Chat(roomId = room.roomId, userId = currentUser!!.uid, msg= msg, messageType = CHAT_NORMAL)
 
             CoroutineScope(Dispatchers.IO).launch {
                 async {
-                    viewModel.sendMessage(chat, currentUser.name, tokenList.toList())
+                    viewModel.sendMessage(chat, currentUser!!.name, tokenList.toList())
                     delay(200)
                 }.await()
                 viewModel.detachChatList(room.roomId)
@@ -104,23 +100,32 @@ class ChatRoomFragment: Fragment() {
         }
 
     }
+    private fun registerBroadcastReceiver() {
+        // 새로운 메세지가 온 경우 브로드 캐스트 리시버를 통해 알 수 있음
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    viewModel.detachChatList(room.roomId) // 채팅 내역 조회
+                }
 
+            }, IntentFilter("newMessage"))
+    }
     @SuppressLint("SetTextI18n")
-    private fun init(){
+    private fun init() {
         binding.fragment = this
-        val args : ChatRoomFragmentArgs by navArgs()
+        val args: ChatRoomFragmentArgs by navArgs()
         room = args.room
 
         currentUser = (activity as MainActivity).detachUserInfo()
         binding.tvRoomTitle.text = "${room.startPlace.place_name} - ${room.endPlace.place_name}"
 
         KeyboardUtils.addKeyboardToggleListener(requireActivity(), keyboardStateListener)
-        chatListAdapter = ChatListAdapter(currentUser, listOf())
-        binding.rvMessage.adapter = chatListAdapter
-
+        currentUser?.let {user->
+            chatListAdapter = ChatListAdapter(user, listOf())
+            binding.rvMessage.adapter = chatListAdapter
+        }
         viewModel.detachChatList(room.roomId)
     }
-
     @SuppressLint("NotifyDataSetChanged")
     private fun setObserver(){
         viewModel.detachRoom(room.roomId).observe(viewLifecycleOwner){room ->
@@ -135,7 +140,7 @@ class ChatRoomFragment: Fragment() {
                 room.user3?.fcmToken,
                 room.user4?.fcmToken,
             )
-            if(tokenList.contains(currentUser.fcmToken)) tokenList.remove(currentUser.fcmToken)
+            if(tokenList.contains(currentUser?.fcmToken)) tokenList.remove(currentUser?.fcmToken)
             chatListAdapter.userList = userList
             chatListAdapter.notifyDataSetChanged()
         }
@@ -181,7 +186,7 @@ class ChatRoomFragment: Fragment() {
                         content = "정말로 나가시겠습니까?",
                         negativeButtonVisible = true,
                         positiveCallback = {
-                            when(currentUser.uid){
+                            when(currentUser?.uid){
                                 room.user1?.uid ->{
                                     viewModel.exitRoom("user1", room)
                                 }
@@ -196,7 +201,7 @@ class ChatRoomFragment: Fragment() {
                                 }
                             }
                             messages.forEach {chat->
-                                if(chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid){
+                                if(chat.messageType == CHAT_NORMAL && chat.userId == currentUser?.uid){
                                     // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
                                     val lastMsg = messages.last()
                                     val roomInfo = RoomInfo(room.roomId, lastMsg.msg, lastMsg.dateTime, lastMsg.id, room.startPlace, room.endPlace)
@@ -205,7 +210,10 @@ class ChatRoomFragment: Fragment() {
                                 }
                             }
                             CoroutineScope(Dispatchers.IO).launch {
-                                viewModel.sendMessage(Chat(roomId = room.roomId, userId = currentUser.uid, msg = "${currentUser.name}님이 나갔습니다", messageType = CHAT_EXIT), currentUser.name, tokenList)
+                                currentUser?.let {user->
+                                    viewModel.sendMessage(Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 나갔습니다", messageType = CHAT_EXIT), user.name, tokenList)
+                                }
+
                             }
                             onClickBack()
                         }

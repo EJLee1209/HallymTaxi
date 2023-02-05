@@ -40,7 +40,6 @@ class MainViewModel(
     private var roomListener: ListenerRegistration? = null
     private var roomInfoListener: ListenerRegistration? = null
 
-
     private var _startPoint = MutableLiveData<ResultSearchKeyword>()
     val startPoint: LiveData<ResultSearchKeyword> = _startPoint
 
@@ -59,7 +58,12 @@ class MainViewModel(
     private var _chatList = MutableLiveData<List<Chat>>()
     val chatList : LiveData<List<Chat>> = _chatList
 
-    fun logout(activity: Activity) {
+    fun logout(activity: Activity, uid: String) {
+        val userInfo = mapOf<String, Any>(
+            "fcmToken" to ""
+        )
+        fireStore.collection("User").document(uid).update(userInfo)
+
         sharedPreferences.edit().run {
             putString("uid", "")
             putString("joinedRoom", "")
@@ -82,12 +86,35 @@ class MainViewModel(
     fun getUserInfo(): LiveData<User>? {
         val user = MutableLiveData<User>()
 
-        if (uid.isBlank()) return null
+        if (uid.isEmpty()) return null
+        getFcmToken()
+        fireStore.collection("User").document(uid).get().addOnSuccessListener {
+            if(it == null){
+                Log.d("testt", "getUserInfo: fail to get user info")
+                return@addOnSuccessListener
+            }
 
-        mainRepository.getUserInfo(uid).observeForever {
-            user.value = it
+            user.value = it.toObject<User>()
+            Log.d("testt", "getUserInfo()")
         }
+        return user
+    }
 
+    fun subscribeUser() : LiveData<User>? {
+        val user = MutableLiveData<User>()
+
+        if (uid.isEmpty()) return null
+        getFcmToken()
+        fireStore.collection("User").document(uid).addSnapshotListener { value, error->
+            if(error != null){
+                Log.d("testt", "getUserInfo: fail to get user info")
+                return@addSnapshotListener
+            }
+            value?.let {snapshot->
+                user.value = snapshot.toObject<User>()
+                Log.d("testt", "subscribeUser()")
+            }
+        }
         return user
     }
 

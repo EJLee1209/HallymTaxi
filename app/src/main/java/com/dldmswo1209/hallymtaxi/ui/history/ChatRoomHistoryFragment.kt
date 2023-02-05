@@ -20,7 +20,7 @@ class ChatRoomHistoryFragment: Fragment() {
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private lateinit var binding: FragmentChatRoomHistoryBinding
     private lateinit var roomInfo: RoomInfo
-    private lateinit var user: User
+    private var user: User? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -65,7 +65,7 @@ class FcmService: FirebaseMessagingService() {
             .setContentText(message)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(true)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority = NotificationCompat.PRIORITY_HIGH
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority = NotificationCompat.PRIORITY_MAX
 
         val notification = builder.build()
         notificationManager.notify(1, notification)

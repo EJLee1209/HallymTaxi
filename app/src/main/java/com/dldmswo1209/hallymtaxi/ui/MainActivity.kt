@@ -1,8 +1,10 @@
 package com.dldmswo1209.hallymtaxi.ui
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +14,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
+import com.dldmswo1209.hallymtaxi.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
@@ -22,9 +25,9 @@ import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var user: User
-    private var navController : NavController? = null
+    private var user: User? = null
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(application) }
+    private var navController : NavController? = null
     var joinedRoom: CarPoolRoom? = null
     private val checkNetwork by lazy{
         CheckNetwork(this)
@@ -45,26 +48,32 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         requestPermission()
+        getIntentExtraData()
         setObserver()
-        getUserInfo()
         bottomNavigationSetup()
-
     }
 
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기
     }
-    private fun setObserver(){
-        viewModel.getFcmToken()
-        checkNetwork.isConnected.observe(this){
-            isNetworkActivate = it
-        }
-    }
-    private fun getUserInfo(){
+
+    private fun getIntentExtraData(){
         user = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("userInfo", User::class.java) as User
         }else{
             intent.getSerializableExtra("userInfo") as User
+        }
+    }
+    private fun setObserver(){
+        checkNetwork.isConnected.observe(this){
+            isNetworkActivate = it
+        }
+
+        viewModel.subscribeUser()?.observe(this){
+            user = it
+            Log.d("testt", "setObserver: ${it}")
+        } ?: kotlin.run {
+            startActivity(Intent(this, SplashActivity::class.java))
         }
     }
 
@@ -88,7 +97,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun detachUserInfo() : User{
+    fun detachUserInfo() : User?{
         return user
     }
 
