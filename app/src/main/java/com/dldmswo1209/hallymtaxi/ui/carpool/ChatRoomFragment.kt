@@ -20,7 +20,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.SplashActivity
+import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
 import com.dldmswo1209.hallymtaxi.model.*

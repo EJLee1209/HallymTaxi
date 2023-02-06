@@ -9,4 +9,5 @@ class RoomRepository(context: Context) {
 
     fun saveChat(chat: Chat) = roomDB?.chatDao()?.saveChat(chat)
     fun detachChatList(roomId: String) = roomDB?.chatDao()?.detachChatList(roomId)
+    fun deleteChatHistory(roomId: String) = roomDB?.chatDao()?.deleteChatHistory(roomId)
 }

@@ -124,10 +124,6 @@ class MainRepository(val context: Context) {
     }
 
     suspend fun sendMessage(roomId: String, chat: Chat, senderName: String, receiveTokens: List<String?>){
-//        val ref = fireStore.collection("Room").document(roomId).collection("Chat").document()
-//        chat.id = ref.id
-//        ref.set(chat)
-
         CoroutineScope(Dispatchers.IO).launch {
             RoomRepository(context).saveChat(chat)
         }

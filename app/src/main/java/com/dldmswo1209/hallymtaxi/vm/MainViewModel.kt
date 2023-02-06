@@ -7,18 +7,17 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
-import com.dldmswo1209.hallymtaxi.SplashActivity
+import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.context
 import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.repository.MainRepository
 import com.dldmswo1209.hallymtaxi.repository.RoomRepository
 import com.dldmswo1209.hallymtaxi.repository.ServerRepository
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.*
@@ -107,7 +106,7 @@ class MainViewModel(
 
         if (uid.isEmpty()) return null
         getFcmToken()
-        fireStore.collection("User").document(uid).addSnapshotListener { value, error->
+        userListener = fireStore.collection("User").document(uid).addSnapshotListener { value, error->
             if(error != null){
                 Log.d("testt", "getUserInfo: fail to get user info")
                 return@addSnapshotListener
@@ -172,6 +171,27 @@ class MainViewModel(
         return room
     }
 
+    fun getMyRoom(user: User) : LiveData<CarPoolRoom>{
+        val room = MutableLiveData<CarPoolRoom>()
+
+        fireStore.collection("Room")
+            .whereEqualTo("user2",user)
+
+            .addSnapshotListener { value, error ->
+                if(error != null){
+                    Log.d("testt", "getMyRoom: ${error}")
+                    return@addSnapshotListener
+                }
+                value?.let {querySnapshot ->
+                    if(!querySnapshot.isEmpty) {
+                        val snapshot = querySnapshot.first()
+                        room.postValue(snapshot.toObject())
+                    }
+                }
+            }
+
+        return room
+    }
     fun detachRoomInfo(roomId: String) : LiveData<RoomInfo>{
         val roomInfo = MutableLiveData<RoomInfo>()
 
@@ -191,6 +211,9 @@ class MainViewModel(
 
     fun exitRoom(user: String, room: CarPoolRoom) {
         mainRepository.exitRoom(user, room)
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.deleteChatHistory(room.roomId)
+        }
         sharedPreferences.edit().putString("joinedRoom", "").apply()
     }
 
@@ -199,6 +222,10 @@ class MainViewModel(
         roomListener?.remove()
         historyMessageListener?.remove()
         roomInfoListener?.remove()
+    }
+
+    fun userListenerRemove(){
+        userListener?.remove()
     }
 
     fun getFcmToken() {

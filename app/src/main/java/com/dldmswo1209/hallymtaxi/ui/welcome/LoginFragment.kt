@@ -8,14 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.dldmswo1209.hallymtaxi.SplashActivity
+import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.common.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.databinding.FragmentLoginBinding
-import com.dldmswo1209.hallymtaxi.ui.MainActivity
-import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.dldmswo1209.hallymtaxi.vm.WelcomeViewModel
-import kotlinx.coroutines.*
 
 class LoginFragment: Fragment() {
     private lateinit var binding: FragmentLoginBinding

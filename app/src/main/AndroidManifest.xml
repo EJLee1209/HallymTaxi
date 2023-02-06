@@ -32,7 +32,7 @@
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
 
-        <activity android:name=".SplashActivity"
+        <activity android:name=".ui.SplashActivity"
             android:exported="true"
             android:noHistory="true">
             <intent-filter>

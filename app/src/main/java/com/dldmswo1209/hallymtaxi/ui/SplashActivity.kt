@@ -1,22 +1,15 @@
-package com.dldmswo1209.hallymtaxi
+package com.dldmswo1209.hallymtaxi.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
-import com.dldmswo1209.hallymtaxi.common.CustomDialog
 import com.dldmswo1209.hallymtaxi.common.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
-import com.dldmswo1209.hallymtaxi.common.context
-import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 

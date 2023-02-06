@@ -14,9 +14,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
-import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
@@ -52,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         getIntentExtraData()
         setObserver()
         bottomNavigationSetup()
+
     }
 
     private fun requestPermission(){
@@ -75,6 +74,12 @@ class MainActivity : AppCompatActivity() {
             Log.d("testt", "setObserver: ${it}")
         } ?: kotlin.run {
             startActivity(Intent(this, SplashActivity::class.java))
+        }
+
+        user?.let {
+            viewModel.getMyRoom(it).observe(this){
+                Log.d("testt", "getMyRoom: ${it}")
+            }
         }
     }
 
@@ -110,6 +115,11 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         checkNetwork.unRegisterNetworkListener()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.userListenerRemove()
     }
 
 }
