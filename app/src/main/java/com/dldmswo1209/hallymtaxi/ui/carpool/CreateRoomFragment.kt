@@ -14,10 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.common.LoadingDialog
-import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
-import com.dldmswo1209.hallymtaxi.common.getMinute
-import com.dldmswo1209.hallymtaxi.common.setMinutePicker
+import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentCreateRoomBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.GENDER_OPTION_NONE
@@ -37,13 +34,16 @@ import java.time.LocalDateTime
 class CreateRoomFragment: Fragment() {
 
     private lateinit var binding: FragmentCreateRoomBinding
+    private val viewModel : MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
+
     private var maxCount = 4
     private lateinit var startPlace: Place
     private lateinit var endPlace: Place
     private lateinit var currentUser : User
-    private val viewModel : MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private var isClicked = false
     private lateinit var gender : String
+    private lateinit var globalVariable: GlobalVariable
+
     private val loadingDialog by lazy{
         LoadingDialog(requireContext())
     }
@@ -70,22 +70,23 @@ class CreateRoomFragment: Fragment() {
         val args : CreateRoomFragmentArgs by navArgs()
         startPlace = args.startPlace
         endPlace = args.endPlace
+        globalVariable = requireActivity().application as GlobalVariable
+
+        currentUser = globalVariable.getUser() ?: kotlin.run {
+            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            requireActivity().finish()
+            return
+        }
 
         binding.timePicker.setMinutePicker()
 
         binding.etStartPoint.setText(startPlace.place_name)
         binding.etEndPoint.setText(endPlace.place_name)
 
-        currentUser = (activity as MainActivity).detachUserInfo() ?: kotlin.run {
-            startActivity(Intent(requireContext(), SplashActivity::class.java))
-            requireActivity().finish()
-            return
-        }
-
-        if(currentUser?.gender == "male"){
+        if(currentUser.gender == "male"){
             gender = "남성"
             binding.tvGenderOption.text = "남자끼리 탑승하기"
-        }else if(currentUser?.gender == "female"){
+        }else if(currentUser.gender == "female"){
             gender = "여성"
             binding.tvGenderOption.text = "여자끼리 탑승하기"
         }else{ // 성별 none 탑승 옵션을 없애야 함
@@ -180,7 +181,7 @@ class CreateRoomFragment: Fragment() {
         var hour = binding.timePicker.hour
         val min = binding.timePicker.getMinute()
         val genderOption = if(binding.checkboxGenderOption.isChecked){
-            currentUser?.gender ?: GENDER_OPTION_NONE
+            currentUser.gender ?: GENDER_OPTION_NONE
         }else{
             GENDER_OPTION_NONE
         }
@@ -204,7 +205,7 @@ class CreateRoomFragment: Fragment() {
             genderOption = genderOption
         )
 
-        viewModel.createRoom(room, currentUser!!)
+        viewModel.createRoom(room, currentUser)
         isClicked = true
 
         loadingDialog.show()

@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.ui.map
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,6 +21,7 @@ import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentMapBinding
 import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
+import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.PoolListBottomSheetFragment
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import net.daum.mf.map.api.CameraPosition
@@ -44,7 +46,7 @@ class MapFragment: Fragment() {
     private var searchResultBottomSheet : SearchResultBottomSheetFragment? = null
     private var poolListBottomSheet : PoolListBottomSheetFragment? = null
     private var joinedRoom: CarPoolRoom? = null
-    private var user : User? = null
+    private lateinit var user : User
     private lateinit var globalVariable: GlobalVariable
 
     companion object{
@@ -74,10 +76,14 @@ class MapFragment: Fragment() {
     private fun init(){
         locationService = LocationService(requireActivity())
         moveCamera(hallym_lat, hallym_lng, 2f)
-        user = (activity as MainActivity).detachUserInfo()
+        globalVariable = requireActivity().application as GlobalVariable
+        user = globalVariable.getUser() ?: kotlin.run {
+            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            requireActivity().finish()
+            return
+        }
 
         binding.fragment = this
-        globalVariable = requireActivity().application as GlobalVariable
     }
 
     private fun setObservers(){
@@ -308,7 +314,7 @@ class MapFragment: Fragment() {
 
     fun onClickViewMyCurrentRoom(){
         joinedRoom?.let { room->
-            user?.let { viewModel.joinRoom(room, it) }
+            viewModel.joinRoom(room, user)
         }
     }
 

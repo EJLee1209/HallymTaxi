@@ -38,6 +38,7 @@ class PoolListAdapter(
                 tvGenderOption.setTextColor(context.resources.getColor(R.color.hallym_white_ffffff, context.resources.newTheme()))
                 tvStartTime.setTextColor(context.resources.getColor(R.color.hallym_white_ffffff, context.resources.newTheme()))
                 tvUserCount.setTextColor(context.resources.getColor(R.color.hallym_white_ffffff, context.resources.newTheme()))
+                tvDistanceTitle.setTextColor(context.resources.getColor(R.color.hallym_white_ffffff, context.resources.newTheme()))
                 tvDistance.setTextColor(context.resources.getColor(R.color.hallym_white_ffffff, context.resources.newTheme()))
                 ivDownRightArrow.setImageResource(R.drawable.corner_down_right_white)
             }

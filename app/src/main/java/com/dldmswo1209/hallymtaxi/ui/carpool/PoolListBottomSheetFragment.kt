@@ -56,12 +56,13 @@ class PoolListBottomSheetFragment(
 
     private fun init() {
         binding.fragment = this
-        user = (activity as MainActivity).detachUserInfo() ?: kotlin.run {
+        globalVariable = requireActivity().application as GlobalVariable
+
+        user = globalVariable.getUser()?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return
         }
-        globalVariable = requireActivity().application as GlobalVariable
     }
 
     private fun setObserver() {

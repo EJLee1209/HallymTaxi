@@ -104,8 +104,7 @@ class ChatRoomFragment: Fragment() {
         room = args.room
 
         globalVariable = requireActivity().application as GlobalVariable
-
-        currentUser = (activity as MainActivity).detachUserInfo() ?: kotlin.run {
+        currentUser = globalVariable.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return

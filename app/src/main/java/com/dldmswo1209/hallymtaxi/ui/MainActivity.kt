@@ -75,8 +75,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewModel.subscribeUser()?.observe(this){
-            user = it
-            Log.d("testt", "setObserver: ${it}")
+            globalVariable.setUser(it)
+            Log.d("testt", "subscribeUser: ${it}")
         } ?: kotlin.run {
             startActivity(Intent(this, SplashActivity::class.java))
         }
@@ -108,10 +108,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    fun detachUserInfo() : User?{
-        return user
     }
 
     override fun onResume() {

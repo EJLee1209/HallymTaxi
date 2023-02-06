@@ -7,5 +7,5 @@ import kotlin.math.roundToInt
 
 @BindingAdapter("distance")
 fun distanceAdapter(view: TextView, distance: Int){
-    view.text = "내 목적지와 거리 : " + if(distance < 1000) "${distance}m" else "%.2fkm".format((distance/1000f))
+    view.text = if(distance < 1000) "${distance}m" else "%.1fkm".format((distance/1000f))
 }

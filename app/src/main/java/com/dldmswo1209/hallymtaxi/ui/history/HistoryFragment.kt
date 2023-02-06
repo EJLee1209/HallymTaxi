@@ -1,7 +1,9 @@
 package com.dldmswo1209.hallymtaxi.ui.history
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings.Global
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.TimeService
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentHistoryBinding
@@ -16,15 +19,17 @@ import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
+import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.google.api.ResourceDescriptor
 
 class HistoryFragment : Fragment() {
     private lateinit var binding: FragmentHistoryBinding
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
-    private var user: User? = null
+    private lateinit var user: User
     private var joinedRoom: CarPoolRoom? = null
     private var lastChatKey: Int = -1
+    private lateinit var globalVariable: GlobalVariable
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,7 +47,12 @@ class HistoryFragment : Fragment() {
     }
 
     private fun init() {
-        user = (activity as MainActivity).detachUserInfo()
+        globalVariable = requireActivity().application as GlobalVariable
+        user = globalVariable.getUser() ?: kotlin.run {
+            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            requireActivity().finish()
+            return
+        }
         joinedRoom = (activity as MainActivity).joinedRoom
         binding.fragment = this
         val sharedPreference = requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
