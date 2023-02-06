@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.LocationService
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
@@ -189,14 +190,16 @@ class MapFragment: Fragment() {
             // 마커 생성
             itemName = place.place_name
             mapPoint = MapPoint.mapPointWithGeoCoord(place.y,place.x)
-            markerType = MapPOIItem.MarkerType.BluePin
-
+            markerType = MapPOIItem.MarkerType.CustomImage
+            isCustomImageAutoscale = false
+            setCustomImageAnchor(0.5f, 1.0f)
         }
 
         if(isStartPoint){
             binding.etStartPoint.setText(place.road_address_name)
             startPlace = place
             binding.mapview.removePOIItem(startPlaceMarker) // 이전 마커 제거
+            newMarker.customImageResourceId = R.drawable.start_marker
             startPlaceMarker = newMarker
             binding.mapview.addPOIItem(startPlaceMarker) // 마커 추가
 
@@ -204,6 +207,7 @@ class MapFragment: Fragment() {
             binding.etEndPoint.setText(place.road_address_name)
             endPlace = place
             binding.mapview.removePOIItem(endPlaceMarker) // 이전 마커 제거
+            newMarker.customImageResourceId = R.drawable.end_marker
             endPlaceMarker = newMarker
             binding.mapview.addPOIItem(endPlaceMarker) // 마커 추가
         }

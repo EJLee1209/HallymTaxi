@@ -10,10 +10,10 @@ import com.dldmswo1209.hallymtaxi.model.GENDER_OPTION_NONE
 fun genderOption(view: TextView, option: String){
     view.text = when(option){
         GENDER_OPTION_MALE -> {
-            "남자끼리 탑승하기"
+            "여성끼리 탑승하기"
         }
         GENDER_OPTION_FEMALE -> {
-            "여자끼리 탑승하기"
+            "남성끼리 탑승하기"
         }
         else -> {
             "상관없이 탑승하기"

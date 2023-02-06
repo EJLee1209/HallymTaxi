@@ -82,28 +82,41 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_title"
                 tools:listitem="@layout/item_pool" />
 
-            <TextView
-                android:id="@+id/tv_no_pool_room"
-                style="@style/TextHint.Black"
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_no_pool_room"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/guide_no_pool_room"
-                android:paddingVertical="130dp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
                 app:layout_constraintTop_toBottomOf="@id/tv_title"
-                tools:visibility="visible" />
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:paddingTop="26dp"
+                    android:src="@drawable/img_character" />
+
+                <TextView
+                    style="@style/TextHint.Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingBottom="65dp"
+                    android:text="@string/guide_no_pool_room" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lottie_loading"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:visibility="gone"
-                android:padding="50dp"
                 android:background="#99000000"
+                android:padding="50dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

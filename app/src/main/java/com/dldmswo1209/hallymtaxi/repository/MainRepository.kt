@@ -18,7 +18,6 @@ import kotlinx.coroutines.*
 class MainRepository(val context: Context) {
 
     private val client = KakaoApiClient.create()
-//    private val fcmClient = FcmServerApiClient.create()
     private val fireStore = Firebase.firestore
     private val welcomeRepository = ServerRepository()
 

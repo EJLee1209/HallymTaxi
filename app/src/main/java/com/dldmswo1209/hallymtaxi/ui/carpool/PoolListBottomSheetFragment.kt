@@ -73,8 +73,8 @@ class PoolListBottomSheetFragment(
             val filteredRoomList = filterRoom(roomList)
             setRecyclerViewAdapter(filteredRoomList)
 
-            if (filteredRoomList.isEmpty()) binding.tvNoPoolRoom.visibility = View.VISIBLE
-            else binding.tvNoPoolRoom.visibility = View.INVISIBLE
+            if (filteredRoomList.isEmpty()) binding.layoutNoPoolRoom.visibility = View.VISIBLE
+            else binding.layoutNoPoolRoom.visibility = View.INVISIBLE
             loadingDialog.dismiss()
         }
 
