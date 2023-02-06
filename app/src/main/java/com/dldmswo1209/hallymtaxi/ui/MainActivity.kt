@@ -76,11 +76,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SplashActivity::class.java))
         }
 
-        user?.let {
-            viewModel.getMyRoom(it).observe(this){
-                Log.d("testt", "getMyRoom: ${it}")
-            }
-        }
     }
 
     private fun bottomNavigationSetup() {

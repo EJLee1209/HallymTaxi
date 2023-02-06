@@ -171,27 +171,27 @@ class MainViewModel(
         return room
     }
 
-    fun getMyRoom(user: User) : LiveData<CarPoolRoom>{
-        val room = MutableLiveData<CarPoolRoom>()
-
-        fireStore.collection("Room")
-            .whereEqualTo("user2",user)
-
-            .addSnapshotListener { value, error ->
-                if(error != null){
-                    Log.d("testt", "getMyRoom: ${error}")
-                    return@addSnapshotListener
-                }
-                value?.let {querySnapshot ->
-                    if(!querySnapshot.isEmpty) {
-                        val snapshot = querySnapshot.first()
-                        room.postValue(snapshot.toObject())
-                    }
-                }
-            }
-
-        return room
-    }
+//    fun getMyRoom(user: User) : LiveData<CarPoolRoom>{
+//        val room = MutableLiveData<CarPoolRoom>()
+//
+//        fireStore.collection("Room")
+//            .whereEqualTo("user2",user)
+//
+//            .addSnapshotListener { value, error ->
+//                if(error != null){
+//                    Log.d("testt", "getMyRoom: ${error}")
+//                    return@addSnapshotListener
+//                }
+//                value?.let {querySnapshot ->
+//                    if(!querySnapshot.isEmpty) {
+//                        val snapshot = querySnapshot.first()
+//                        room.postValue(snapshot.toObject())
+//                    }
+//                }
+//            }
+//
+//        return room
+//    }
     fun detachRoomInfo(roomId: String) : LiveData<RoomInfo>{
         val roomInfo = MutableLiveData<RoomInfo>()
 
