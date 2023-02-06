@@ -1,6 +1,7 @@
 package com.dldmswo1209.hallymtaxi.ui.carpool
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentPoolListBottomSheetBinding
 import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
+import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.*
@@ -24,7 +26,7 @@ class PoolListBottomSheetFragment(
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private var joinedRoom: CarPoolRoom? = null
     private var room: CarPoolRoom? = null
-    private var user: User? = null
+    private lateinit var user: User
     private val loadingDialog by lazy{
         LoadingDialog(requireContext())
     }
@@ -37,7 +39,7 @@ class PoolListBottomSheetFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         binding = FragmentPoolListBottomSheetBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -52,7 +54,11 @@ class PoolListBottomSheetFragment(
 
     private fun init() {
         binding.fragment = this
-        user = (activity as MainActivity).detachUserInfo()
+        user = (activity as MainActivity).detachUserInfo() ?: kotlin.run {
+            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            requireActivity().finish()
+            return
+        }
     }
 
     private fun setObserver() {
@@ -93,8 +99,7 @@ class PoolListBottomSheetFragment(
 
     private fun checkMyRoom(roomList: List<CarPoolRoom>){
         roomList.forEach { room->
-            if(room.user1?.uid == user?.uid || room.user2?.uid == user?.uid ||
-                room.user3?.uid == user?.uid || room.user4?.uid == user?.uid ){
+            if(room.participants.contains(user)){
                 // 내가 속한 방이 존재
                 joinedRoom = room
             }
@@ -105,7 +110,7 @@ class PoolListBottomSheetFragment(
         val filteredRoomList = roomList.toMutableList()
 
         for(idx in filteredRoomList.size-1 downTo 0){
-            if(filteredRoomList[idx].genderOption != GENDER_OPTION_NONE && filteredRoomList[idx].genderOption != user?.gender){
+            if(filteredRoomList[idx].genderOption != GENDER_OPTION_NONE && filteredRoomList[idx].genderOption != user.gender){
                 filteredRoomList.remove(filteredRoomList[idx]) // 성별 조건에 부합 하지 않은 방을 필터링
             }
         }
@@ -147,9 +152,7 @@ class PoolListBottomSheetFragment(
             }
         }
 
-        user?.let { user->
-            viewModel.joinRoom(room,user)
-        }
+        viewModel.joinRoom(room,user)
         loadingDialog.show()
     }
     private fun getSortedListByDistance(roomList: List<CarPoolRoom>) : List<CarPoolRoom>{

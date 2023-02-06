@@ -8,6 +8,8 @@ import com.dldmswo1209.hallymtaxi.database.AppDatabase
 import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.retrofit.*
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
@@ -61,60 +63,39 @@ class MainRepository(val context: Context) {
     fun joinRoom(room: CarPoolRoom, user: User): LiveData<Boolean>{
         val result = MutableLiveData<Boolean>()
 
-        if(room.user1?.uid == user.uid || room.user2?.uid == user.uid || room.user3?.uid == user.uid || room.user4?.uid == user.uid){
-            // 이미 방에 속해있음
-            result.value = true
+        if(room.participants.contains(user)){
+            // 이미 방에 속해 있음
+            result.postValue(true)
         }else{
             if(room.userMaxCount > room.userCount){
-                val updateMap = mutableMapOf<String, Any>()
-                val receiveTokens : List<String?>
-                if(room.user1 == null || room.user2 == null || room.user3 == null || room.user4 == null){
-                    when{
-                        room.user1 == null ->{
-                            updateMap["user1"] = user
-                            receiveTokens = listOf( room.user2?.fcmToken, room.user3?.fcmToken, room.user4?.fcmToken)
-                        }
-                        room.user2 == null ->{
-                            updateMap["user2"] = user
-                            receiveTokens = listOf( room.user1?.fcmToken, room.user3?.fcmToken, room.user4?.fcmToken)
-                        }
-                        room.user3 == null ->{
-                            updateMap["user3"] = user
-                            receiveTokens = listOf( room.user1?.fcmToken, room.user2?.fcmToken, room.user4?.fcmToken)
-                        }
-                        else ->{
-                            updateMap["user4"] = user
-                            receiveTokens = listOf( room.user1?.fcmToken, room.user2?.fcmToken, room.user3?.fcmToken)
-                        }
-                    }
-                    updateMap["userCount"] = room.userCount + 1
+                val receiveTokens = mutableListOf<String?>()
 
-                    fireStore.collection("Room").document(room.roomId).update(updateMap).addOnSuccessListener {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            async {
-                                delay(500)
-                            }.await()
-                            fireStore.collection("Room").document(room.roomId).get().addOnCompleteListener {
-                                if(it.isSuccessful){
-                                    val fetchedRoom = it.result.toObject<CarPoolRoom>() ?: return@addOnCompleteListener
-                                    if(fetchedRoom.user1?.uid == user.uid || fetchedRoom.user2?.uid == user.uid || fetchedRoom.user3?.uid == user.uid || fetchedRoom.user4?.uid == user.uid){
-                                        result.postValue(true)
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            sendMessage(roomId = room.roomId, chat = Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
-                                        }
-                                    }
+                val docRef = fireStore.collection("Room").document(room.roomId)
+                fireStore.runTransaction {transaction->
+                    val snapshot = transaction.get(docRef)
+                    val newCount = snapshot.getLong("userCount")?.plus(1) ?: return@runTransaction
 
-                                    else result.postValue(false)
-                                }
-                            }
-                        }
+                    if(newCount <= room.userMaxCount){
+                        transaction.update(docRef, "userCount", FieldValue.increment(1))
+                        transaction.update(docRef, "participants", FieldValue.arrayUnion(user))
+                    }else{
+                        throw FirebaseFirestoreException("userCount limit over", FirebaseFirestoreException.Code.ABORTED)
                     }
-                        .addOnFailureListener {
-                            result.postValue(false)
-                        }
-                }else{
-                    result.postValue(false)
                 }
+                    .addOnSuccessListener {
+                        result.postValue(true)
+                        room.participants.add(user)
+                        room.participants.forEach { receiveTokens.add(it.fcmToken) }
+
+                        CoroutineScope(Dispatchers.Main).launch {
+                            sendMessage(roomId = room.roomId, chat = Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
+                        }
+                    }
+                    .addOnFailureListener {
+                        Log.w("transaction", "Transaction failure: ${it}", )
+                        result.postValue(false)
+                    }
+
             }else{
                 result.postValue(false)
             }
@@ -168,7 +149,7 @@ class MainRepository(val context: Context) {
     }
 
     // 채팅방 퇴장
-    fun exitRoom(user: String, room: CarPoolRoom){
+    fun exitRoom(user: User, room: CarPoolRoom){
         if(room.userCount == 1){
             // 나 혼자 있으면 바로 채팅방 삭제해버리기
             deleteRoom(room.roomId)
@@ -176,7 +157,7 @@ class MainRepository(val context: Context) {
         }
 
         val updateMap = mapOf<String, Any?>(
-            user to null,
+            "participants" to FieldValue.arrayRemove(user),
             "userCount" to --room.userCount
         )
 

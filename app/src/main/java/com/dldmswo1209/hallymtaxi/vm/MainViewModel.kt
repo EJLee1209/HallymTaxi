@@ -209,7 +209,7 @@ class MainViewModel(
         return roomInfo
     }
 
-    fun exitRoom(user: String, room: CarPoolRoom) {
+    fun exitRoom(user: User, room: CarPoolRoom) {
         mainRepository.exitRoom(user, room)
         viewModelScope.launch(Dispatchers.IO) {
             roomRepository.deleteChatHistory(room.roomId)

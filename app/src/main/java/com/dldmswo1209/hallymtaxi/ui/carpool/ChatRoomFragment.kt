@@ -124,16 +124,10 @@ class ChatRoomFragment: Fragment() {
             if(room == null) return@observe
             binding.room = room
             this.room = room
+            tokenList = mutableListOf()
 
-            val userList = listOf(room.user1, room.user2, room.user3, room.user4 )
-            tokenList = mutableListOf(
-                room.user1?.fcmToken,
-                room.user2?.fcmToken,
-                room.user3?.fcmToken,
-                room.user4?.fcmToken,
-            )
-            if(tokenList.contains(currentUser.fcmToken)) tokenList.remove(currentUser.fcmToken)
-            chatListAdapter.userList = userList
+            room.participants.forEach { if(it.fcmToken != currentUser.fcmToken) tokenList.add(it.fcmToken) }
+            chatListAdapter.userList = room.participants
             chatListAdapter.notifyDataSetChanged()
         }
 
@@ -177,20 +171,7 @@ class ChatRoomFragment: Fragment() {
                         content = "정말로 나가시겠습니까?",
                         negativeButtonVisible = true,
                         positiveCallback = {
-                            when(currentUser.uid){
-                                room.user1?.uid ->{
-                                    viewModel.exitRoom("user1", room)
-                                }
-                                room.user2?.uid ->{
-                                    viewModel.exitRoom("user2", room)
-                                }
-                                room.user3?.uid ->{
-                                    viewModel.exitRoom("user3", room)
-                                }
-                                room.user4?.uid ->{
-                                    viewModel.exitRoom("user4", room)
-                                }
-                            }
+                            viewModel.exitRoom(currentUser, room)
                             messages.forEach {chat->
                                 if(chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid){
                                     // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함

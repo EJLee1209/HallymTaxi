@@ -138,8 +138,7 @@ class MapFragment: Fragment() {
 
         viewModel.poolList.observe(viewLifecycleOwner){ roomList->
             roomList.forEach { room->
-                if(room.user1?.uid == user?.uid || room.user2?.uid == user?.uid ||
-                    room.user3?.uid == user?.uid || room.user4?.uid == user?.uid ){
+                if(room.participants.contains(user)){
                     // 내가 속한 방이 존재
                     binding.viewCurrentMyRoom.visibility = View.VISIBLE
                     binding.room = room

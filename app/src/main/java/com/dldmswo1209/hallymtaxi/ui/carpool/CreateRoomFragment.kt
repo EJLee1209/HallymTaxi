@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.ui.carpool
 
+import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,6 +24,7 @@ import com.dldmswo1209.hallymtaxi.model.GENDER_OPTION_NONE
 import com.dldmswo1209.hallymtaxi.model.Place
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
+import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.map.MapFragment
 import com.dldmswo1209.hallymtaxi.ui.map.MapFragment.Companion.SEARCH_RESULT_BOTTOM_SHEET_TAG
 import com.dldmswo1209.hallymtaxi.ui.map.MapFragmentDirections
@@ -38,7 +40,7 @@ class CreateRoomFragment: Fragment() {
     private var maxCount = 4
     private lateinit var startPlace: Place
     private lateinit var endPlace: Place
-    private var currentUser : User? = null
+    private lateinit var currentUser : User
     private val viewModel : MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private var isClicked = false
     private lateinit var gender : String
@@ -74,7 +76,11 @@ class CreateRoomFragment: Fragment() {
         binding.etStartPoint.setText(startPlace.place_name)
         binding.etEndPoint.setText(endPlace.place_name)
 
-        currentUser = (activity as MainActivity).detachUserInfo()
+        currentUser = (activity as MainActivity).detachUserInfo() ?: kotlin.run {
+            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            requireActivity().finish()
+            return
+        }
 
         if(currentUser?.gender == "male"){
             gender = "남성"
@@ -189,7 +195,7 @@ class CreateRoomFragment: Fragment() {
         }
 
         val room = CarPoolRoom(
-            user1 = currentUser,
+            participants = mutableListOf(currentUser),
             userMaxCount = maxCount,
             departureTime = time,
             startPlace = startPlace,
