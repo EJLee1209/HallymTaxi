@@ -17,7 +17,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.*
@@ -36,10 +35,7 @@ class MainViewModel(
     private val auth = Firebase.auth
 
     private var userListener: ListenerRegistration? = null
-    private var messageListener: ListenerRegistration? = null
-    private var historyMessageListener: ListenerRegistration? = null
-    private var roomListener: ListenerRegistration? = null
-    private var roomInfoListener: ListenerRegistration? = null
+    private var myRoomListener: ListenerRegistration? = null
 
     private var _startPoint = MutableLiveData<ResultSearchKeyword>()
     val startPoint: LiveData<ResultSearchKeyword> = _startPoint
@@ -150,64 +146,28 @@ class MainViewModel(
         roomRepository.saveChat(chat)
     }
 
-    fun detachRoom(roomId: String): LiveData<CarPoolRoom> { // 현재 내가 참여 중인 채팅방을 실시간으로 가져옴
-        val room = MutableLiveData<CarPoolRoom>()
+    fun subscribeMyRoom(user: User) : LiveData<CarPoolRoom?> {
+        val room = MutableLiveData<CarPoolRoom?>()
 
-        roomListener =
-            fireStore.collection("Room").document(roomId).addSnapshotListener { value, error ->
-                if (error != null) {
-                    Log.d("testt", "detachRoom: ${error}")
+        myRoomListener = fireStore.collection("Room").whereArrayContains("participants", user)
+            .addSnapshotListener { value, error ->
+                if(error != null){
+                    Log.d("testt", "getMyRoom: ${error}")
                     return@addSnapshotListener
                 }
-                value?.let { snapshot ->
-                    room.value = snapshot.toObject<CarPoolRoom>()
+                value?.let {querySnapshot ->
+                    if(!querySnapshot.isEmpty) {
+                        val snapshot = querySnapshot.first()
+                        room.postValue(snapshot.toObject())
+                    }else{
+                        room.postValue(null) // 참여중인 방이 없음 null 반환
+                    }
                 }
-
-                Log.d("testt", "방 정보 가져오기!")
             }
-
-
 
         return room
     }
 
-//    fun getMyRoom(user: User) : LiveData<CarPoolRoom>{
-//        val room = MutableLiveData<CarPoolRoom>()
-//
-//        fireStore.collection("Room")
-//            .whereEqualTo("user2",user)
-//
-//            .addSnapshotListener { value, error ->
-//                if(error != null){
-//                    Log.d("testt", "getMyRoom: ${error}")
-//                    return@addSnapshotListener
-//                }
-//                value?.let {querySnapshot ->
-//                    if(!querySnapshot.isEmpty) {
-//                        val snapshot = querySnapshot.first()
-//                        room.postValue(snapshot.toObject())
-//                    }
-//                }
-//            }
-//
-//        return room
-//    }
-    fun detachRoomInfo(roomId: String) : LiveData<RoomInfo>{
-        val roomInfo = MutableLiveData<RoomInfo>()
-
-        roomInfoListener = fireStore.collection("RoomInfo").document(roomId).addSnapshotListener { value, error ->
-            if (error != null) {
-                Log.d("testt", "detachRoomInfo: ${error}")
-                return@addSnapshotListener
-            }
-            value?.let { snapshot ->
-                roomInfo.value = snapshot.toObject<RoomInfo>()
-            }
-
-            Log.d("testt", "detachRoomInfo")
-        }
-        return roomInfo
-    }
 
     fun exitRoom(user: User, room: CarPoolRoom) {
         mainRepository.exitRoom(user, room)
@@ -217,15 +177,12 @@ class MainViewModel(
         sharedPreferences.edit().putString("joinedRoom", "").apply()
     }
 
-    fun allListenerRemove() {
-        messageListener?.remove()
-        roomListener?.remove()
-        historyMessageListener?.remove()
-        roomInfoListener?.remove()
-    }
-
     fun userListenerRemove(){
         userListener?.remove()
+    }
+
+    fun myRoomListenerRemove(){
+        myRoomListener?.remove()
     }
 
     fun getFcmToken() {
@@ -256,7 +213,7 @@ class MainViewModel(
     override fun onCleared() {
         super.onCleared()
         Log.d("testt", "onCleared: ")
-        allListenerRemove()
+        userListenerRemove()
     }
 
 }

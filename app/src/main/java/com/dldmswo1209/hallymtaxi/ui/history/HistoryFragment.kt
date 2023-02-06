@@ -50,17 +50,7 @@ class HistoryFragment : Fragment() {
     }
 
     private fun setObservers() {
-        joinedRoom?.let {
-            viewModel.detachRoomInfo(it.roomId).observe(viewLifecycleOwner) { room ->
-                binding.roomInfo = room
-                binding.layoutCurrentJoinedRoom.visibility = View.VISIBLE
-                if (room.lastChatKey != lastChatKey) { // 새로운 메세지가 옴
-                    binding.ivNewChat.visibility = View.VISIBLE
-                } else {
-                    binding.ivNewChat.visibility = View.GONE
-                }
-            }
-        }
+
 
 //        HistoryListAdapter { roomInfo ->
 //            // 히스토리 클릭 이벤트
@@ -102,12 +92,10 @@ class HistoryFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
 
-        viewModel.allListenerRemove()
     }
 
     override fun onPause() {
         super.onPause()
 
-        viewModel.allListenerRemove()
     }
 }

@@ -59,6 +59,5 @@ class ChatRoomHistoryFragment: Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        viewModel.allListenerRemove()
     }
 }

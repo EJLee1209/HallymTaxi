@@ -120,7 +120,7 @@ class ChatRoomFragment: Fragment() {
     }
     @SuppressLint("NotifyDataSetChanged")
     private fun setObserver(){
-        viewModel.detachRoom(room.roomId).observe(viewLifecycleOwner){room ->
+        globalVariable.myRoom.observe(viewLifecycleOwner){ room->
             if(room == null) return@observe
             binding.room = room
             this.room = room
@@ -128,7 +128,6 @@ class ChatRoomFragment: Fragment() {
 
             room.participants.forEach { if(it.fcmToken != currentUser.fcmToken) tokenList.add(it.fcmToken) }
             chatListAdapter.userList = room.participants
-            chatListAdapter.notifyDataSetChanged()
         }
 
         viewModel.chatList.observe(viewLifecycleOwner){
@@ -204,7 +203,6 @@ class ChatRoomFragment: Fragment() {
         CoroutineScope(Dispatchers.IO).launch {
             async {
                 viewModel.sendMessage(chat, currentUser.name, tokenList.toList())
-//                delay(200)
             }.await()
             viewModel.detachChatList(room.roomId)
         }
@@ -223,13 +221,11 @@ class ChatRoomFragment: Fragment() {
 
     override fun onStart() {
         super.onStart()
-        Log.d("testt", "onStart: ")
         globalVariable.setIsViewChatRoom(true)
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d("testt", "onPause: ")
         globalVariable.setIsViewChatRoom(false)
     }
 
@@ -237,6 +233,5 @@ class ChatRoomFragment: Fragment() {
         super.onDetach()
         KeyboardUtils.removeKeyboardToggleListener(keyboardStateListener)
         Log.d("testt", "ChatRoomFragment onDetach: ")
-        viewModel.allListenerRemove()
     }
 }

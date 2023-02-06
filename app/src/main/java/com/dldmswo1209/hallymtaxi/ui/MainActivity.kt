@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
+import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
@@ -24,14 +25,17 @@ import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private var user: User? = null
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(application) }
+
     private var navController : NavController? = null
-    var joinedRoom: CarPoolRoom? = null
     private val checkNetwork by lazy{
         CheckNetwork(this)
     }
     var isNetworkActivate = false
+
+    var joinedRoom: CarPoolRoom? = null
+    private var user: User? = null
+    private lateinit var globalVariable: GlobalVariable
 
     //권한 가져오기
     companion object{
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        globalVariable = application as GlobalVariable
 
         requestPermission()
         getIntentExtraData()
@@ -74,6 +79,13 @@ class MainActivity : AppCompatActivity() {
             Log.d("testt", "setObserver: ${it}")
         } ?: kotlin.run {
             startActivity(Intent(this, SplashActivity::class.java))
+        }
+
+        user?.let {
+            viewModel.subscribeMyRoom(it).observe(this){room->
+                Log.d("testt", "global myRoom: ${room}")
+                globalVariable.setMyRoom(room)
+            }
         }
 
     }
@@ -115,6 +127,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.userListenerRemove()
+        viewModel.myRoomListenerRemove()
     }
 
 }

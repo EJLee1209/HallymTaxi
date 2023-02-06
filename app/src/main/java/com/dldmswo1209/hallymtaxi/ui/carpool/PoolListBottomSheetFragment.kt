@@ -24,9 +24,12 @@ class PoolListBottomSheetFragment(
 ) : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentPoolListBottomSheetBinding
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
-    private var joinedRoom: CarPoolRoom? = null
-    private var room: CarPoolRoom? = null
+
+    private var joinedRoom: CarPoolRoom? = null // 참여 중인 방
+    private var room: CarPoolRoom? = null // 참여하려는 방
     private lateinit var user: User
+    private lateinit var globalVariable: GlobalVariable
+
     private val loadingDialog by lazy{
         LoadingDialog(requireContext())
     }
@@ -49,7 +52,6 @@ class PoolListBottomSheetFragment(
 
         init()
         setObserver()
-
     }
 
     private fun init() {
@@ -59,12 +61,16 @@ class PoolListBottomSheetFragment(
             requireActivity().finish()
             return
         }
+        globalVariable = requireActivity().application as GlobalVariable
     }
 
     private fun setObserver() {
+        globalVariable.myRoom.observe(viewLifecycleOwner){ room->
+            joinedRoom = room
+        }
+
         viewModel.poolList.observe(viewLifecycleOwner) { roomList ->
             val filteredRoomList = filterRoom(roomList)
-            checkMyRoom(filteredRoomList)
             setRecyclerViewAdapter(filteredRoomList)
 
             if (filteredRoomList.isEmpty()) binding.tvNoPoolRoom.visibility = View.VISIBLE
@@ -95,15 +101,6 @@ class PoolListBottomSheetFragment(
         }
 
         viewModel.detachAllRoom()
-    }
-
-    private fun checkMyRoom(roomList: List<CarPoolRoom>){
-        roomList.forEach { room->
-            if(room.participants.contains(user)){
-                // 내가 속한 방이 존재
-                joinedRoom = room
-            }
-        }
     }
 
     private fun filterRoom(roomList: List<CarPoolRoom>) : List<CarPoolRoom>{

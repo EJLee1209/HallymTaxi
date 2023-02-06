@@ -70,6 +70,9 @@ class MainRepository(val context: Context) {
             if(room.userMaxCount > room.userCount){
                 val receiveTokens = mutableListOf<String?>()
 
+                // transaction 을 사용해서 하나의 document 에 접근 하려는 다수의 작업들을 통제
+                // 예를 들어 인원제한이 3명인 채팅방에 현재 2명이 입장해 있고, 2명 이상의 유저가 동시에 채팅방 입장을 하려는 경우
+                // 먼저 입장이 완료된 유저만 성공시키고, 나머지 유저는 실패 처리
                 val docRef = fireStore.collection("Room").document(room.roomId)
                 fireStore.runTransaction {transaction->
                     val snapshot = transaction.get(docRef)
@@ -83,16 +86,16 @@ class MainRepository(val context: Context) {
                     }
                 }
                     .addOnSuccessListener {
+                        // 입장 성공
                         result.postValue(true)
                         room.participants.add(user)
-                        room.participants.forEach { receiveTokens.add(it.fcmToken) }
-
+                        room.participants.forEach { if(it.fcmToken != user.fcmToken) receiveTokens.add(it.fcmToken) }
                         CoroutineScope(Dispatchers.Main).launch {
                             sendMessage(roomId = room.roomId, chat = Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
                         }
                     }
                     .addOnFailureListener {
-                        Log.w("transaction", "Transaction failure: ${it}", )
+                        // 입장 실패
                         result.postValue(false)
                     }
 

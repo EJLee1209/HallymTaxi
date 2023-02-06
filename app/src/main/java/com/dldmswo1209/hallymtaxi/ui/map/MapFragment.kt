@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.LocationService
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentMapBinding
@@ -43,6 +44,7 @@ class MapFragment: Fragment() {
     private var poolListBottomSheet : PoolListBottomSheetFragment? = null
     private var joinedRoom: CarPoolRoom? = null
     private var user : User? = null
+    private lateinit var globalVariable: GlobalVariable
 
     companion object{
         const val SEARCH_RESULT_BOTTOM_SHEET_TAG = "SearchResultBottomSheetFragment"
@@ -68,45 +70,26 @@ class MapFragment: Fragment() {
 
     }
 
-    private fun onShortCutButtonClickListener(){
-
-        binding.apply {
-            btnShortCutChuncheonStation.setOnClickListener {
-            locationService.getCurrentAddress()
-            searchResultClickEvent(place_chuncheon_station, false)
-        }
-
-            btnShortCutHallym.setOnClickListener {
-                locationService.getCurrentAddress()
-                searchResultClickEvent(place_hallym_univ, false)
-            }
-
-            btnShortCutMyeongDong.setOnClickListener {
-                locationService.getCurrentAddress()
-                searchResultClickEvent(place_myeoungdong, false)
-            }
-            btnShortCutBusTerminal.setOnClickListener {
-                locationService.getCurrentAddress()
-                searchResultClickEvent(place_terminal, false)
-            }
-
-            btnShortCutKangwonUniv.setOnClickListener {
-                locationService.getCurrentAddress()
-                searchResultClickEvent(place_kangwon_univ, false)
-            }
-        }
-
-    }
-
     private fun init(){
         locationService = LocationService(requireActivity())
         moveCamera(hallym_lat, hallym_lng, 2f)
         user = (activity as MainActivity).detachUserInfo()
 
         binding.fragment = this
+        globalVariable = requireActivity().application as GlobalVariable
     }
 
     private fun setObservers(){
+        globalVariable.myRoom.observe(viewLifecycleOwner){room->
+            if(room != null){
+                binding.viewCurrentMyRoom.visibility = View.VISIBLE
+                binding.room = room
+            }else{
+                binding.viewCurrentMyRoom.visibility = View.GONE
+            }
+            joinedRoom = room
+        }
+
         viewModel.startPoint.observe(viewLifecycleOwner){ result->
             val placeList = result.documents
 
@@ -136,22 +119,6 @@ class MapFragment: Fragment() {
             }
         }
 
-        viewModel.poolList.observe(viewLifecycleOwner){ roomList->
-            roomList.forEach { room->
-                if(room.participants.contains(user)){
-                    // 내가 속한 방이 존재
-                    binding.viewCurrentMyRoom.visibility = View.VISIBLE
-                    binding.room = room
-                    joinedRoom = room
-                    (activity as MainActivity).joinedRoom = room
-
-                    return@observe
-                }
-            }
-            joinedRoom = null
-            (activity as MainActivity).joinedRoom = null
-            binding.viewCurrentMyRoom.visibility = View.GONE
-        }
         viewModel.isJoined.observe(viewLifecycleOwner){
             if(it){
                 // 채팅방 입장
@@ -185,6 +152,36 @@ class MapFragment: Fragment() {
             }
             true
         }
+    }
+
+    private fun onShortCutButtonClickListener(){
+
+        binding.apply {
+            btnShortCutChuncheonStation.setOnClickListener {
+                locationService.getCurrentAddress()
+                searchResultClickEvent(place_chuncheon_station, false)
+            }
+
+            btnShortCutHallym.setOnClickListener {
+                locationService.getCurrentAddress()
+                searchResultClickEvent(place_hallym_univ, false)
+            }
+
+            btnShortCutMyeongDong.setOnClickListener {
+                locationService.getCurrentAddress()
+                searchResultClickEvent(place_myeoungdong, false)
+            }
+            btnShortCutBusTerminal.setOnClickListener {
+                locationService.getCurrentAddress()
+                searchResultClickEvent(place_terminal, false)
+            }
+
+            btnShortCutKangwonUniv.setOnClickListener {
+                locationService.getCurrentAddress()
+                searchResultClickEvent(place_kangwon_univ, false)
+            }
+        }
+
     }
 
     private fun searchResultClickEvent(place: Place, isStartPoint: Boolean){
