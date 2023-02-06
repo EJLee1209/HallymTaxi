@@ -14,6 +14,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
+import java.lang.reflect.Field
 
 class MainRepository(val context: Context) {
 
@@ -141,32 +142,26 @@ class MainRepository(val context: Context) {
     // 채팅방 삭제(모든 참여자가 퇴장한 경우)
     private fun deleteRoom(roomId: String){
         fireStore.collection("Room").document(roomId).delete().addOnSuccessListener {
-            CoroutineScope(Dispatchers.Main).launch {
-                withContext(Dispatchers.Default) {
-                    delay(1000)
-                }
-                fireStore.collection("RoomInfo").document(roomId).delete()
-            }
+            fireStore.collection("RoomInfo").document(roomId).delete()
         }
     }
 
     // 채팅방 퇴장
     fun exitRoom(user: User, room: CarPoolRoom){
-        if(room.userCount == 1){
-            // 나 혼자 있으면 바로 채팅방 삭제해버리기
-            deleteRoom(room.roomId)
-            return
-        }
-
-        val updateMap = mapOf<String, Any?>(
-            "participants" to FieldValue.arrayRemove(user),
-            "userCount" to --room.userCount
-        )
-
         // 채팅방에 나말고도 다른 사람 존재하면, 그냥 나만 퇴장
-        fireStore.collection("Room").document(room.roomId).update(updateMap)
-    }
+        val docRef = fireStore.collection("Room").document(room.roomId)
+        fireStore.runTransaction{transaction->
+            val snapshot = transaction.get(docRef)
+            val userCount = snapshot.getLong("userCount")?.minus(1) ?: return@runTransaction
 
+            if(userCount > 0){
+                transaction.update(docRef,"userCount",userCount)
+                transaction.update(docRef, "participants", FieldValue.arrayRemove(user))
+            }else{
+                deleteRoom(room.roomId)
+            }
+        }
+    }
 
     fun updateFcmToken(uid: String, token: String){
         fireStore.collection("User").document(uid).update(mapOf("fcmToken" to token))
