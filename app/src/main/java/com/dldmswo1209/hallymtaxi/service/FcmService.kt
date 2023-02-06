@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.dldmswo1209.hallymtaxi.R
+import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.dateToString
 import com.dldmswo1209.hallymtaxi.model.Chat
 import com.dldmswo1209.hallymtaxi.repository.MainRepository
@@ -18,6 +19,7 @@ import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.logging.Logger.global
 
 class FcmService: FirebaseMessagingService() {
     private var broadcaster: LocalBroadcastManager? = null
@@ -40,6 +42,8 @@ class FcmService: FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+
+        val globalVariable = application as GlobalVariable
 
         val notificationManager = NotificationManagerCompat.from(applicationContext)
 
@@ -68,7 +72,9 @@ class FcmService: FirebaseMessagingService() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority = NotificationCompat.PRIORITY_MAX
 
         val notification = builder.build()
-        notificationManager.notify(1, notification)
+        if(!globalVariable.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
+            notificationManager.notify(1, notification)
+        }
 
         val notificationMessage = Intent("newMessage")
         broadcaster?.sendBroadcast(notificationMessage) // 브로드 캐스트 리시버를 통해 노티가 온 경우 알려준다.

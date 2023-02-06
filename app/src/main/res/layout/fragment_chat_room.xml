@@ -8,6 +8,10 @@
         <variable
             name="fragment"
             type="com.dldmswo1209.hallymtaxi.ui.carpool.ChatRoomFragment" />
+
+        <variable
+            name="room"
+            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -38,7 +42,8 @@
             app:layout_constraintEnd_toStartOf="@id/btn_menu"
             app:layout_constraintStart_toEndOf="@id/btn_back"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="한림대학교 - 춘천역 경춘선" />
+            tools:text="한림대학교 - 춘천역 경춘선"
+            android:text="@{@string/room_title_format(room.startPlace.place_name, room.endPlace.place_name)}"/>
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btn_menu"
@@ -70,10 +75,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="13dp"
+            android:text="@{@string/user_count_format(room.userCount)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/bg_white"
-            tools:text="인원 4명" />
+            tools:text="인원 2명" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_message"
@@ -119,6 +125,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@null"
+                android:onClick="@{()->fragment.onClickSend()}"
                 android:padding="10dp"
                 android:src="@drawable/arrow_up_circle"
                 android:visibility="gone"

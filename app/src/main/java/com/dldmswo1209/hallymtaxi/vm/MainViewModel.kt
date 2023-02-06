@@ -35,6 +35,8 @@ class MainViewModel(
 
     private val fireStore = Firebase.firestore
     private val auth = Firebase.auth
+
+    private var userListener: ListenerRegistration? = null
     private var messageListener: ListenerRegistration? = null
     private var historyMessageListener: ListenerRegistration? = null
     private var roomListener: ListenerRegistration? = null

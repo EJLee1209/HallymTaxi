@@ -16,6 +16,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
+import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
@@ -109,6 +110,6 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         checkNetwork.unRegisterNetworkListener()
-
     }
+
 }
