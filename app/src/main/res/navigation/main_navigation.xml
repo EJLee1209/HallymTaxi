@@ -76,5 +76,10 @@
     <fragment
         android:id="@+id/chatRoomHistoryFragment"
         android:name="com.dldmswo1209.hallymtaxi.ui.history.ChatRoomHistoryFragment"
-        android:label="ChatRoomHistoryFragment" />
+        android:label="ChatRoomHistoryFragment" >
+        <argument
+            android:name="roomId"
+            app:argType="string"
+            android:defaultValue='""' />
+    </fragment>
 </navigation>

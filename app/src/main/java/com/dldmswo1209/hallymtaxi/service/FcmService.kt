@@ -20,8 +20,9 @@ class FcmService: FirebaseMessagingService() {
     private var broadcaster: LocalBroadcastManager? = null
 
     companion object{
-        const val CHANNEL_ID = "hallym_univ"
-        const val CHANNEL_NAME = "hallym_univ"
+        const val CHANNEL_ID = "com.dldmswo1209.hallymtaxi"
+        const val CHANNEL_NAME = "com.dldmswo1209.hallymtaxi"
+        const val GROUP_KEY_MESSAGE = "com.dldmswo1209.hallymtaxi.message"
     }
 
     override fun onCreate() {
@@ -55,28 +56,23 @@ class FcmService: FirebaseMessagingService() {
         val message = remoteMessage.data["message"].toString()
         val messageType = remoteMessage.data["messageType"].toString()
         val dateTime = remoteMessage.data["dateTime"].toString()
-        val chat = Chat(roomId = roomId, userId = userId, msg = message, dateTime = dateTime, messageType = messageType)
+        val chat = Chat(roomId = roomId, userId = userId, userName = userName, msg = message, dateTime = dateTime, messageType = messageType)
 
         val roomRepo = RoomRepository(this)
         roomRepo.saveChat(chat) // 채팅 저장
 
-        val sender = Person.Builder().setName(userName).build()
-        val me = Person.Builder().setName("Me").build()
-        builder.setStyle(NotificationCompat.MessagingStyle(me)
-            .setConversationTitle("한림카풀")
-            .addMessage(message, System.currentTimeMillis(), sender)
-        )
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setAutoCancel(true)
+        builder.setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle(userName)
+            .setContentText(message)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority = NotificationCompat.PRIORITY_MAX
 
-
         val notification = builder.build()
+
         if(!globalVariable.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
             notificationManager.notify(System.currentTimeMillis().toInt(), notification)
-            roomRepo.insertRoomInfo(RoomInfo(roomId, message, dateTime, true))
+            roomRepo.insertRoomInfo(RoomInfo(roomId, message, dateTime, true, isActivate = true))
         }else{
-            roomRepo.insertRoomInfo(RoomInfo(roomId, message, dateTime, false))
+            roomRepo.insertRoomInfo(RoomInfo(roomId, message, dateTime, false, isActivate = true))
         }
 
         val notificationMessage = Intent("newMessage")

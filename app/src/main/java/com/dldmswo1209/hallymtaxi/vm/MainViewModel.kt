@@ -59,6 +59,9 @@ class MainViewModel(
     private var _roomInfo = MutableLiveData<RoomInfo>()
     val roomInfo : LiveData<RoomInfo> = _roomInfo
 
+    private var _roomHistory = MutableLiveData<List<RoomInfo>>()
+    val roomHistory : LiveData<List<RoomInfo>> = _roomHistory
+
     fun logout(activity: Activity, uid: String) {
         myRoomListenerRemove()
         userListenerRemove()
@@ -174,10 +177,11 @@ class MainViewModel(
 
     fun exitRoom(user: User, room: CarPoolRoom) {
         mainRepository.exitRoom(user, room)
-        viewModelScope.launch(Dispatchers.IO) {
-            roomRepository.deleteChatHistory(room.roomId)
-        }
         sharedPreferences.edit().putString("joinedRoom", "").apply()
+    }
+    fun insertRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
+        Log.d("testt", "roomInfo 저장!: ${roomInfo}")
+        roomRepository.insertRoomInfo(roomInfo)
     }
 
     fun detachRoomInfo(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -186,6 +190,10 @@ class MainViewModel(
 
     fun updateRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
         roomRepository.updateRoomInfo(roomInfo)
+    }
+
+    fun detachRoomInfoHistory() = viewModelScope.launch(Dispatchers.IO) {
+        _roomHistory.postValue(roomRepository.detachRoomInfoHistory())
     }
 
     fun userListenerRemove(){

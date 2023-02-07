@@ -17,5 +17,11 @@ data class RoomInfo(
     @ColumnInfo(name = "lastReceiveMsgDateTime")
     var lastReceiveMsgDateTime: String, // 가장 최근에 메세지를 받은 시간
     @ColumnInfo(name = "isNewMessage")
-    var isNewMessage: Boolean = true, // 읽지 않은 새 메세지가 왔는지 여부
+    var isNewMessage: Boolean = false, // 읽지 않은 새 메세지가 왔는지 여부
+    @ColumnInfo(name = "isActivate")
+    var isActivate: Boolean = false, // 현재 활성화 돼있는 방인지 히스토리 인지 여부
+    @ColumnInfo(name = "startPlaceName")
+    var startPlaceName: String = "",
+    @ColumnInfo(name = "endPlaceName")
+    var endPlaceName: String = "",
 )

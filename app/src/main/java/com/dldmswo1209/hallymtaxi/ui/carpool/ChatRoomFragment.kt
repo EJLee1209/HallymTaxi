@@ -35,6 +35,7 @@ class ChatRoomFragment: Fragment() {
     private lateinit var globalVariable: GlobalVariable
 
     private lateinit var room : CarPoolRoom
+    private var roomInfo: RoomInfo? = null
     private var messages: MutableList<Chat> = mutableListOf()
     private lateinit var currentUser: User
     private var tokenList = mutableListOf<String?>()
@@ -73,7 +74,34 @@ class ChatRoomFragment: Fragment() {
         setObserver()
         registerBroadcastReceiver()
     }
+    @SuppressLint("SetTextI18n")
+    private fun init() {
+        binding.fragment = this
+        val args: ChatRoomFragmentArgs by navArgs()
+        room = args.room
 
+        globalVariable = requireActivity().application as GlobalVariable
+        currentUser = globalVariable.getUser() ?: kotlin.run {
+            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            requireActivity().finish()
+            return
+        }
+        KeyboardUtils.addKeyboardToggleListener(requireActivity(), keyboardStateListener)
+        setRecyclerAdapter()
+        editTextWatcher()
+    }
+    private fun backPressedSetCallback(){
+        callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                onClickBack()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+    }
+    private fun setRecyclerAdapter(){
+        chatListAdapter = ChatListAdapter(currentUser)
+        binding.rvMessage.adapter = chatListAdapter
+    }
     private fun editTextWatcher(){
         binding.etMsg.addTextChangedListener(object: TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -87,38 +115,9 @@ class ChatRoomFragment: Fragment() {
 
         })
     }
-    private fun registerBroadcastReceiver() {
-        // 새로운 메세지가 온 경우 브로드 캐스트 리시버를 통해 알 수 있음
-        LocalBroadcastManager.getInstance(requireContext())
-            .registerReceiver(object : BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    viewModel.detachChatList(room.roomId) // 채팅 내역 조회
-                }
-
-            }, IntentFilter("newMessage"))
-    }
-    @SuppressLint("SetTextI18n")
-    private fun init() {
-        binding.fragment = this
-        val args: ChatRoomFragmentArgs by navArgs()
-        room = args.room
-
-        globalVariable = requireActivity().application as GlobalVariable
-        currentUser = globalVariable.getUser() ?: kotlin.run {
-            startActivity(Intent(requireContext(), SplashActivity::class.java))
-            requireActivity().finish()
-            return
-        }
-
-        KeyboardUtils.addKeyboardToggleListener(requireActivity(), keyboardStateListener)
-        chatListAdapter = ChatListAdapter(currentUser, listOf())
-        binding.rvMessage.adapter = chatListAdapter
-        viewModel.detachChatList(room.roomId)
-
-        editTextWatcher()
-    }
     @SuppressLint("NotifyDataSetChanged")
     private fun setObserver(){
+        viewModel.detachChatList(room.roomId)
         globalVariable.myRoom.observe(viewLifecycleOwner){ room->
             if(room == null) return@observe
             binding.room = room
@@ -126,7 +125,6 @@ class ChatRoomFragment: Fragment() {
             tokenList = mutableListOf()
 
             room.participants.forEach { if(it.fcmToken != currentUser.fcmToken) tokenList.add(it.fcmToken) }
-            chatListAdapter.userList = room.participants
         }
 
         viewModel.chatList.observe(viewLifecycleOwner){
@@ -138,9 +136,19 @@ class ChatRoomFragment: Fragment() {
         viewModel.roomInfo.observe(viewLifecycleOwner){
             if(it == null) return@observe
             it.isNewMessage = false
+            roomInfo = it
             viewModel.updateRoomInfo(it)
         }
+    }
+    private fun registerBroadcastReceiver() {
+        // 새로운 메세지가 온 경우 브로드 캐스트 리시버를 통해 알 수 있음
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    viewModel.detachChatList(room.roomId) // 채팅 내역 조회
+                }
 
+            }, IntentFilter("newMessage"))
     }
 
     private fun scrollToLastItem(){
@@ -175,19 +183,24 @@ class ChatRoomFragment: Fragment() {
                         content = "정말로 나가시겠습니까?",
                         negativeButtonVisible = true,
                         positiveCallback = {
-                            viewModel.exitRoom(currentUser, room)
-                            messages.forEach {chat->
-                                if(chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid){
-                                    // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
-                                    val lastMsg = messages.last()
-//                                    val roomInfo = RoomInfo(room.roomId, lastMsg.msg, lastMsg.dateTime, lastMsg.id, room.startPlace, room.endPlace)
-//                                    viewModel.saveHistory(roomInfo, messages)
-                                    return@forEach
-                                }
-                            }
                             CoroutineScope(Dispatchers.IO).launch {
                                 viewModel.sendMessage(Chat(roomId = room.roomId, userId = currentUser.uid, msg = "${currentUser.name}님이 나갔습니다", messageType = CHAT_EXIT), currentUser.name, tokenList)
                             }
+                            messages.forEachIndexed {idx,chat->
+                                if(chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid){
+                                    // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
+                                    roomInfo?.let {roomInfo ->
+                                        roomInfo.isActivate = false
+                                        roomInfo.startPlaceName = room.startPlace.place_name
+                                        roomInfo.endPlaceName = room.endPlace.place_name
+                                        roomInfo.lastMsg = messages.last().msg
+                                        roomInfo.lastReceiveMsgDateTime = messages.last().dateTime
+                                        viewModel.insertRoomInfo(roomInfo)
+                                    }
+                                    return@forEachIndexed
+                                }
+                            }
+                            viewModel.exitRoom(currentUser, room)
                             onClickBack()
                         }
                     )
@@ -213,15 +226,6 @@ class ChatRoomFragment: Fragment() {
         }
 
         binding.etMsg.text.clear()
-    }
-
-    private fun backPressedSetCallback(){
-        callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                onClickBack()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
 
     override fun onStart() {

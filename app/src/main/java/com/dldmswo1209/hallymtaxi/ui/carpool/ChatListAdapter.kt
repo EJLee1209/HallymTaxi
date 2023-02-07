@@ -16,8 +16,7 @@ import com.dldmswo1209.hallymtaxi.model.*
 // 유저리스트를 넣어주면 될듯
 
 class ChatListAdapter(
-    private val currentUser: User,
-    var userList: List<User?>
+    private val currentUser: User
 ) : ListAdapter<Chat, RecyclerView.ViewHolder>(diffUtil) {
     override fun getItemViewType(position: Int): Int {
         val item = currentList[position]
@@ -33,7 +32,6 @@ class ChatListAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(chat: Chat) {
             binding.chat = chat
-//            binding.tvTime.text = TimeService.currentTime(chat.dateTime.toDate().dateToString())
             binding.executePendingBindings()
         }
     }
@@ -42,13 +40,6 @@ class ChatListAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(chat: Chat) {
             binding.chat = chat
-//            binding.tvTime.text = TimeService.currentTime(chat.dateTime.toDate().dateToString())
-            userList.forEach {
-                if(chat.userId == it?.uid) {
-                    binding.user = it
-                    return@forEach
-                }
-            }
             binding.executePendingBindings()
         }
     }

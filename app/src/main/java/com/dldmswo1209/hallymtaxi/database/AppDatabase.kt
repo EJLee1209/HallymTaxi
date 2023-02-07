@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 import com.dldmswo1209.hallymtaxi.model.Chat
 import com.dldmswo1209.hallymtaxi.model.RoomInfo
 
-@Database(entities = [Chat::class, RoomInfo::class], version = 3)
+@Database(entities = [Chat::class, RoomInfo::class], version = 5)
 abstract class AppDatabase : RoomDatabase(){
     abstract fun chatDao(): ChatDao
     abstract fun roomInfoDao(): RoomInfoDao

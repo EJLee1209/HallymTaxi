@@ -54,15 +54,26 @@
             tools:visibility="visible">
 
             <TextView
+                android:id="@+id/tv_activate_room_title"
+                style="@style/Text13.Blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="진행중인 카풀"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="13dp"
+                android:layout_marginTop="11dp"/>
+
+            <TextView
                 android:id="@+id/tv_start_place_name"
                 style="@style/TextSubTitle.Black.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="5dp"
                 android:text="@{room.startPlace.place_name}"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_activate_room_title"
                 tools:text="한림대학교 대학본부" />
 
             <androidx.constraintlayout.utils.widget.ImageFilterView
@@ -94,7 +105,7 @@
                 android:layout_marginTop="8.6dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:paddingBottom="17dp"
+                android:paddingBottom="13dp"
                 android:text="@{room_info.lastMsg}"
                 app:layout_constraintEnd_toStartOf="@id/iv_new_chat"
                 app:layout_constraintStart_toStartOf="parent"
@@ -119,32 +130,24 @@
                 style="@style/Text14.d9d9d9.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="17dp"
+                android:layout_marginTop="31dp"
                 android:layout_marginEnd="14dp"
                 time="@{room_info.lastReceiveMsgDateTime.toString()}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="오후 03:12" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="3dp"
-                android:background="@color/hallym_grey_f5f5f5"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <View
-                android:id="@+id/view_pin"
-                android:layout_width="4dp"
-                android:layout_height="0dp"
-                android:background="@drawable/stick"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:background="@color/hallym_grey_f5f5f5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_current_joined_room"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_history"
@@ -156,7 +159,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_current_joined_room"
+            app:layout_constraintTop_toBottomOf="@id/divider"
             tools:listitem="@layout/item_history" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -168,9 +171,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:gravity="center"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:gravity="center">
 
             <androidx.constraintlayout.utils.widget.ImageFilterView
                 android:layout_width="wrap_content"

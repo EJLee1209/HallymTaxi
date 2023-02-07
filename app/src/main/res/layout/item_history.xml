@@ -8,9 +8,6 @@
         <variable
             name="room_info"
             type="com.dldmswo1209.hallymtaxi.model.RoomInfo" />
-        <variable
-            name="room"
-            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
 
     </data>
 
@@ -25,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="18dp"
-            android:text="@{room.startPlace.place_name}"
+            android:text="@{room_info.startPlaceName}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="한림대학교 대학본부" />
@@ -45,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1.4dp"
-            android:text="@{room.endPlace.place_name}"
+            android:text="@{room_info.endPlaceName}"
             app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
             app:layout_constraintTop_toBottomOf="@id/tv_start_place_name"
             tools:text="춘천역 경춘선" />

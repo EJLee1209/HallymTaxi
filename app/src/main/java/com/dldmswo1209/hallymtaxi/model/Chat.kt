@@ -15,6 +15,8 @@ data class Chat(
     val roomId: String = "" ,
     @ColumnInfo(name = "userId")
     val userId: String = "", // 보내는 유저 uid
+    @ColumnInfo(name = "userName")
+    val userName: String = "",
     @ColumnInfo(name = "msg")
     val msg: String = "", // 메세지
     @ColumnInfo(name = "dateTime")

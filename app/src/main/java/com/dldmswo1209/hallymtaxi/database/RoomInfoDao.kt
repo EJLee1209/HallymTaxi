@@ -19,4 +19,7 @@ interface RoomInfoDao {
     @Update
     fun updateRoomInfo(roomInfo: RoomInfo)
 
+    @Query("SELECT * FROM room_info WHERE isActivate = :isActivate")
+    fun detachRoomInfoHistory(isActivate: Boolean = false) : List<RoomInfo>
+
 }

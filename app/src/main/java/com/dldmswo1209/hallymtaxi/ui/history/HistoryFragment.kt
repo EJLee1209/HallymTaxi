@@ -31,8 +31,10 @@ class HistoryFragment : Fragment() {
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private lateinit var user: User
     private var joinedRoom: CarPoolRoom? = null
-    private var lastChatKey: Int = -1
+    private var history: List<RoomInfo> = listOf()
     private lateinit var globalVariable: GlobalVariable
+    private lateinit var historyListAdapter: HistoryListAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,15 +60,22 @@ class HistoryFragment : Fragment() {
             return
         }
         binding.fragment = this
-        val sharedPreference = requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
-        lastChatKey = sharedPreference.getInt("lastChatKey", -1)
+        viewModel.detachRoomInfoHistory()
+
+        historyListAdapter = HistoryListAdapter {
+            val action = HistoryFragmentDirections.actionNavigationHistoryToChatRoomHistoryFragment(it.roomId)
+            findNavController().navigate(action)
+        }
+        binding.rvHistory.adapter = historyListAdapter
+
     }
 
     private fun setObservers() {
         globalVariable.myRoom.observe(viewLifecycleOwner){
+            Log.d("testt", "myRoom: ${it}")
             if(it == null) {
+                if(history.isEmpty()) binding.layoutNoPoolRoom.visibility = View.VISIBLE
                 binding.layoutCurrentJoinedRoom.visibility = View.GONE
-                binding.layoutNoPoolRoom.visibility = View.VISIBLE
                 return@observe
             }
             binding.room = it
@@ -78,6 +87,16 @@ class HistoryFragment : Fragment() {
 
         viewModel.roomInfo.observe(viewLifecycleOwner){
             binding.roomInfo = it
+        }
+        viewModel.roomHistory.observe(viewLifecycleOwner){
+            Log.d("testt", "room history: ${it}")
+            if(it.isEmpty()){
+                if(joinedRoom == null) binding.layoutNoPoolRoom.visibility = View.VISIBLE
+                return@observe
+            }
+            binding.layoutNoPoolRoom.visibility = View.GONE
+            history = it
+            historyListAdapter.submitList(it)
         }
         
     }
@@ -111,13 +130,4 @@ class HistoryFragment : Fragment() {
         }
     }
 
-    override fun onDetach() {
-        super.onDetach()
-
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-    }
 }

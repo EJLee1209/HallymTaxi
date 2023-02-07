@@ -1,6 +1,7 @@
 package com.dldmswo1209.hallymtaxi.ui.history
 
 import android.content.Intent
+import android.content.LocusId
 import android.os.Bundle
 import android.provider.Settings.Global
 import android.view.LayoutInflater
@@ -23,9 +24,10 @@ import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 class ChatRoomHistoryFragment: Fragment() {
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private lateinit var binding: FragmentChatRoomHistoryBinding
-    private lateinit var roomInfo: RoomInfo
+    private lateinit var roomId: String
     private lateinit var globalVariable: GlobalVariable
     private lateinit var user: User
+    private lateinit var chatListAdapter: ChatListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,36 +41,38 @@ class ChatRoomHistoryFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
-
+        setObservers()
     }
 
     private fun init(){
-//        val args : ChatRoomHistoryFragmentArgs by navArgs()
-//        roomInfo = args.roomInfo
+        val args : ChatRoomHistoryFragmentArgs by navArgs()
+        roomId = args.roomId
         globalVariable = requireActivity().application as GlobalVariable
         user = globalVariable.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return
         }
-
         binding.fragment = this
+        chatListAdapter = ChatListAdapter(user)
+        binding.rvMessage.adapter = chatListAdapter
+    }
 
-//        binding.tvRoomTitle.text = "${roomInfo.startPlace.place_name} - ${roomInfo.endPlace.place_name}"
+    private fun setObservers(){
+        viewModel.detachChatList(roomId)
+        viewModel.detachRoomInfo(roomId)
 
-//        ChatListAdapter(user,).apply {
-//            viewModel.getHistoryMessage(roomInfo.roomId).observe(viewLifecycleOwner){
-//                binding.rvMessage.adapter = this
-//                submitList(it)
-//            }
-//        }
+        viewModel.chatList.observe(viewLifecycleOwner){
+            chatListAdapter.submitList(it)
+        }
+
+        viewModel.roomInfo.observe(viewLifecycleOwner){
+            binding.roomInfo = it
+        }
     }
 
     fun onClickBack(){
         findNavController().popBackStack()
     }
 
-    override fun onDetach() {
-        super.onDetach()
-    }
 }

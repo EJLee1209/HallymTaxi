@@ -17,7 +17,7 @@ object TimeService {
     }
 
     fun currentDate(timestamp: String) : String{
-        return timestamp.split("T")[0]
+        return timestamp.split(" ")[0]
     }
 
     fun dateTimeSplitHelper(timestamp: String, target: String) : Int{

@@ -30,7 +30,7 @@ class MainRepository(val context: Context) {
         ref.set(room).addOnSuccessListener {
             newRoom.value = room
             CoroutineScope(Dispatchers.Main).launch {
-                sendMessage(chat = Chat(roomId = room.roomId, userId = user.uid, messageType = CHAT_JOIN), user.name, listOf())
+                sendMessage(chat = Chat(roomId = room.roomId, userId = user.uid, userName = user.name, messageType = CHAT_JOIN), user.name, listOf())
             }
         }
 
@@ -91,7 +91,7 @@ class MainRepository(val context: Context) {
                         room.participants.add(user)
                         room.participants.forEach { if(it.fcmToken != user.fcmToken) receiveTokens.add(it.fcmToken) }
                         CoroutineScope(Dispatchers.Main).launch {
-                            sendMessage(chat = Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
+                            sendMessage(chat = Chat(roomId = room.roomId, userId = user.uid, userName = user.name ,msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
                         }
                     }
                     .addOnFailureListener {
@@ -110,7 +110,9 @@ class MainRepository(val context: Context) {
     suspend fun sendMessage(chat: Chat, senderName: String, receiveTokens: List<String?>){
         CoroutineScope(Dispatchers.IO).launch {
             RoomRepository(context).saveChat(chat)
-            RoomRepository(context).insertRoomInfo(RoomInfo(chat.roomId, chat.msg, chat.dateTime, false))
+            if(chat.messageType != CHAT_EXIT) {
+                RoomRepository(context).insertRoomInfo(RoomInfo(chat.roomId, chat.msg, chat.dateTime, false, isActivate = true))
+            }
         }
 
         receiveTokens.forEach {
