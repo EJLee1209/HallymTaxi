@@ -135,6 +135,12 @@ class ChatRoomFragment: Fragment() {
             scrollToLastItem()
         }
 
+        viewModel.roomInfo.observe(viewLifecycleOwner){
+            if(it == null) return@observe
+            it.isNewMessage = false
+            viewModel.updateRoomInfo(it)
+        }
+
     }
 
     private fun scrollToLastItem(){
@@ -174,7 +180,7 @@ class ChatRoomFragment: Fragment() {
                                 if(chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid){
                                     // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
                                     val lastMsg = messages.last()
-                                    val roomInfo = RoomInfo(room.roomId, lastMsg.msg, lastMsg.dateTime, lastMsg.id, room.startPlace, room.endPlace)
+//                                    val roomInfo = RoomInfo(room.roomId, lastMsg.msg, lastMsg.dateTime, lastMsg.id, room.startPlace, room.endPlace)
 //                                    viewModel.saveHistory(roomInfo, messages)
                                     return@forEach
                                 }
@@ -221,6 +227,7 @@ class ChatRoomFragment: Fragment() {
     override fun onStart() {
         super.onStart()
         globalVariable.setIsViewChatRoom(true)
+        viewModel.detachRoomInfo(room.roomId)
     }
 
     override fun onPause() {

@@ -1,7 +1,9 @@
 package com.dldmswo1209.hallymtaxi.ui.history
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.provider.Settings.Global
 import android.util.Log
@@ -10,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.TimeService
@@ -44,6 +47,7 @@ class HistoryFragment : Fragment() {
 
         init()
         setObservers()
+        registerBroadcastReceiver()
     }
 
     private fun init() {
@@ -53,32 +57,40 @@ class HistoryFragment : Fragment() {
             requireActivity().finish()
             return
         }
-        joinedRoom = (activity as MainActivity).joinedRoom
         binding.fragment = this
         val sharedPreference = requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
         lastChatKey = sharedPreference.getInt("lastChatKey", -1)
     }
 
     private fun setObservers() {
+        globalVariable.myRoom.observe(viewLifecycleOwner){
+            if(it == null) {
+                binding.layoutCurrentJoinedRoom.visibility = View.GONE
+                binding.layoutNoPoolRoom.visibility = View.VISIBLE
+                return@observe
+            }
+            binding.room = it
+            joinedRoom = it
+            viewModel.detachRoomInfo(it.roomId)
+            binding.layoutCurrentJoinedRoom.visibility = View.VISIBLE
+            binding.layoutNoPoolRoom.visibility = View.GONE
+        }
 
+        viewModel.roomInfo.observe(viewLifecycleOwner){
+            binding.roomInfo = it
+        }
+        
+    }
 
-//        HistoryListAdapter { roomInfo ->
-//            // 히스토리 클릭 이벤트
-//            val action =
-//                HistoryFragmentDirections.actionNavigationHistoryToChatRoomHistoryFragment(roomInfo)
-//            findNavController().navigate(action)
-//        }.apply {
-//            viewModel.detachHistory().observe(viewLifecycleOwner) { poolList ->
-//                binding.rvHistory.adapter = this
-//                val sortedList = sortedWithDate(poolList)
-//                submitList(sortedList)
-//                if (sortedList.isEmpty() && joinedRoom == null) {
-//                    binding.tvNoPoolRoom.visibility = View.VISIBLE
-//                } else {
-//                    binding.tvNoPoolRoom.visibility = View.GONE
-//                }
-//            }
-//        }
+    private fun registerBroadcastReceiver() {
+        // 새로운 메세지가 온 경우 브로드 캐스트 리시버를 통해 알 수 있음
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    joinedRoom?.let { viewModel.detachRoomInfo(it.roomId) }// 채팅 내역 조회
+                }
+
+            }, IntentFilter("newMessage"))
     }
     private fun sortedWithDate(poolList: List<RoomInfo>) : List<RoomInfo>{
         return poolList.sortedWith(compareBy<RoomInfo> {

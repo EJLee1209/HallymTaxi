@@ -11,6 +11,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.model.Chat
+import com.dldmswo1209.hallymtaxi.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.repository.RoomRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -73,6 +74,9 @@ class FcmService: FirebaseMessagingService() {
         val notification = builder.build()
         if(!globalVariable.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
             notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+            roomRepo.insertRoomInfo(RoomInfo(roomId, message, dateTime, true))
+        }else{
+            roomRepo.insertRoomInfo(RoomInfo(roomId, message, dateTime, false))
         }
 
         val notificationMessage = Intent("newMessage")

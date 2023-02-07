@@ -110,6 +110,7 @@ class MainRepository(val context: Context) {
     suspend fun sendMessage(chat: Chat, senderName: String, receiveTokens: List<String?>){
         CoroutineScope(Dispatchers.IO).launch {
             RoomRepository(context).saveChat(chat)
+            RoomRepository(context).insertRoomInfo(RoomInfo(chat.roomId, chat.msg, chat.dateTime, false))
         }
 
         receiveTokens.forEach {
@@ -117,25 +118,6 @@ class MainRepository(val context: Context) {
                 serverRepository.sendPushMessage(it, chat.roomId, chat.userId, senderName, chat.msg, chat.messageType)
             }
         }
-        updateRoomInfo(chat.roomId, chat)
-    }
-
-    private fun updateRoomInfo(roomId: String, chat: Chat){
-//        val roomInfo = RoomInfo(
-//            room.roomId,
-//            chat.msg,
-//            chat.dateTime,
-//            chat.id,
-//            room.startPlace,
-//            room.endPlace
-//        )
-        val updateRoomInfo = mapOf<String, Any>(
-            "msg" to chat.msg,
-            "dateTime" to chat.dateTime,
-        )
-
-
-        fireStore.collection("RoomInfo").document(roomId).update(updateRoomInfo)
     }
 
     // 채팅방 삭제(모든 참여자가 퇴장한 경우)

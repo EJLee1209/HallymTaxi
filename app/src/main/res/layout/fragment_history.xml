@@ -8,6 +8,9 @@
         <variable
             name="room_info"
             type="com.dldmswo1209.hallymtaxi.model.RoomInfo" />
+        <variable
+            name="room"
+            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
 
         <variable
             name="fragment"
@@ -57,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="18dp"
-                android:text="@{room_info.startPlace.place_name}"
+                android:text="@{room.startPlace.place_name}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="한림대학교 대학본부" />
@@ -77,7 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1.4dp"
-                android:text="@{room_info.endPlace.place_name}"
+                android:text="@{room.endPlace.place_name}"
                 app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
                 app:layout_constraintTop_toBottomOf="@id/tv_start_place_name"
                 tools:text="춘천역 경춘선" />
@@ -106,6 +109,7 @@
                 android:layout_marginBottom="17dp"
                 android:src="@drawable/ic_new"
                 android:visibility="gone"
+                isNewMessage="@{room_info.isNewMessage}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:visibility="visible" />
@@ -155,18 +159,31 @@
             app:layout_constraintTop_toBottomOf="@id/layout_current_joined_room"
             tools:listitem="@layout/item_history" />
 
-        <TextView
-            android:id="@+id/tv_no_pool_room"
-            style="@style/Text14.Black"
-            android:layout_width="wrap_content"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_no_pool_room"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/no_join_room"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/top_bar" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible">
 
+            <androidx.constraintlayout.utils.widget.ImageFilterView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/img_character"
+                android:layout_marginBottom="30dp"/>
+
+            <TextView
+                style="@style/Text14.Black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_join_room" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
+import androidx.room.Room
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.context
 import com.dldmswo1209.hallymtaxi.model.*
@@ -54,6 +55,9 @@ class MainViewModel(
 
     private var _chatList = MutableLiveData<List<Chat>>()
     val chatList : LiveData<List<Chat>> = _chatList
+
+    private var _roomInfo = MutableLiveData<RoomInfo>()
+    val roomInfo : LiveData<RoomInfo> = _roomInfo
 
     fun logout(activity: Activity, uid: String) {
         myRoomListenerRemove()
@@ -174,6 +178,14 @@ class MainViewModel(
             roomRepository.deleteChatHistory(room.roomId)
         }
         sharedPreferences.edit().putString("joinedRoom", "").apply()
+    }
+
+    fun detachRoomInfo(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
+        _roomInfo.postValue(roomRepository.detachRoomInfo(roomId))
+    }
+
+    fun updateRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
+        roomRepository.updateRoomInfo(roomInfo)
     }
 
     fun userListenerRemove(){

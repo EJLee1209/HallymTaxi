@@ -6,10 +6,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.dldmswo1209.hallymtaxi.model.Chat
+import com.dldmswo1209.hallymtaxi.model.RoomInfo
 
-@Database(entities = [Chat::class], version = 2)
+@Database(entities = [Chat::class, RoomInfo::class], version = 3)
 abstract class AppDatabase : RoomDatabase(){
     abstract fun chatDao(): ChatDao
+    abstract fun roomInfoDao(): RoomInfoDao
 
     // 데이터 베이스 객체를 싱글톤으로 인스턴스.
     companion object {

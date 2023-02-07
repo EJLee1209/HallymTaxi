@@ -43,8 +43,8 @@ class ChatRoomHistoryFragment: Fragment() {
     }
 
     private fun init(){
-        val args : ChatRoomHistoryFragmentArgs by navArgs()
-        roomInfo = args.roomInfo
+//        val args : ChatRoomHistoryFragmentArgs by navArgs()
+//        roomInfo = args.roomInfo
         globalVariable = requireActivity().application as GlobalVariable
         user = globalVariable.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
@@ -54,7 +54,7 @@ class ChatRoomHistoryFragment: Fragment() {
 
         binding.fragment = this
 
-        binding.tvRoomTitle.text = "${roomInfo.startPlace.place_name} - ${roomInfo.endPlace.place_name}"
+//        binding.tvRoomTitle.text = "${roomInfo.startPlace.place_name} - ${roomInfo.endPlace.place_name}"
 
 //        ChatListAdapter(user,).apply {
 //            viewModel.getHistoryMessage(roomInfo.roomId).observe(viewLifecycleOwner){
