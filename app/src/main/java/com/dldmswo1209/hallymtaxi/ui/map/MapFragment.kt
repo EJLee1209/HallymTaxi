@@ -325,9 +325,6 @@ class MapFragment: Fragment() {
         endPlace?.let {
             searchResultClickEvent(it, false)
         }
-
-        viewModel.detachAllRoom()
-
     }
 
     override fun onPause() {

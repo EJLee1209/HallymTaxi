@@ -6,20 +6,14 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.Person
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.GlobalVariable
-import com.dldmswo1209.hallymtaxi.common.dateToString
 import com.dldmswo1209.hallymtaxi.model.Chat
-import com.dldmswo1209.hallymtaxi.repository.MainRepository
 import com.dldmswo1209.hallymtaxi.repository.RoomRepository
-import com.google.firebase.Timestamp
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.logging.Logger.global
 
 class FcmService: FirebaseMessagingService() {
     private var broadcaster: LocalBroadcastManager? = null
@@ -65,15 +59,20 @@ class FcmService: FirebaseMessagingService() {
         val roomRepo = RoomRepository(this)
         roomRepo.saveChat(chat) // 채팅 저장
 
-        builder.setContentTitle(userName)
-            .setContentText(message)
+        val sender = Person.Builder().setName(userName).build()
+        val me = Person.Builder().setName("Me").build()
+        builder.setStyle(NotificationCompat.MessagingStyle(me)
+            .setConversationTitle("한림카풀")
+            .addMessage(message, System.currentTimeMillis(), sender)
+        )
             .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority = NotificationCompat.PRIORITY_MAX
 
+
         val notification = builder.build()
         if(!globalVariable.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
-            notificationManager.notify(1, notification)
+            notificationManager.notify(System.currentTimeMillis().toInt(), notification)
         }
 
         val notificationMessage = Intent("newMessage")

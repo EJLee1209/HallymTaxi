@@ -95,12 +95,6 @@ class WelcomeViewModel(
             return
         }
         auth.signInWithEmailAndPassword("$email@hallym.ac.kr", password).addOnSuccessListener {
-            val uid = auth.currentUser?.uid
-
-            context.getSharedPreferences("login", Context.MODE_PRIVATE)
-                .edit()
-                .putString("uid", uid)
-                .apply()
             _loginResult.value = true
         }.addOnFailureListener {
             _loginResult.value = false

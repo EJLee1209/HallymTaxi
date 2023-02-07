@@ -19,8 +19,7 @@ class ViewModelFactory(val application: Application):ViewModelProvider.Factory {
             modelClass.isAssignableFrom(MainViewModel::class.java) ->{
                 val mainRepository = MainRepository(application.applicationContext)
                 val roomRepository = RoomRepository(application.applicationContext)
-                val serverRepository = ServerRepository()
-                MainViewModel(mainRepository, roomRepository, serverRepository, application) as T
+                MainViewModel(mainRepository, roomRepository, application) as T
             }
 
             else->{

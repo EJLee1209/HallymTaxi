@@ -13,6 +13,7 @@ import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.repository.MainRepository
 import com.dldmswo1209.hallymtaxi.repository.RoomRepository
 import com.dldmswo1209.hallymtaxi.repository.ServerRepository
+import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
@@ -20,16 +21,15 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 
 class MainViewModel(
     private val mainRepository: MainRepository,
     private val roomRepository: RoomRepository,
-    private val serverRepository: ServerRepository,
     application: Application
 ) : AndroidViewModel(application) {
 
     private val sharedPreferences = context.getSharedPreferences("login", Context.MODE_PRIVATE)
-    private val uid = sharedPreferences.getString("uid", "").toString()
 
     private val fireStore = Firebase.firestore
     private val auth = Firebase.auth
@@ -56,19 +56,22 @@ class MainViewModel(
     val chatList : LiveData<List<Chat>> = _chatList
 
     fun logout(activity: Activity, uid: String) {
+        myRoomListenerRemove()
+        userListenerRemove()
+
         val userInfo = mapOf<String, Any>(
             "fcmToken" to ""
         )
-        fireStore.collection("User").document(uid).update(userInfo)
+        CoroutineScope(Dispatchers.IO).launch {
+            fireStore.collection("User").document(uid).update(userInfo).await()
+            sharedPreferences.edit().run {
+                putString("joinedRoom", "")
+            }.apply()
 
-        sharedPreferences.edit().run {
-            putString("uid", "")
-            putString("joinedRoom", "")
-        }.apply()
-
-        auth.signOut()
-        activity.finish()
-        activity.startActivity(Intent(activity, SplashActivity::class.java))
+            auth.signOut()
+            activity.finish()
+            activity.startActivity(Intent(activity, WelcomeActivity::class.java))
+        }
     }
 
     fun searchKeyword(keyword: String, isStartPoint: Boolean) = viewModelScope.launch {
@@ -83,9 +86,9 @@ class MainViewModel(
     fun getUserInfo(): LiveData<User>? {
         val user = MutableLiveData<User>()
 
-        if (uid.isEmpty()) return null
+        if (auth.currentUser == null) return null
         getFcmToken()
-        fireStore.collection("User").document(uid).get().addOnSuccessListener {
+        fireStore.collection("User").document(auth.currentUser!!.uid).get().addOnSuccessListener {
             if(it == null){
                 Log.d("testt", "getUserInfo: fail to get user info")
                 return@addOnSuccessListener
@@ -100,9 +103,9 @@ class MainViewModel(
     fun subscribeUser() : LiveData<User>? {
         val user = MutableLiveData<User>()
 
-        if (uid.isEmpty()) return null
+        if (auth.currentUser == null) return null
         getFcmToken()
-        userListener = fireStore.collection("User").document(uid).addSnapshotListener { value, error->
+        userListener = fireStore.collection("User").document(auth.currentUser!!.uid).addSnapshotListener { value, error->
             if(error != null){
                 Log.d("testt", "getUserInfo: fail to get user info")
                 return@addSnapshotListener
@@ -122,8 +125,8 @@ class MainViewModel(
         }
     }
 
-    fun detachAllRoom() {
-        mainRepository.detachAllRoom().observeForever {
+    fun detachAllRoom(genderOption: String) {
+        mainRepository.detachAllRoom(genderOption).observeForever {
             _poolList.postValue(it)
         }
     }
@@ -138,12 +141,7 @@ class MainViewModel(
     }
 
     suspend fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {
-        receiveTokens.forEach {
-            if(!it.isNullOrEmpty()){
-                serverRepository.sendPushMessage(token = it, roomId = chat.roomId, userId = chat.userId, userName = userName, message = chat.msg, messageType = chat.messageType, id = "")
-            }
-        }
-        roomRepository.saveChat(chat)
+        mainRepository.sendMessage(chat, userName, receiveTokens)
     }
 
     fun subscribeMyRoom(user: User) : LiveData<CarPoolRoom?> {
@@ -159,6 +157,7 @@ class MainViewModel(
                     if(!querySnapshot.isEmpty) {
                         val snapshot = querySnapshot.first()
                         room.postValue(snapshot.toObject())
+                        Log.d("testt", "subscribeMyRoom: ${room.value}")
                     }else{
                         room.postValue(null) // 참여중인 방이 없음 null 반환
                     }
@@ -179,6 +178,7 @@ class MainViewModel(
 
     fun userListenerRemove(){
         userListener?.remove()
+
     }
 
     fun myRoomListenerRemove(){
@@ -197,7 +197,8 @@ class MainViewModel(
     }
 
     private fun updateFcmToken(token: String){
-        mainRepository.updateFcmToken(uid, token)
+        if(auth.currentUser == null) return
+        mainRepository.updateFcmToken(auth.currentUser!!.uid, token)
     }
 
     fun detachChatList(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -214,6 +215,7 @@ class MainViewModel(
         super.onCleared()
         Log.d("testt", "onCleared: ")
         userListenerRemove()
+        myRoomListenerRemove()
     }
 
 }

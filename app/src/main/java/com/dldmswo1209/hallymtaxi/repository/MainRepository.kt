@@ -4,23 +4,20 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.dldmswo1209.hallymtaxi.database.AppDatabase
 import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.retrofit.*
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
-import java.lang.reflect.Field
 
 class MainRepository(val context: Context) {
 
     private val client = KakaoApiClient.create()
     private val fireStore = Firebase.firestore
-    private val welcomeRepository = ServerRepository()
+    private val serverRepository = ServerRepository()
 
     suspend fun searchKeyword(keyword: String) = client.getSearchKeyword(query = keyword)
 
@@ -33,29 +30,32 @@ class MainRepository(val context: Context) {
         ref.set(room).addOnSuccessListener {
             newRoom.value = room
             CoroutineScope(Dispatchers.Main).launch {
-                sendMessage(roomId = room.roomId, chat = Chat(roomId = room.roomId, userId = user.uid, messageType = CHAT_JOIN), user.name, listOf())
+                sendMessage(chat = Chat(roomId = room.roomId, userId = user.uid, messageType = CHAT_JOIN), user.name, listOf())
             }
         }
 
         return newRoom
     }
 
-    fun detachAllRoom() : LiveData<List<CarPoolRoom>>{
+    fun detachAllRoom(genderOption: String) : LiveData<List<CarPoolRoom>>{
         val rooms = MutableLiveData<List<CarPoolRoom>>()
 
-        fireStore.collection("Room").get().addOnSuccessListener {
-            if(it == null){
-                Log.d("testt", "detachAllRoom: null")
-                return@addOnSuccessListener
+        fireStore.collection("Room")
+            .whereIn("genderOption", listOf(GENDER_OPTION_NONE, genderOption))
+            .get()
+            .addOnSuccessListener {
+                if(it == null){
+                    Log.d("testt", "detachAllRoom: null")
+                    return@addOnSuccessListener
+                }
+                val dataList = mutableListOf<CarPoolRoom>()
+                it.forEach { data->
+                    val room = data.toObject<CarPoolRoom>()
+                    dataList.add(room)
+                }
+                Log.d("testt", "detachAllRoom()")
+                rooms.postValue(dataList)
             }
-            val dataList = mutableListOf<CarPoolRoom>()
-            it.forEach { data->
-                val room = data.toObject<CarPoolRoom>()
-                dataList.add(room)
-            }
-            Log.d("testt", "detachAllRoom()")
-            rooms.postValue(dataList)
-        }
 
         return rooms
     }
@@ -91,7 +91,7 @@ class MainRepository(val context: Context) {
                         room.participants.add(user)
                         room.participants.forEach { if(it.fcmToken != user.fcmToken) receiveTokens.add(it.fcmToken) }
                         CoroutineScope(Dispatchers.Main).launch {
-                            sendMessage(roomId = room.roomId, chat = Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
+                            sendMessage(chat = Chat(roomId = room.roomId, userId = user.uid, msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
                         }
                     }
                     .addOnFailureListener {
@@ -107,18 +107,17 @@ class MainRepository(val context: Context) {
         return result
     }
 
-    suspend fun sendMessage(roomId: String, chat: Chat, senderName: String, receiveTokens: List<String?>){
+    suspend fun sendMessage(chat: Chat, senderName: String, receiveTokens: List<String?>){
         CoroutineScope(Dispatchers.IO).launch {
             RoomRepository(context).saveChat(chat)
         }
 
         receiveTokens.forEach {
             if(!it.isNullOrEmpty()){
-                welcomeRepository.sendPushMessage(it, chat.roomId, chat.userId, senderName, chat.msg, chat.messageType)
+                serverRepository.sendPushMessage(it, chat.roomId, chat.userId, senderName, chat.msg, chat.messageType)
             }
-
         }
-        updateRoomInfo(roomId, chat)
+        updateRoomInfo(chat.roomId, chat)
     }
 
     private fun updateRoomInfo(roomId: String, chat: Chat){
@@ -148,7 +147,6 @@ class MainRepository(val context: Context) {
 
     // 채팅방 퇴장
     fun exitRoom(user: User, room: CarPoolRoom){
-        // 채팅방에 나말고도 다른 사람 존재하면, 그냥 나만 퇴장
         val docRef = fireStore.collection("Room").document(room.roomId)
         fireStore.runTransaction{transaction->
             val snapshot = transaction.get(docRef)
@@ -158,7 +156,7 @@ class MainRepository(val context: Context) {
                 transaction.update(docRef,"userCount",userCount)
                 transaction.update(docRef, "participants", FieldValue.arrayRemove(user))
             }else{
-                deleteRoom(room.roomId)
+                deleteRoom(room.roomId) // 채팅방에 유저수가 0이므로 채팅방 삭제
             }
         }
     }

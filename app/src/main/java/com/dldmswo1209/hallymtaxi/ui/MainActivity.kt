@@ -76,14 +76,12 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.subscribeUser()?.observe(this){
             globalVariable.setUser(it)
-            Log.d("testt", "subscribeUser: ${it}")
         } ?: kotlin.run {
             startActivity(Intent(this, SplashActivity::class.java))
         }
 
         user?.let {
             viewModel.subscribeMyRoom(it).observe(this){room->
-                Log.d("testt", "global myRoom: ${room}")
                 globalVariable.setMyRoom(room)
             }
         }
@@ -118,12 +116,6 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         checkNetwork.unRegisterNetworkListener()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.userListenerRemove()
-        viewModel.myRoomListenerRemove()
     }
 
 }

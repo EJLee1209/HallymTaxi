@@ -71,10 +71,10 @@ class PoolListBottomSheetFragment(
         }
 
         viewModel.poolList.observe(viewLifecycleOwner) { roomList ->
-            val filteredRoomList = filterRoom(roomList)
-            setRecyclerViewAdapter(filteredRoomList)
+//            val filteredRoomList = filterRoom(roomList)
+            setRecyclerViewAdapter(roomList)
 
-            if (filteredRoomList.isEmpty()) binding.layoutNoPoolRoom.visibility = View.VISIBLE
+            if (roomList.isEmpty()) binding.layoutNoPoolRoom.visibility = View.VISIBLE
             else binding.layoutNoPoolRoom.visibility = View.INVISIBLE
             loadingDialog.dismiss()
         }
@@ -96,24 +96,12 @@ class PoolListBottomSheetFragment(
                         content = "채팅방 인원 초과 혹은\n삭제된 채팅방 입니다"
                     ) {}
                     dialog.show(parentFragmentManager, dialog.tag)
-                    viewModel.detachAllRoom() // 채팅방 새로고침
+                    viewModel.detachAllRoom(user.gender) // 채팅방 새로고침
                 }
             }
         }
 
-        viewModel.detachAllRoom()
-    }
-
-    private fun filterRoom(roomList: List<CarPoolRoom>) : List<CarPoolRoom>{
-        val filteredRoomList = roomList.toMutableList()
-
-        for(idx in filteredRoomList.size-1 downTo 0){
-            if(filteredRoomList[idx].genderOption != GENDER_OPTION_NONE && filteredRoomList[idx].genderOption != user.gender){
-                filteredRoomList.remove(filteredRoomList[idx]) // 성별 조건에 부합 하지 않은 방을 필터링
-            }
-        }
-
-        return filteredRoomList
+        viewModel.detachAllRoom(user.gender)
     }
 
     private fun setRecyclerViewAdapter(roomList: List<CarPoolRoom>){
@@ -183,7 +171,7 @@ class PoolListBottomSheetFragment(
     }
 
     fun onClickRefreshRoomList() {
-        viewModel.detachAllRoom()
+        viewModel.detachAllRoom(user.gender)
         loadingDialog.show()
     }
 }
