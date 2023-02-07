@@ -95,8 +95,8 @@ class HistoryFragment : Fragment() {
                 return@observe
             }
             binding.layoutNoPoolRoom.visibility = View.GONE
-            history = it
-            historyListAdapter.submitList(it)
+            history = sortedWithDate(it)
+            historyListAdapter.submitList(history)
         }
         
     }
