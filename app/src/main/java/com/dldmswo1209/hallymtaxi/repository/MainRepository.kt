@@ -41,7 +41,7 @@ class MainRepository(val context: Context) {
         val rooms = MutableLiveData<List<CarPoolRoom>>()
 
         fireStore.collection("Room")
-            .whereIn("genderOption", listOf(GENDER_OPTION_NONE, genderOption))
+            .whereIn("genderOption", listOf(GENDER_OPTION_NONE, genderOption)) // 성별 옵션 필터링
             .get()
             .addOnSuccessListener {
                 if(it == null){

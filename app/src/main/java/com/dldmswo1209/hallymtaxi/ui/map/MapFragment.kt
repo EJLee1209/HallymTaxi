@@ -219,14 +219,12 @@ class MapFragment: Fragment() {
         }
         if(binding.mapview.poiItems.size == 2){ // 출발지, 목적지 모두 입력 완료
             if(startPlace != null && endPlace != null){
-                val centerLat = (startPlace!!.y + endPlace!!.y) / 2.0
-                val centerLng = (startPlace!!.x + endPlace!!.x) / 2.0
-                moveCamera(centerLat, centerLng, 5f)
                 binding.mapview.selectPOIItem(endPlaceMarker, true)
+                setCameraCenterAllPOIItems()
                 showBottomSheetDialog(isSearchResult = false, tag = POOL_LIST_BOTTOM_SHEET_TAG) // 카풀방 리스트 보여주기
             }
         }else{
-            moveCamera(place.y, place.x, 0.5f)
+            setCameraCenterAllPOIItems()
         }
 
         val constraintLayout: ConstraintLayout = binding.parentConstraintLayout
@@ -250,6 +248,12 @@ class MapFragment: Fragment() {
         val cameraPosition = CameraPosition(MapPoint.mapPointWithGeoCoord(lat,lng), zoomLevel)
         val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
         binding.mapview.moveCamera(cameraUpdate)
+    }
+
+    private fun setCameraCenterAllPOIItems(){
+        binding.mapview.fitMapViewAreaToShowAllPOIItems()
+        binding.mapview.zoomOut(true)
+        binding.mapview.zoomOut(true)
     }
 
     // 장소 검색결과 또는 카풀방 리스트 보여주기

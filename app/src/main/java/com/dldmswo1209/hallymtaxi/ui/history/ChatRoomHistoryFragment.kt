@@ -67,7 +67,7 @@ class ChatRoomHistoryFragment: Fragment() {
         }
 
         viewModel.roomInfo.observe(viewLifecycleOwner){
-            binding.roomInfo = it
+            it?.let { binding.roomInfo = it }
         }
     }
 
