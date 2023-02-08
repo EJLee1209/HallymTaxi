@@ -45,29 +45,6 @@ class MainRepository(val context: Context) {
         return newRoom
     }
 
-    fun detachAllRoom(genderOption: String) : LiveData<List<CarPoolRoom>>{
-        val rooms = MutableLiveData<List<CarPoolRoom>>()
-
-        fireStore.collection("Room")
-            .whereIn("genderOption", listOf(GENDER_OPTION_NONE, genderOption)) // 성별 옵션 필터링
-            .get()
-            .addOnSuccessListener {
-                if(it == null){
-                    Log.d("testt", "detachAllRoom: null")
-                    return@addOnSuccessListener
-                }
-                val dataList = mutableListOf<CarPoolRoom>()
-                it.forEach { data->
-                    val room = data.toObject<CarPoolRoom>()
-                    dataList.add(room)
-                }
-                Log.d("testt", "detachAllRoom()")
-                rooms.postValue(dataList)
-            }
-
-        return rooms
-    }
-
     fun joinRoom(room: CarPoolRoom, user: User): LiveData<Boolean>{
         val result = MutableLiveData<Boolean>()
 

@@ -22,7 +22,6 @@ class SplashActivity : AppCompatActivity() {
         CheckNetwork(this)
     }
     private lateinit var globalVariable: GlobalVariable
-    private var extras : Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

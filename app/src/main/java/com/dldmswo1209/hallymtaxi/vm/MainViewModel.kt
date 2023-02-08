@@ -2,8 +2,10 @@ package com.dldmswo1209.hallymtaxi.vm
 
 import android.app.Activity
 import android.app.Application
+import android.app.DirectAction
 import android.content.Context
 import android.content.Intent
+import android.graphics.Path.Direction
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
@@ -32,14 +34,14 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 class MainViewModel(
     private val mainRepository: MainRepository,
     private val roomRepository: RoomRepository,
     application: Application
 ) : AndroidViewModel(application) {
-    private val sharedPreferences = context.getSharedPreferences("login", Context.MODE_PRIVATE)
-
     private val fireStore = Firebase.firestore
     private val auth = Firebase.auth
 
@@ -51,9 +53,6 @@ class MainViewModel(
 
     private var _endPoint = MutableLiveData<ResultSearchKeyword>()
     val endPoint: LiveData<ResultSearchKeyword> = _endPoint
-
-    private var _poolList = MutableLiveData<List<CarPoolRoom>>()
-    val poolList: LiveData<List<CarPoolRoom>> = _poolList
 
     private var _isCreated = MutableLiveData<CarPoolRoom>()
     val isCreated: LiveData<CarPoolRoom> = _isCreated
@@ -72,7 +71,10 @@ class MainViewModel(
 
     fun detachRoomPaging(genderOption: String) : Flow<PagingData<CarPoolRoom>> {
         val query = fireStore.collection("Room")
+            .whereEqualTo("closed", false)
+            .whereGreaterThanOrEqualTo("created", LocalDate.now().toString())
             .whereIn("genderOption", listOf(genderOption, GENDER_OPTION_NONE))
+            .orderBy("created", Query.Direction.DESCENDING)
             .limit(PAGE_SIZE.toLong())
 
         return Pager(
@@ -93,9 +95,6 @@ class MainViewModel(
         )
         CoroutineScope(Dispatchers.IO).launch {
             fireStore.collection("User").document(uid).update(userInfo).await()
-            sharedPreferences.edit().run {
-                putString("joinedRoom", "")
-            }.apply()
 
             auth.signOut()
             activity.finish()
@@ -151,16 +150,12 @@ class MainViewModel(
 
     fun createRoom(room: CarPoolRoom, user: User) {
         mainRepository.createRoom(room, user).observeForever {
-            sharedPreferences.edit().putString("joinedRoom", room.roomId).apply()
             _isCreated.value = it
         }
     }
 
     fun joinRoom(room: CarPoolRoom, user: User) {
         mainRepository.joinRoom(room, user).observeForever {
-            if (it) {
-                sharedPreferences.edit().putString("joinedRoom", room.roomId).apply()
-            }
             _isJoined.value = it
         }
     }
@@ -195,7 +190,6 @@ class MainViewModel(
 
     fun exitRoom(user: User, room: CarPoolRoom) {
         mainRepository.exitRoom(user, room)
-        sharedPreferences.edit().putString("joinedRoom", "").apply()
     }
     fun insertRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
         Log.d("testt", "roomInfo 저장!: ${roomInfo}")

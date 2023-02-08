@@ -21,6 +21,7 @@ import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import java.time.LocalDate
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,8 +33,6 @@ class MainActivity : AppCompatActivity() {
         CheckNetwork(this)
     }
     var isNetworkActivate = false
-
-    var joinedRoom: CarPoolRoom? = null
     private var user: User? = null
     private lateinit var globalVariable: GlobalVariable
 

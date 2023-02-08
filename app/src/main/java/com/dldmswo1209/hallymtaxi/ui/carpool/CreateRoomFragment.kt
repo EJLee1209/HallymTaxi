@@ -3,11 +3,13 @@ package com.dldmswo1209.hallymtaxi.ui.carpool
 import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.NumberPicker
+import android.widget.NumberPicker.OnValueChangeListener
 import android.widget.TimePicker
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -28,7 +30,9 @@ import com.dldmswo1209.hallymtaxi.ui.map.MapFragmentDirections
 import com.dldmswo1209.hallymtaxi.ui.map.SearchResultBottomSheetFragment
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import java.text.DecimalFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.Date
 
 
 class CreateRoomFragment: Fragment() {
@@ -43,6 +47,7 @@ class CreateRoomFragment: Fragment() {
     private var isClicked = false
     private lateinit var gender : String
     private lateinit var globalVariable: GlobalVariable
+    private var departureDate: String = ""
 
     private val loadingDialog by lazy{
         LoadingDialog(requireContext())
@@ -59,7 +64,10 @@ class CreateRoomFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         init()
+        datePickerSetUp()
         setObserver()
         genderOptionCheckedListener()
         setEditorActionListener()
@@ -80,8 +88,7 @@ class CreateRoomFragment: Fragment() {
 
         binding.timePicker.setMinutePicker()
 
-        binding.etStartPoint.setText(startPlace.place_name)
-        binding.etEndPoint.setText(endPlace.place_name)
+        etTextUpdate()
 
         if(currentUser.gender == "male"){
             gender = "남성"
@@ -96,16 +103,24 @@ class CreateRoomFragment: Fragment() {
         binding.fragment = this
     }
 
-    private fun genderOptionCheckedListener(){
-        binding.checkboxGenderOption.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                binding.tvGenderOptionGuide.text = "${gender} 사용자에게만 채팅방이 노출됩니다."
-            } else {
-                binding.tvGenderOptionGuide.text = "선택하지 않을 경우 성별 상관 없이 배차됩니다."
+    private fun etTextUpdate(){
+        binding.etStartPoint.setText(startPlace.place_name)
+        binding.etEndPoint.setText(endPlace.place_name)
+    }
+
+    private fun datePickerSetUp(){
+        val datePickerItems = arrayOf("내일","오늘")
+        binding.datePicker.apply {
+            minValue = 0
+            maxValue = datePickerItems.size - 1
+            displayedValues = datePickerItems
+            wrapSelectorWheel = true
+            value = 1
+            setOnValueChangedListener { picker, oldVal, newVal ->
+                departureDate = datePickerItems[newVal]
             }
         }
     }
-
     private fun setObserver(){
         viewModel.isCreated.observe(viewLifecycleOwner){ room ->
             loadingDialog.dismiss()
@@ -119,6 +134,16 @@ class CreateRoomFragment: Fragment() {
 
         viewModel.endPoint.observe(viewLifecycleOwner){
             showBottomSheetDialog(it.documents, false)
+        }
+    }
+
+    private fun genderOptionCheckedListener(){
+        binding.checkboxGenderOption.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                binding.tvGenderOptionGuide.text = "${gender} 사용자에게만 채팅방이 노출됩니다."
+            } else {
+                binding.tvGenderOptionGuide.text = "선택하지 않을 경우 성별 상관 없이 배차됩니다."
+            }
         }
     }
 
@@ -181,7 +206,7 @@ class CreateRoomFragment: Fragment() {
         var hour = binding.timePicker.hour
         val min = binding.timePicker.getMinute()
         val genderOption = if(binding.checkboxGenderOption.isChecked){
-            currentUser.gender ?: GENDER_OPTION_NONE
+            currentUser.gender
         }else{
             GENDER_OPTION_NONE
         }
@@ -190,9 +215,9 @@ class CreateRoomFragment: Fragment() {
 
         if(hour >= 12){
             if(hour != 12) hour -= 12
-            time = "오후 %d:%02d".format(hour, min)
+            time = "$departureDate 오후 %d:%02d".format(hour, min)
         }else{
-            time = "오전 %d:%02d".format(hour,min)
+            time = "$departureDate 오전 %d:%02d".format(hour,min)
         }
 
         val room = CarPoolRoom(
@@ -209,5 +234,14 @@ class CreateRoomFragment: Fragment() {
         isClicked = true
 
         loadingDialog.show()
+    }
+
+
+    fun onClickSwapButton(){
+        val tmp = startPlace
+        startPlace = endPlace
+        endPlace = tmp
+
+        etTextUpdate()
     }
 }

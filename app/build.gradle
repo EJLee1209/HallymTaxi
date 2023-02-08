@@ -110,4 +110,5 @@ dependencies {
     // paging3
     implementation "androidx.paging:paging-runtime:$paging_version"
 
+
 }

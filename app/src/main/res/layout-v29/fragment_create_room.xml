@@ -67,7 +67,7 @@
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="11dp"
                 android:textColorHint="@color/hallym_grey_D9D9D9"
-                app:layout_constraintEnd_toStartOf="@id/iv_search_icon"
+                app:layout_constraintEnd_toStartOf="@id/iv_swap_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -88,20 +88,21 @@
                 android:paddingVertical="11dp"
                 android:textColorHint="@color/hallym_grey_D9D9D9"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/iv_search_icon"
+                app:layout_constraintEnd_toStartOf="@id/iv_swap_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/et_start_point" />
 
             <androidx.constraintlayout.utils.widget.ImageFilterView
-                android:id="@+id/iv_search_icon"
+                android:id="@+id/iv_swap_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="13dp"
                 android:layout_marginEnd="21dp"
-                android:src="@drawable/ic_search"
+                android:src="@drawable/ic_swap"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:onClick="@{()->fragment.onClickSwapButton()}"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -184,25 +185,36 @@
             app:layout_constraintTop_toBottomOf="@id/max_count_under_line" />
 
         <View
+            android:id="@+id/view_picker"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_marginHorizontal="65dp"
+            android:layout_marginHorizontal="46dp"
             android:background="@drawable/background_grey_r10"
             app:layout_constraintBottom_toBottomOf="@id/time_picker"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/time_picker" />
 
+        <NumberPicker
+            android:id="@+id/datePicker"
+            android:layout_width="50dp"
+            android:layout_height="70dp"
+            app:layout_constraintTop_toTopOf="@id/time_picker"
+            app:layout_constraintBottom_toBottomOf="@id/time_picker"
+            android:selectionDividerHeight="0dp"
+            android:theme="@style/NumberPickerStyle"
+            android:layout_marginStart="20dp"
+            app:layout_constraintStart_toStartOf="@id/view_picker"/>
 
         <TimePicker
             android:id="@+id/time_picker"
             android:layout_width="0dp"
             android:layout_height="100dp"
-            android:selectionDividerHeight="0.1dp"
+            android:selectionDividerHeight="0dp"
             android:theme="@style/NumberPickerStyle"
             android:timePickerMode="spinner"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/datePicker"
+            app:layout_constraintEnd_toEndOf="@id/view_picker"
             app:layout_constraintTop_toBottomOf="@id/tv_start_time_title" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
