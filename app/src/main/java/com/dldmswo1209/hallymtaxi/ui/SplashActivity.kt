@@ -29,10 +29,6 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         globalVariable = application as GlobalVariable
-        extras = intent?.extras
-        extras?.let {bundle ->
-            Log.d("testt", "roomIdFromPendingIntent: ${bundle.getString("roomId")}")
-        }
 
         if(checkNetwork.getCurrentNetworkHasTransport()){
             checkLoginInfo()
@@ -47,7 +43,6 @@ class SplashActivity : AppCompatActivity() {
             globalVariable.setUser(it)
             val intent = Intent(this@SplashActivity, MainActivity::class.java).apply {
                 putExtra("userInfo", it)
-
             }
             startActivity(intent)
             finish()
@@ -76,9 +71,4 @@ class SplashActivity : AppCompatActivity() {
         checkNetwork.unRegisterNetworkListener()
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-
-    }
 }

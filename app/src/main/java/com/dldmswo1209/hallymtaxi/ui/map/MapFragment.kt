@@ -91,6 +91,7 @@ class MapFragment: Fragment() {
             if(room != null){
                 binding.viewCurrentMyRoom.visibility = View.VISIBLE
                 binding.room = room
+                globalVariable.setMyRoomId(room.roomId)
             }else{
                 binding.viewCurrentMyRoom.visibility = View.GONE
             }

@@ -107,5 +107,7 @@ dependencies {
 // To use Kotlin annotation processing tool (kapt)
     kapt("androidx.room:room-compiler:$room_version")
 
+    // paging3
+    implementation "androidx.paging:paging-runtime:$paging_version"
 
 }

@@ -7,21 +7,30 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import androidx.room.Room
+import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.context
 import com.dldmswo1209.hallymtaxi.model.*
+import com.dldmswo1209.hallymtaxi.pagingSource.FirestorePagingSource
+import com.dldmswo1209.hallymtaxi.pagingSource.PAGE_SIZE
 import com.dldmswo1209.hallymtaxi.repository.MainRepository
 import com.dldmswo1209.hallymtaxi.repository.RoomRepository
 import com.dldmswo1209.hallymtaxi.repository.ServerRepository
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
 class MainViewModel(
@@ -29,7 +38,6 @@ class MainViewModel(
     private val roomRepository: RoomRepository,
     application: Application
 ) : AndroidViewModel(application) {
-
     private val sharedPreferences = context.getSharedPreferences("login", Context.MODE_PRIVATE)
 
     private val fireStore = Firebase.firestore
@@ -62,6 +70,20 @@ class MainViewModel(
     private var _roomHistory = MutableLiveData<List<RoomInfo>>()
     val roomHistory : LiveData<List<RoomInfo>> = _roomHistory
 
+    fun detachRoomPaging(genderOption: String) : Flow<PagingData<CarPoolRoom>> {
+        val query = fireStore.collection("Room")
+            .whereIn("genderOption", listOf(genderOption, GENDER_OPTION_NONE))
+            .limit(PAGE_SIZE.toLong())
+
+        return Pager(
+            PagingConfig(
+                pageSize = PAGE_SIZE
+            )
+        ){
+            FirestorePagingSource(query)
+        }.flow.cachedIn(viewModelScope)
+    }
+
     fun logout(activity: Activity, uid: String) {
         myRoomListenerRemove()
         userListenerRemove()
@@ -80,6 +102,8 @@ class MainViewModel(
             activity.startActivity(Intent(activity, WelcomeActivity::class.java))
         }
     }
+
+
 
     fun searchKeyword(keyword: String, isStartPoint: Boolean) = viewModelScope.launch {
         try {
@@ -129,12 +153,6 @@ class MainViewModel(
         mainRepository.createRoom(room, user).observeForever {
             sharedPreferences.edit().putString("joinedRoom", room.roomId).apply()
             _isCreated.value = it
-        }
-    }
-
-    fun detachAllRoom(genderOption: String) {
-        mainRepository.detachAllRoom(genderOption).observeForever {
-            _poolList.postValue(it)
         }
     }
 

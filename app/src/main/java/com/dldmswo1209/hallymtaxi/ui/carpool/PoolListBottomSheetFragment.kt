@@ -3,10 +3,15 @@ package com.dldmswo1209.hallymtaxi.ui.carpool
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.PagingDataAdapter
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentPoolListBottomSheetBinding
 import com.dldmswo1209.hallymtaxi.model.*
@@ -15,6 +20,7 @@ import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collectLatest
 import java.util.Collections
 
 class PoolListBottomSheetFragment(
@@ -33,6 +39,7 @@ class PoolListBottomSheetFragment(
     private val loadingDialog by lazy{
         LoadingDialog(requireContext())
     }
+    private lateinit var poolListAdapter : PoolListAdapter
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return BottomSheetBehaviorSetting.bottomSheetBehaviorSetting(requireContext(), theme)
@@ -52,6 +59,14 @@ class PoolListBottomSheetFragment(
 
         init()
         setObserver()
+        lifecycleScope.launch {
+            poolListAdapter.loadStateFlow.collectLatest {
+                if(it.append is LoadState.Loading) loadingDialog.show()
+                else loadingDialog.dismiss()
+            }
+        }
+
+
     }
 
     private fun init() {
@@ -63,20 +78,21 @@ class PoolListBottomSheetFragment(
             requireActivity().finish()
             return
         }
+
+        poolListAdapter = PoolListAdapter(requireActivity(), endPlace) { room -> recyclerItemClickEvent(room) }
+        binding.rvPool.adapter = poolListAdapter
     }
 
     private fun setObserver() {
         globalVariable.myRoom.observe(viewLifecycleOwner){ room->
             joinedRoom = room
+            poolListAdapter.roomId = room?.roomId
         }
 
-        viewModel.poolList.observe(viewLifecycleOwner) { roomList ->
-//            val filteredRoomList = filterRoom(roomList)
-            setRecyclerViewAdapter(roomList)
-
-            if (roomList.isEmpty()) binding.layoutNoPoolRoom.visibility = View.VISIBLE
-            else binding.layoutNoPoolRoom.visibility = View.INVISIBLE
-            loadingDialog.dismiss()
+        lifecycleScope.launch {
+            viewModel.detachRoomPaging(user.gender).collectLatest {
+                poolListAdapter.submitData(it)
+            }
         }
 
         viewModel.isJoined.observe(viewLifecycleOwner){
@@ -96,31 +112,11 @@ class PoolListBottomSheetFragment(
                         content = "채팅방 인원 초과 혹은\n삭제된 채팅방 입니다"
                     ) {}
                     dialog.show(parentFragmentManager, dialog.tag)
-                    viewModel.detachAllRoom(user.gender) // 채팅방 새로고침
+                    poolListAdapter.refresh()
                 }
             }
         }
 
-        viewModel.detachAllRoom(user.gender)
-    }
-
-    private fun setRecyclerViewAdapter(roomList: List<CarPoolRoom>){
-        val sortedRoomList = getSortedListByDistance(roomList)
-        val distanceList = getDistanceList(sortedRoomList)
-        binding.rvPool.adapter = PoolListAdapter(joinedRoom, requireContext(), distanceList) { room ->
-            recyclerItemClickEvent(room)
-        }.apply {
-            submitList(sortedRoomList)
-        }
-    }
-
-    private fun getDistanceList(roomList: List<CarPoolRoom>) : List<Int>{
-        val distanceList = mutableListOf<Int>()
-        roomList.forEach { room->  // 모든 카풀방 거리 계산
-            distanceList.add(DistanceManager.getDistance(room.endPlace.y, room.endPlace.x, endPlace.y, endPlace.x))
-        }
-
-        return distanceList
     }
 
     private fun recyclerItemClickEvent(room: CarPoolRoom){
@@ -141,18 +137,6 @@ class PoolListBottomSheetFragment(
         viewModel.joinRoom(room,user)
         loadingDialog.show()
     }
-    private fun getSortedListByDistance(roomList: List<CarPoolRoom>) : List<CarPoolRoom>{
-        // 현재 내 목적지와 거리를 비교해서 정렬
-        val sortedList = roomList.sortedWith(compareBy { DistanceManager.getDistance(it.endPlace.y, it.endPlace.x, endPlace.y, endPlace.x) }).toMutableList()
-
-        joinedRoom?.let{
-            // 현재 참여중인 방을 맨 앞으로
-            sortedList.remove(it)
-            sortedList.add(0, it)
-        }
-
-        return sortedList
-    }
 
     fun onClickCreateRoom() {
         joinedRoom?.let {
@@ -171,7 +155,6 @@ class PoolListBottomSheetFragment(
     }
 
     fun onClickRefreshRoomList() {
-        viewModel.detachAllRoom(user.gender)
-        loadingDialog.show()
+        poolListAdapter.refresh()
     }
 }

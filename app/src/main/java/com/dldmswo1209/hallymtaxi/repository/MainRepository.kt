@@ -1,10 +1,17 @@
 package com.dldmswo1209.hallymtaxi.repository
 
 import android.content.Context
+import android.nfc.tech.MifareUltralight
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.dldmswo1209.hallymtaxi.model.*
+import com.dldmswo1209.hallymtaxi.pagingSource.FirestorePagingSource
 import com.dldmswo1209.hallymtaxi.retrofit.*
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -12,6 +19,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 
 class MainRepository(val context: Context) {
 
