@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.dldmswo1209.hallymtaxi.R
@@ -21,12 +22,17 @@ class SplashActivity : AppCompatActivity() {
         CheckNetwork(this)
     }
     private lateinit var globalVariable: GlobalVariable
+    private var extras : Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
         globalVariable = application as GlobalVariable
+        extras = intent?.extras
+        extras?.let {bundle ->
+            Log.d("testt", "roomIdFromPendingIntent: ${bundle.getString("roomId")}")
+        }
 
         if(checkNetwork.getCurrentNetworkHasTransport()){
             checkLoginInfo()
@@ -41,6 +47,7 @@ class SplashActivity : AppCompatActivity() {
             globalVariable.setUser(it)
             val intent = Intent(this@SplashActivity, MainActivity::class.java).apply {
                 putExtra("userInfo", it)
+
             }
             startActivity(intent)
             finish()
@@ -67,5 +74,11 @@ class SplashActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         checkNetwork.unRegisterNetworkListener()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
     }
 }

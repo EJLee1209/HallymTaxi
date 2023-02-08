@@ -1,6 +1,7 @@
 package com.dldmswo1209.hallymtaxi.ui.carpool
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.activity.OnBackPressedCallback
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -24,6 +26,7 @@ import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
 import com.dldmswo1209.hallymtaxi.model.*
+import com.dldmswo1209.hallymtaxi.service.FcmService.Companion.CHANNEL_ID
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import kotlinx.coroutines.*
@@ -44,6 +47,9 @@ class ChatRoomFragment: Fragment() {
     private lateinit var callback: OnBackPressedCallback
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
         ViewMarginDynamicChanger(requireContext())
+    }
+    private val notificationManager : NotificationManagerCompat by lazy{
+        NotificationManagerCompat.from(requireActivity().applicationContext)
     }
 
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드 상태(true/false)
@@ -232,6 +238,7 @@ class ChatRoomFragment: Fragment() {
         super.onStart()
         globalVariable.setIsViewChatRoom(true)
         viewModel.detachRoomInfo(room.roomId)
+        notificationManager.cancelAll()
     }
 
     override fun onPause() {
