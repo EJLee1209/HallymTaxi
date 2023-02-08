@@ -8,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
+import androidx.paging.map
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentPoolListBottomSheetBinding
 import com.dldmswo1209.hallymtaxi.model.*
@@ -79,7 +82,7 @@ class PoolListBottomSheetFragment(
             return
         }
 
-        poolListAdapter = PoolListAdapter(requireActivity(), endPlace) { room -> recyclerItemClickEvent(room) }
+        poolListAdapter = PoolListAdapter(requireActivity(),this, endPlace) { room -> recyclerItemClickEvent(room) }
         binding.rvPool.adapter = poolListAdapter
     }
 
@@ -91,7 +94,8 @@ class PoolListBottomSheetFragment(
 
         lifecycleScope.launch {
             viewModel.detachRoomPaging(user.gender).collectLatest {
-                poolListAdapter.submitData(it)
+                poolListAdapter.submitData(it) // submitData는 무효화 또는 새로고침 전까지 반환되지 않는 정지 함수
+                // 여기부터 실행이 중단됨.
             }
         }
 
@@ -156,5 +160,10 @@ class PoolListBottomSheetFragment(
 
     fun onClickRefreshRoomList() {
         poolListAdapter.refresh()
+    }
+
+    fun visibilityNoPoolRoomLayout(isVisible: Boolean){
+        if(isVisible) binding.layoutNoPoolRoom.visibility = View.VISIBLE
+        else binding.layoutNoPoolRoom.visibility = View.GONE
     }
 }

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -18,6 +19,7 @@ import com.dldmswo1209.hallymtaxi.model.Place
 
 class PoolListAdapter(
     val activity: Activity,
+    val fragment: PoolListBottomSheetFragment,
     val endPlace: Place,
     val onClickRoom: (CarPoolRoom)->Unit,
     ): PagingDataAdapter<CarPoolRoom, PoolListAdapter.ViewHolder>(diffUtil) {
@@ -73,8 +75,12 @@ class PoolListAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val room = getItem(position) ?: return
-        holder.bind(room)
+        getItem(position)?.let{
+            fragment.visibilityNoPoolRoomLayout(false)
+            holder.bind(it)
+        } ?: kotlin.run {
+            if(position == 0) fragment.visibilityNoPoolRoomLayout(true)
+        }
     }
 
     companion object{

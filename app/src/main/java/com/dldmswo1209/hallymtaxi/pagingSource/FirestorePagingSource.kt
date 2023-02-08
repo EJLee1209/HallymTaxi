@@ -28,7 +28,6 @@ class FirestorePagingSource(
         }catch (e: Exception){
             LoadResult.Error(e)
         }
-        Log.d("testt", "load: ")
     }
 }
 
