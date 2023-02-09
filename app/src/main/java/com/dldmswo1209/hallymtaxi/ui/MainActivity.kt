@@ -15,12 +15,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
+import com.dldmswo1209.hallymtaxi.common.FirebaseAnalyticsManager
 import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 
 
@@ -35,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     var isNetworkActivate = false
     private var user: User? = null
     private lateinit var globalVariable: GlobalVariable
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     //권한 가져오기
     companion object{
@@ -49,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         globalVariable = application as GlobalVariable
+        firebaseAnalytics = Firebase.analytics
 
         requestPermission()
         getIntentExtraData()
@@ -102,6 +108,28 @@ class MainActivity : AppCompatActivity() {
                 // 바텀 네비게이션이 표시되지 않는 Fragment
                 else{
                     binding.navigationMain.visibility = View.GONE
+                }
+
+                when(destination.id){
+                    R.id.navigation_map -> {
+                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("지도를 봤습니다", "MapFragment")
+                    }
+                    R.id.navigation_menu -> {
+                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("메뉴를 봤습니다", "MenuFragment")
+                    }
+                    R.id.navigation_history ->{
+                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("히스토리를 봤습니다", "HistoryFragment")
+                    }
+                    R.id.chatRoomFragment ->{
+                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("채팅방을 봤습니다", "ChatRoomFragment")
+                    }
+                    R.id.chatRoomHistoryFragment->{
+                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("히스토리 채팅방을 봤습니다", "ChatRoomHistoryFragment")
+                    }
+                    R.id.navigation_create_room->{
+                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("채팅방 만드는 화면을 봤습니다", "CreateRoomFragment")
+                    }
+
                 }
             }
         }

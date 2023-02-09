@@ -24,6 +24,10 @@ import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.PoolListBottomSheetFragment
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.FirebaseAnalytics.Param
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import net.daum.mf.map.api.CameraPosition
 import net.daum.mf.map.api.CameraUpdateFactory
 import net.daum.mf.map.api.MapPOIItem
@@ -48,6 +52,7 @@ class MapFragment: Fragment() {
     private var joinedRoom: CarPoolRoom? = null
     private lateinit var user : User
     private lateinit var globalVariable: GlobalVariable
+
 
     companion object{
         const val SEARCH_RESULT_BOTTOM_SHEET_TAG = "SearchResultBottomSheetFragment"

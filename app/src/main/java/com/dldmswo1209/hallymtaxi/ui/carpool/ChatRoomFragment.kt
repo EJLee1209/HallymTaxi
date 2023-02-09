@@ -29,6 +29,9 @@ import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.service.FcmService.Companion.CHANNEL_ID
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 
 class ChatRoomFragment: Fragment() {
@@ -95,6 +98,8 @@ class ChatRoomFragment: Fragment() {
         KeyboardUtils.addKeyboardToggleListener(requireActivity(), keyboardStateListener)
         setRecyclerAdapter()
         editTextWatcher()
+
+
     }
     private fun backPressedSetCallback(){
         callback = object : OnBackPressedCallback(true) {
