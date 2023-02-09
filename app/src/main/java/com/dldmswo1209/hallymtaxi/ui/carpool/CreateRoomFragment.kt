@@ -1,38 +1,27 @@
 package com.dldmswo1209.hallymtaxi.ui.carpool
 
 import android.content.Intent
-import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.NumberPicker
-import android.widget.NumberPicker.OnValueChangeListener
-import android.widget.TimePicker
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentCreateRoomBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.model.GENDER_OPTION_NONE
 import com.dldmswo1209.hallymtaxi.model.Place
 import com.dldmswo1209.hallymtaxi.model.User
-import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
-import com.dldmswo1209.hallymtaxi.ui.map.MapFragment
 import com.dldmswo1209.hallymtaxi.ui.map.MapFragment.Companion.SEARCH_RESULT_BOTTOM_SHEET_TAG
-import com.dldmswo1209.hallymtaxi.ui.map.MapFragmentDirections
 import com.dldmswo1209.hallymtaxi.ui.map.SearchResultBottomSheetFragment
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
-import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Date
 
 
 class CreateRoomFragment: Fragment() {
@@ -47,7 +36,7 @@ class CreateRoomFragment: Fragment() {
     private var isClicked = false
     private lateinit var gender : String
     private lateinit var globalVariable: GlobalVariable
-    private var departureDate: String = ""
+    private var isToday = true
 
     private val loadingDialog by lazy{
         LoadingDialog(requireContext())
@@ -63,9 +52,6 @@ class CreateRoomFragment: Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-
         init()
         datePickerSetUp()
         setObserver()
@@ -117,7 +103,7 @@ class CreateRoomFragment: Fragment() {
             wrapSelectorWheel = true
             value = 1
             setOnValueChangedListener { picker, oldVal, newVal ->
-                departureDate = datePickerItems[newVal]
+                isToday = datePickerItems[newVal] == "오늘"
             }
         }
     }
@@ -211,19 +197,12 @@ class CreateRoomFragment: Fragment() {
             GENDER_OPTION_NONE
         }
 
-        var time = ""
-
-        if(hour >= 12){
-            if(hour != 12) hour -= 12
-            time = "$departureDate 오후 %d:%02d".format(hour, min)
-        }else{
-            time = "$departureDate 오전 %d:%02d".format(hour,min)
-        }
+        val departureDateTime = "${dateIsToday(LocalDate.now())} ${hour}:${min}"
 
         val room = CarPoolRoom(
             participants = mutableListOf(currentUser),
             userMaxCount = maxCount,
-            departureTime = time,
+            departureTime = departureDateTime,
             startPlace = startPlace,
             endPlace = endPlace,
             created = LocalDateTime.now().toString(),
@@ -234,6 +213,10 @@ class CreateRoomFragment: Fragment() {
         isClicked = true
 
         loadingDialog.show()
+    }
+
+    private fun dateIsToday(date: LocalDate) : String{
+        return if(isToday) date.toString() else date.plusDays(1).toString()
     }
 
 

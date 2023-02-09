@@ -2,8 +2,8 @@ package com.dldmswo1209.hallymtaxi.common
 
 
 object TimeService {
-    fun currentTime(timestamp: String) : String{
-        val splitDateTime = timestamp.split(" ")
+    fun currentTime(timestamp: String, delimiter: String) : String{
+        val splitDateTime = timestamp.split(delimiter)
         val (hour, min) = splitDateTime[1].split(":")
 
         val realTime : String = if(hour.toInt() >= 12){
@@ -16,8 +16,8 @@ object TimeService {
         return realTime
     }
 
-    fun currentDate(timestamp: String) : String{
-        return timestamp.split(" ")[0]
+    fun currentDate(timestamp: String, delimiter: String) : String{
+        return timestamp.split(delimiter)[0]
     }
 
     fun dateTimeSplitHelper(timestamp: String, target: String) : Int{

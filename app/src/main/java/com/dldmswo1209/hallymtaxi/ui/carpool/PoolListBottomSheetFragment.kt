@@ -68,8 +68,6 @@ class PoolListBottomSheetFragment(
                 else loadingDialog.dismiss()
             }
         }
-
-
     }
 
     private fun init() {
@@ -81,8 +79,7 @@ class PoolListBottomSheetFragment(
             requireActivity().finish()
             return
         }
-
-        poolListAdapter = PoolListAdapter(requireActivity(),this, endPlace) { room -> recyclerItemClickEvent(room) }
+        poolListAdapter = PoolListAdapter(requireActivity(),this@PoolListBottomSheetFragment, endPlace) { room -> recyclerItemClickEvent(room) }
         binding.rvPool.adapter = poolListAdapter
     }
 
@@ -96,6 +93,7 @@ class PoolListBottomSheetFragment(
             viewModel.detachRoomPaging(user.gender).collectLatest {
                 poolListAdapter.submitData(it) // submitData는 무효화 또는 새로고침 전까지 반환되지 않는 정지 함수
                 // 여기부터 실행이 중단됨.
+                loadingDialog.dismiss() // 새로고침이 완료 되면, 로딩 다이얼로그 숨김
             }
         }
 
@@ -160,6 +158,7 @@ class PoolListBottomSheetFragment(
 
     fun onClickRefreshRoomList() {
         poolListAdapter.refresh()
+        loadingDialog.show()
     }
 
     fun visibilityNoPoolRoomLayout(isVisible: Boolean){

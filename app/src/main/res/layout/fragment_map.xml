@@ -275,7 +275,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="오후 2:40"
-                android:text="@{room.departureTime}"
+                departure_time="@{room.departureTime}"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="8dp"/>
 

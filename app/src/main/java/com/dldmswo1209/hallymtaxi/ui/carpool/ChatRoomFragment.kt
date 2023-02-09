@@ -125,7 +125,16 @@ class ChatRoomFragment: Fragment() {
     private fun setObserver(){
         viewModel.detachChatList(room.roomId)
         globalVariable.myRoom.observe(viewLifecycleOwner){ room->
-            if(room == null) return@observe
+            if(room == null) {
+                val deletedRoomDialog = CustomDialog(
+                    title = "채팅방 입장 오류",
+                    content = "참여할 수 없는 채팅방입니다.",
+                    positiveCallback = {onClickBack()}
+                )
+                deletedRoomDialog.show(parentFragmentManager, deletedRoomDialog.tag)
+                return@observe
+            }
+
             binding.room = room
             this.room = room
             tokenList = mutableListOf()

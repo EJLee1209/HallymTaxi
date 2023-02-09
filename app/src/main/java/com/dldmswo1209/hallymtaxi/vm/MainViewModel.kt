@@ -71,10 +71,11 @@ class MainViewModel(
 
     fun detachRoomPaging(genderOption: String) : Flow<PagingData<CarPoolRoom>> {
         val query = fireStore.collection("Room")
-            .whereEqualTo("closed", false)
-            .whereGreaterThanOrEqualTo("created", LocalDate.now().toString())
-            .whereIn("genderOption", listOf(genderOption, GENDER_OPTION_NONE))
-            .orderBy("created", Query.Direction.DESCENDING)
+            .whereEqualTo("closed", false) // 이미 마감한 방 필터링
+            .whereIn("genderOption", listOf(genderOption, GENDER_OPTION_NONE)) // 성별 옵션에 부합하지 않는 방 필터링
+            .whereGreaterThanOrEqualTo("departureTime", LocalDateTime.now().toString()) // 출발시간이 이미 지난 방 필터링
+            .orderBy("departureTime", Query.Direction.ASCENDING)// 출발 시간 기준 오름차순
+            .orderBy("created", Query.Direction.DESCENDING) // 방 생성 기준 내림차순
             .limit(PAGE_SIZE.toLong())
 
         return Pager(
@@ -84,6 +85,7 @@ class MainViewModel(
         ){
             FirestorePagingSource(query)
         }.flow.cachedIn(viewModelScope)
+
     }
 
     fun logout(activity: Activity, uid: String) {
