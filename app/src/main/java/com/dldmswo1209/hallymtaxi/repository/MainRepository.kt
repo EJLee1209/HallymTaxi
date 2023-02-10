@@ -71,7 +71,7 @@ class MainRepository(val context: Context) {
                                 room.participants.add(user)
                                 room.participants.forEach { if(it.fcmToken != user.fcmToken) receiveTokens.add(it.fcmToken) }
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    sendMessage(chat = Chat(roomId = room.roomId, userId = user.uid, userName = user.name ,msg = "${user.name}님이 입장했습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
+                                    sendMessage(chat = Chat(roomId = room.roomId, userId = user.uid, userName = user.name ,msg = "-${user.name}님이 입장하셨습니다-" , messageType = CHAT_JOIN), user.name, receiveTokens)
                                 }
                             }
                             .addOnFailureListener {
@@ -126,6 +126,10 @@ class MainRepository(val context: Context) {
                 deleteRoom(room.roomId) // 채팅방에 유저수가 0이므로 채팅방 삭제
             }
         }
+    }
+
+    fun deactivateRoom(roomId: String) {
+        fireStore.collection("Room").document(roomId).update("closed", true)
     }
 
     fun updateFcmToken(uid: String, token: String){

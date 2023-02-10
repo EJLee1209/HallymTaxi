@@ -27,7 +27,10 @@ class CustomDialog(
         savedInstanceState: Bundle?
     ): View? {
         binding = DialogAlreadyExistEmailBinding.inflate(inflater, container, false)
-        if(negativeButtonVisible) binding.btnNegative.visibility = View.VISIBLE
+        if(negativeButtonVisible) {
+            binding.btnNegative.visibility = View.VISIBLE
+            binding.divider.visibility = View.VISIBLE
+        }
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) // 배경 둥글게 하려면 이거 해야함
         dialog?.setCanceledOnTouchOutside(false)
         binding.fragment = this

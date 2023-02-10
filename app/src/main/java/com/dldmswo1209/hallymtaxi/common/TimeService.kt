@@ -1,5 +1,7 @@
 package com.dldmswo1209.hallymtaxi.common
 
+import java.time.LocalDateTime
+
 
 object TimeService {
     fun currentTime(timestamp: String, delimiter: String) : String{
@@ -18,6 +20,14 @@ object TimeService {
 
     fun currentDate(timestamp: String, delimiter: String) : String{
         return timestamp.split(delimiter)[0]
+    }
+
+    fun isBefore(timestamp: String, delimiter: String) : Boolean{
+        val (year, month,day) = currentDate(timestamp, delimiter).split("-")
+        val (hour, min) = timestamp.split(delimiter)[1].split(":")
+        val localDateTime = LocalDateTime.now()
+
+        return localDateTime.isBefore(LocalDateTime.of(year.toInt(), month.toInt(), day.toInt(), hour.toInt(), min.toInt()))
     }
 
     fun dateTimeSplitHelper(timestamp: String, target: String) : Int{

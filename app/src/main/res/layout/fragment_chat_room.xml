@@ -116,7 +116,7 @@
                 android:background="@null"
                 android:maxLines="3"
                 android:paddingHorizontal="10dp"
-                android:paddingVertical="10dp" />
+                android:paddingVertical="13dp" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btn_send"

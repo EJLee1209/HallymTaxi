@@ -3,4 +3,7 @@
     <item
         android:id="@+id/menu_exit"
         android:title="채팅방 나가기"/>
+    <item
+        android:id="@+id/menu_deactivate"
+        android:title="카풀 마감하기"/>
 </menu>

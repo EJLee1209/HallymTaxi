@@ -2,6 +2,7 @@ package com.dldmswo1209.hallymtaxi.ui.carpool
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -190,14 +191,25 @@ class CreateRoomFragment: Fragment() {
 
         val maxCount = binding.tvMaxCount.text.toString().toInt()
         var hour = binding.timePicker.hour
-        val min = binding.timePicker.getMinute()
+        val min = binding.timePicker.minute * 5
         val genderOption = if(binding.checkboxGenderOption.isChecked){
             currentUser.gender
         }else{
             GENDER_OPTION_NONE
         }
 
-        val departureDateTime = "${dateIsToday(LocalDate.now())} ${hour}:${min}"
+        val departureDateTime = "${dateIsToday(LocalDate.now())}T${hour}:${min}"
+        Log.d("testt", "출발 시간: ${departureDateTime}")
+        val isBefore = TimeService.isBefore(departureDateTime, "T")
+        if(!isBefore){
+            // 설정한 출발 시간이 이미 지난 시간인 경우
+            val invalidValueDialog = CustomDialog(
+                title = "채팅방 생성 실패",
+                content = "설정 하신 출발 시간이 이미 지났습니다",
+            )
+            invalidValueDialog.show(parentFragmentManager, invalidValueDialog.tag)
+            return
+        }
 
         val room = CarPoolRoom(
             participants = mutableListOf(currentUser),

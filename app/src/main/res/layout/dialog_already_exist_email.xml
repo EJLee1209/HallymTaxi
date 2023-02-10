@@ -14,15 +14,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingVertical="16dp">
+        android:paddingTop="21dp">
 
         <TextView
             android:id="@+id/title"
+            style="@style/TextSubTitle.Black.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{fragment.title}"
-            android:textColor="@color/hallym_black_000000"
-            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -30,13 +29,13 @@
 
         <TextView
             android:id="@+id/content"
-            android:layout_width="wrap_content"
+            style="@style/Text13.Black"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="34dp"
+            android:layout_marginTop="18dp"
             android:gravity="center"
             android:text="@{fragment.content}"
-            android:textColor="@color/hallym_black_000000"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title"
@@ -46,41 +45,57 @@
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="18dp"
-            android:background="@color/hallym_grey_D9D9D9"
+            android:layout_marginTop="27dp"
+            android:background="@color/hallym_grey_f5f5f5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/content" />
 
-        <TextView
-            android:id="@+id/btn_positive"
-            android:layout_width="wrap_content"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@null"
-            android:onClick="@{()->fragment.onPositiveButtonClick()}"
-            android:padding="15dp"
-            tools:text="확인"
-            android:text="@{fragment.positiveButton}"
-            android:textColor="@color/hallym_blue_3351b9"
-            app:layout_constraintEnd_toStartOf="@id/btn_negative"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider" />
-
-        <TextView
-            android:id="@+id/btn_negative"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:onClick="@{()->fragment.onNegativeButtonClick()}"
-            android:padding="15dp"
-            android:text="@{fragment.negativeButton}"
-            tools:text="취소"
-            android:textColor="@color/hallym_blue_3351b9"
-            app:layout_constraintStart_toEndOf="@id/btn_positive"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider"
-            android:visibility="gone"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider">
 
+            <TextView
+                style="@style/Text13.Blue.Bold"
+                android:id="@+id/btn_negative"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="center"
+                android:onClick="@{()->fragment.onNegativeButtonClick()}"
+                android:paddingVertical="18dp"
+                android:text="@{fragment.negativeButton}"
+                android:visibility="gone"
+                tools:text="취소"
+                tools:visibility="visible" />
+
+            <View
+                android:id="@+id/button_divider"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/hallym_grey_f5f5f5"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <TextView
+                style="@style/Text13.Red"
+                android:id="@+id/btn_positive"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="center"
+                android:onClick="@{()->fragment.onPositiveButtonClick()}"
+                android:paddingVertical="18dp"
+                android:text="@{fragment.positiveButton}"
+                tools:text="확인" />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

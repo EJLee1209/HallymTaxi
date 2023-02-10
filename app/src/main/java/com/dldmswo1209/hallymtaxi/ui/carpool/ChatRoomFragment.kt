@@ -54,6 +54,7 @@ class ChatRoomFragment: Fragment() {
     private val notificationManager : NotificationManagerCompat by lazy{
         NotificationManagerCompat.from(requireActivity().applicationContext)
     }
+    private var isFirst = true
 
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
@@ -139,12 +140,26 @@ class ChatRoomFragment: Fragment() {
                 deletedRoomDialog.show(parentFragmentManager, deletedRoomDialog.tag)
                 return@observe
             }
+            val isBefore = TimeService.isBefore(room.departureTime, "T")
+            if(!isBefore && isFirst){
+                // 출발시간이 지남
+                val finishedRoom = CustomDialog(
+                    title = "출발시간 초과",
+                    content = "출발시간이 지난 채팅방 입니다.\n더 이상 카풀 목록에 표시되지 않습니다.",
+                    positiveCallback = { exitRoom() },
+                    positiveButton = "나가기",
+                    negativeButtonVisible = true,
+                    negativeButton = "취소",
+                )
+                finishedRoom.show(parentFragmentManager, finishedRoom.tag)
+            }
 
             binding.room = room
             this.room = room
             tokenList = mutableListOf()
 
             room.participants.forEach { if(it.fcmToken != currentUser.fcmToken) tokenList.add(it.fcmToken) }
+            isFirst = false
         }
 
         viewModel.chatList.observe(viewLifecycleOwner){
@@ -181,12 +196,6 @@ class ChatRoomFragment: Fragment() {
     }
 
     fun onClickBack(){
-        // 채팅방을 나갈 때 마지막 메세지의 키를 저장함(히스토리에서 새로운 메세지가 왔을 때 new 를 표시하기 위함)
-        if(messages.isNotEmpty()) {
-            val sharedPreference =
-                requireContext().getSharedPreferences("data", Context.MODE_PRIVATE)
-            sharedPreference.edit().putInt("lastChatKey", messages.last().id).apply()
-        }
         findNavController().navigate(R.id.action_chatRoomFragment_to_navigation_map)
     }
 
@@ -199,41 +208,71 @@ class ChatRoomFragment: Fragment() {
             when(it.itemId){
                 R.id.menu_exit->{
                     val exitDialog = CustomDialog(
-                        title = "채팅방 퇴장",
-                        content = "정말로 나가시겠습니까?",
+                        title = "채팅방 나가기",
+                        content = "나가기를 하면 대화내용이\n모두 히스토리에 저장됩니다.\n정말 나가시겠습니까?",
                         negativeButtonVisible = true,
-                        positiveCallback = {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                viewModel.sendMessage(Chat(roomId = room.roomId, userId = currentUser.uid, msg = "${currentUser.name}님이 나갔습니다", messageType = CHAT_EXIT), currentUser.name, tokenList)
-                            }
-                            messages.forEachIndexed {idx,chat->
-                                if(chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid){
-                                    // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
-                                    roomInfo?.let {roomInfo ->
-                                        roomInfo.isActivate = false
-                                        roomInfo.startPlaceName = room.startPlace.place_name
-                                        roomInfo.endPlaceName = room.endPlace.place_name
-                                        roomInfo.lastMsg = messages.last().msg
-                                        roomInfo.lastReceiveMsgDateTime = messages.last().dateTime
-                                        viewModel.insertRoomInfo(roomInfo)
-                                    }
-                                    return@forEachIndexed
-                                }
-                            }
-                            viewModel.exitRoom(currentUser, room)
-                            onClickBack()
-                        }
+                        positiveButton = "나가기",
+                        positiveCallback = { exitRoom() }
                     )
                     exitDialog.show(parentFragmentManager, exitDialog.tag)
 
                     true
                 }
                 else->{
-                    false
+                    val deactivateDialog = CustomDialog(
+                        title = "카풀 마감하기",
+                        content = "마감하기를 하면\n인원을 더이상 추가할 수 없습니다.\n마감할까요?",
+                        negativeButtonVisible = true,
+                        positiveButton = "마감하기",
+                        positiveCallback = {
+                            if(room.closed) return@CustomDialog
+                            val chat = Chat(roomId = room.roomId, userId = currentUser.uid, msg= "-카풀이 마감됐습니다-", messageType = CHAT_ETC)
+                            viewModel.deactivateRoom(room.roomId)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                async {
+                                    viewModel.sendMessage(chat, currentUser.name, tokenList)
+                                }.await()
+                                viewModel.detachChatList(room.roomId)
+                            }
+                        }
+                    )
+                    deactivateDialog.show(parentFragmentManager, deactivateDialog.tag)
+
+                    true
                 }
             }
         }
     }
+
+    private fun exitRoom() {
+        CoroutineScope(Dispatchers.IO).launch {
+            viewModel.sendMessage(
+                Chat(
+                    roomId = room.roomId,
+                    userId = currentUser.uid,
+                    msg = "-${currentUser.name}님이 나갔습니다-",
+                    messageType = CHAT_EXIT
+                ), currentUser.name, tokenList
+            )
+        }
+        messages.forEachIndexed { idx, chat ->
+            if (chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid) {
+                // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
+                roomInfo?.let { roomInfo ->
+                    roomInfo.isActivate = false
+                    roomInfo.startPlaceName = room.startPlace.place_name
+                    roomInfo.endPlaceName = room.endPlace.place_name
+                    roomInfo.lastMsg = messages.last().msg
+                    roomInfo.lastReceiveMsgDateTime = messages.last().dateTime
+                    viewModel.insertRoomInfo(roomInfo)
+                }
+                return@forEachIndexed
+            }
+        }
+        viewModel.exitRoom(currentUser, room)
+        onClickBack()
+    }
+
     fun onClickSend(){
         val msg = binding.etMsg.text.toString()
         val chat = Chat(roomId = room.roomId, userId = currentUser.uid, msg= msg, messageType = CHAT_NORMAL)

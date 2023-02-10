@@ -28,3 +28,4 @@ data class Chat(
 const val CHAT_NORMAL = "NORMAL"
 const val CHAT_JOIN = "JOIN"
 const val CHAT_EXIT = "EXIT"
+const val CHAT_ETC = "ETC"

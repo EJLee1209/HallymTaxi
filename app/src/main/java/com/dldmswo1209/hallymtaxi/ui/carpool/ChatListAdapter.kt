@@ -1,16 +1,14 @@
 package com.dldmswo1209.hallymtaxi.ui.carpool
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.dldmswo1209.hallymtaxi.common.TimeService
-import com.dldmswo1209.hallymtaxi.common.dateToString
-import com.dldmswo1209.hallymtaxi.databinding.ItemExitMessageBinding
-import com.dldmswo1209.hallymtaxi.databinding.ItemJoinMessageBinding
 import com.dldmswo1209.hallymtaxi.databinding.ItemMyChatBinding
 import com.dldmswo1209.hallymtaxi.databinding.ItemOtherChatBinding
+import com.dldmswo1209.hallymtaxi.databinding.ItemSystemMessageBinding
 import com.dldmswo1209.hallymtaxi.model.*
 
 // 유저리스트를 넣어주면 될듯
@@ -20,9 +18,11 @@ class ChatListAdapter(
 ) : ListAdapter<Chat, RecyclerView.ViewHolder>(diffUtil) {
     override fun getItemViewType(position: Int): Int {
         val item = currentList[position]
+        Log.d("testt", "getItemViewType: ${item.messageType}")
         return when(item.messageType) {
             CHAT_JOIN -> JOINED_MESSAGE
             CHAT_EXIT -> EXIT_MESSAGE
+            CHAT_ETC -> ETC
             CHAT_NORMAL -> if(item.userId == currentUser.uid) MY_CHAT else OTHER_CHAT
             else -> -1
         }
@@ -44,7 +44,7 @@ class ChatListAdapter(
         }
     }
 
-    inner class JoinMessageViewHolder(private val binding: ItemJoinMessageBinding) :
+    inner class SystemMessageViewHolder(private val binding: ItemSystemMessageBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(chat: Chat) {
             binding.chat = chat
@@ -52,19 +52,12 @@ class ChatListAdapter(
         }
     }
 
-    inner class ExitMessageViewHolder(private val binding: ItemExitMessageBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(chat: Chat) {
-            binding.chat = chat
-            binding.executePendingBindings()
-        }
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             JOINED_MESSAGE -> {
-                JoinMessageViewHolder(
-                    ItemJoinMessageBinding.inflate(
+                SystemMessageViewHolder(
+                    ItemSystemMessageBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
@@ -72,8 +65,8 @@ class ChatListAdapter(
                 )
             }
             EXIT_MESSAGE ->{
-                ExitMessageViewHolder(
-                    ItemExitMessageBinding.inflate(
+                SystemMessageViewHolder(
+                    ItemSystemMessageBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
@@ -81,6 +74,15 @@ class ChatListAdapter(
                 )
             }
 
+            ETC ->{
+                SystemMessageViewHolder(
+                    ItemSystemMessageBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                )
+            }
             MY_CHAT -> {
                 MyViewHolder(
                     ItemMyChatBinding.inflate(
@@ -104,16 +106,21 @@ class ChatListAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder.itemViewType) {
-            JOINED_MESSAGE -> {
-                (holder as JoinMessageViewHolder).bind(currentList[position])
+            JOINED_MESSAGE-> {
+                (holder as SystemMessageViewHolder).bind(currentList[position])
             }
-            EXIT_MESSAGE -> {
-                (holder as ExitMessageViewHolder).bind(currentList[position])
+            EXIT_MESSAGE ->{
+                (holder as SystemMessageViewHolder).bind(currentList[position])
+            }
+            ETC ->{
+                (holder as SystemMessageViewHolder).bind(currentList[position])
             }
             MY_CHAT -> {
+                Log.d("testt", "내 메세지 생성: ")
                 (holder as MyViewHolder).bind(currentList[position])
             }
             OTHER_CHAT -> {
+                Log.d("testt", "다른사람 메세지 생성: ")
                 (holder as OtherViewHolder).bind(currentList[position])
             }
         }
@@ -124,6 +131,7 @@ class ChatListAdapter(
         private const val EXIT_MESSAGE = 1
         private const val MY_CHAT = 2
         private const val OTHER_CHAT = 3
+        private const val ETC = 4
 
         private val diffUtil = object : DiffUtil.ItemCallback<Chat>() {
             override fun areItemsTheSame(oldItem: Chat, newItem: Chat): Boolean {

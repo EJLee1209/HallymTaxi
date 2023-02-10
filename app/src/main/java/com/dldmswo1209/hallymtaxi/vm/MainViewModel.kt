@@ -162,6 +162,7 @@ class MainViewModel(
         }
     }
 
+
     suspend fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {
         mainRepository.sendMessage(chat, userName, receiveTokens)
     }
@@ -193,6 +194,11 @@ class MainViewModel(
     fun exitRoom(user: User, room: CarPoolRoom) {
         mainRepository.exitRoom(user, room)
     }
+
+    fun deactivateRoom(roomId: String) {
+        mainRepository.deactivateRoom(roomId)
+    }
+
     fun insertRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
         Log.d("testt", "roomInfo 저장!: ${roomInfo}")
         roomRepository.insertRoomInfo(roomInfo)
