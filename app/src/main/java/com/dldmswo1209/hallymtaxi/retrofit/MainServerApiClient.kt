@@ -1,12 +1,9 @@
 package com.dldmswo1209.hallymtaxi.retrofit
 
-import com.dldmswo1209.hallymtaxi.common.dateToString
 import com.dldmswo1209.hallymtaxi.model.VerifyInfo
 import com.dldmswo1209.hallymtaxi.private_key.BASE_URL
-import com.google.firebase.Timestamp
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query

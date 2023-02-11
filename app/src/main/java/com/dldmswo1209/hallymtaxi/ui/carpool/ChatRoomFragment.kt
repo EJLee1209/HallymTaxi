@@ -1,7 +1,6 @@
 package com.dldmswo1209.hallymtaxi.ui.carpool
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -23,16 +22,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
 import com.dldmswo1209.hallymtaxi.model.*
-import com.dldmswo1209.hallymtaxi.service.FcmService.Companion.CHANNEL_ID
-import com.dldmswo1209.hallymtaxi.ui.MainActivity
+import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 
 class ChatRoomFragment: Fragment() {

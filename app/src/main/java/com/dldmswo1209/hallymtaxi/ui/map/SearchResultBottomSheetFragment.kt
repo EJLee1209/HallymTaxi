@@ -5,13 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.BottomSheetBehaviorSetting
 import com.dldmswo1209.hallymtaxi.databinding.FragmentSearchResultBottomSheetBinding
 import com.dldmswo1209.hallymtaxi.model.Place
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class SearchResultBottomSheetFragment(

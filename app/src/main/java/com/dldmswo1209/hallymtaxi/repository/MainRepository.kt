@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dldmswo1209.hallymtaxi.model.*
-import com.dldmswo1209.hallymtaxi.retrofit.*
+import com.dldmswo1209.hallymtaxi.retrofit.KakaoApiClient
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainRepository(val context: Context) {
 

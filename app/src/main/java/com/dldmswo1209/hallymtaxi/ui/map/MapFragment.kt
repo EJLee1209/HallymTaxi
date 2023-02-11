@@ -2,13 +2,11 @@ package com.dldmswo1209.hallymtaxi.ui.map
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
@@ -20,14 +18,9 @@ import com.dldmswo1209.hallymtaxi.common.LocationService
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentMapBinding
 import com.dldmswo1209.hallymtaxi.model.*
-import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.PoolListBottomSheetFragment
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.FirebaseAnalytics.Param
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
 import net.daum.mf.map.api.CameraPosition
 import net.daum.mf.map.api.CameraUpdateFactory
 import net.daum.mf.map.api.MapPOIItem

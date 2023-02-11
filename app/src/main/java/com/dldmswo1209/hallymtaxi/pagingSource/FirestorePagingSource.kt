@@ -1,6 +1,5 @@
 package com.dldmswo1209.hallymtaxi.pagingSource
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom

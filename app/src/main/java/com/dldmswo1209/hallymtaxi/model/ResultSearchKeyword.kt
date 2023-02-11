@@ -1,6 +1,5 @@
 package com.dldmswo1209.hallymtaxi.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 

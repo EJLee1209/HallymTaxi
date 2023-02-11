@@ -1,20 +1,16 @@
 package com.dldmswo1209.hallymtaxi.ui.carpool
 
 import android.app.Activity
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.DistanceManager
 import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.databinding.ItemPoolBinding
 import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
-import com.dldmswo1209.hallymtaxi.model.GENDER_OPTION_NONE
 import com.dldmswo1209.hallymtaxi.model.Place
 
 class PoolListAdapter(

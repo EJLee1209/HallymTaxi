@@ -1,12 +1,10 @@
 package com.dldmswo1209.hallymtaxi.vm
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dldmswo1209.hallymtaxi.common.context
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.model.VerifyInfo
 import com.dldmswo1209.hallymtaxi.repository.ServerRepository

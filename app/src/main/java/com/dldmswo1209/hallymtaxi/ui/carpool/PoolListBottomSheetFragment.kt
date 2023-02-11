@@ -3,28 +3,22 @@ package com.dldmswo1209.hallymtaxi.ui.carpool
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.paging.PagingData
-import androidx.paging.PagingDataAdapter
-import androidx.paging.map
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentPoolListBottomSheetBinding
-import com.dldmswo1209.hallymtaxi.model.*
-import com.dldmswo1209.hallymtaxi.ui.MainActivity
+import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
+import com.dldmswo1209.hallymtaxi.model.Place
+import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import java.util.Collections
 
 class PoolListBottomSheetFragment(
     private val onCreateRoomBtnClick: () -> Unit,
@@ -112,7 +106,7 @@ class PoolListBottomSheetFragment(
                         title = "채팅방 입장 실패",
                         content = "채팅방 인원 초과 혹은\n마감된 채팅방 입니다"
                     ) {}
-                    if(poolListAdapter.itemCount == 1){
+                    if (poolListAdapter.itemCount == 1) {
                         this@PoolListBottomSheetFragment.dialog?.dismiss()
                     }
                     dialog.show(parentFragmentManager, dialog.tag)

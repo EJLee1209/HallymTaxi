@@ -3,9 +3,7 @@ package com.dldmswo1209.hallymtaxi.common
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.Location
-import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData

@@ -1,9 +1,7 @@
 package com.dldmswo1209.hallymtaxi.ui.history
 
 import android.content.Intent
-import android.content.LocusId
 import android.os.Bundle
-import android.provider.Settings.Global
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +12,7 @@ import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.common.GlobalVariable
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomHistoryBinding
-import com.dldmswo1209.hallymtaxi.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.model.User
-import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.ChatListAdapter
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel

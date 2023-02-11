@@ -4,7 +4,6 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.dldmswo1209.hallymtaxi.model.GENDER_OPTION_FEMALE
 import com.dldmswo1209.hallymtaxi.model.GENDER_OPTION_MALE
-import com.dldmswo1209.hallymtaxi.model.GENDER_OPTION_NONE
 
 @BindingAdapter("genderOption")
 fun genderOption(view: TextView, option: String){

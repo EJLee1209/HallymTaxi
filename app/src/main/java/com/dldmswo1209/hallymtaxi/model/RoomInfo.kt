@@ -1,11 +1,8 @@
 package com.dldmswo1209.hallymtaxi.model
 
-import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.firebase.Timestamp
-import kotlinx.android.parcel.Parcelize
 
 @Entity(tableName = "room_info")
 data class RoomInfo(

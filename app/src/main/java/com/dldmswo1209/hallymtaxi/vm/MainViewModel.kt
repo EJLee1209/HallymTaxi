@@ -2,28 +2,23 @@ package com.dldmswo1209.hallymtaxi.vm
 
 import android.app.Activity
 import android.app.Application
-import android.app.DirectAction
-import android.content.Context
 import android.content.Intent
-import android.graphics.Path.Direction
-import android.system.Os.remove
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.room.Room
-import com.dldmswo1209.hallymtaxi.common.GlobalVariable
-import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.context
 import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.pagingSource.FirestorePagingSource
 import com.dldmswo1209.hallymtaxi.pagingSource.PAGE_SIZE
 import com.dldmswo1209.hallymtaxi.repository.MainRepository
 import com.dldmswo1209.hallymtaxi.repository.RoomRepository
-import com.dldmswo1209.hallymtaxi.repository.ServerRepository
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ListenerRegistration
@@ -32,10 +27,11 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 class MainViewModel(

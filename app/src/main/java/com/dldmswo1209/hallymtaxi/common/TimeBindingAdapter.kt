@@ -2,7 +2,6 @@ package com.dldmswo1209.hallymtaxi.common
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.google.firebase.Timestamp
 import java.time.LocalDate
 
 @BindingAdapter("time")
