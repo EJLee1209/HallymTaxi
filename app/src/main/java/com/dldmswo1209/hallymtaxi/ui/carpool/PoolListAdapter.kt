@@ -79,7 +79,7 @@ class PoolListAdapter(
             fragment.visibilityNoPoolRoomLayout(false)
             holder.bind(it)
         } ?: kotlin.run {
-            if(position == 0) fragment.visibilityNoPoolRoomLayout(true)
+            fragment.visibilityNoPoolRoomLayout(true)
         }
     }
 

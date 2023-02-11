@@ -29,7 +29,7 @@ import java.util.Collections
 class PoolListBottomSheetFragment(
     private val onCreateRoomBtnClick: () -> Unit,
     private val joinRoomCallback: (CarPoolRoom) -> Unit,
-    private val endPlace: Place
+    private val endPlace: Place,
 ) : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentPoolListBottomSheetBinding
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
@@ -39,10 +39,10 @@ class PoolListBottomSheetFragment(
     private lateinit var user: User
     private lateinit var globalVariable: GlobalVariable
 
-    private val loadingDialog by lazy{
+    private val loadingDialog by lazy {
         LoadingDialog(requireContext())
     }
-    private lateinit var poolListAdapter : PoolListAdapter
+    private lateinit var poolListAdapter: PoolListAdapter
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return BottomSheetBehaviorSetting.bottomSheetBehaviorSetting(requireContext(), theme)
@@ -62,29 +62,28 @@ class PoolListBottomSheetFragment(
 
         init()
         setObserver()
-        lifecycleScope.launch {
-            poolListAdapter.loadStateFlow.collectLatest {
-                if(it.append is LoadState.Loading) loadingDialog.show()
-                else loadingDialog.dismiss()
-            }
-        }
+        pagingDataLoadFlow()
     }
 
     private fun init() {
         binding.fragment = this
         globalVariable = requireActivity().application as GlobalVariable
 
-        user = globalVariable.getUser()?: kotlin.run {
+        user = globalVariable.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return
         }
-        poolListAdapter = PoolListAdapter(requireActivity(),this@PoolListBottomSheetFragment, endPlace) { room -> recyclerItemClickEvent(room) }
+        poolListAdapter = PoolListAdapter(
+            requireActivity(),
+            this@PoolListBottomSheetFragment,
+            endPlace
+        ) { room -> recyclerItemClickEvent(room) }
         binding.rvPool.adapter = poolListAdapter
     }
 
     private fun setObserver() {
-        globalVariable.myRoom.observe(viewLifecycleOwner){ room->
+        globalVariable.myRoom.observe(viewLifecycleOwner) { room ->
             joinedRoom = room
             poolListAdapter.roomId = room?.roomId
         }
@@ -97,22 +96,25 @@ class PoolListBottomSheetFragment(
             }
         }
 
-        viewModel.isJoined.observe(viewLifecycleOwner){
-            CoroutineScope(Dispatchers.Main).launch{
+        viewModel.isJoined.observe(viewLifecycleOwner) {
+            CoroutineScope(Dispatchers.Main).launch {
                 withContext(Dispatchers.Default) {
                     loadingDialog.dismiss()
                     delay(100)
                 }
-                if(it){ // 입장 성공
-                    room?.let{ room->
+                if (it) { // 입장 성공
+                    room?.let { room ->
                         joinRoomCallback(room)
                     }
 
-                }else{ // 입장 실패(다이얼로그로 표시)
+                } else { // 입장 실패(다이얼로그로 표시)
                     val dialog = CustomDialog(
                         title = "채팅방 입장 실패",
                         content = "채팅방 인원 초과 혹은\n마감된 채팅방 입니다"
                     ) {}
+                    if(poolListAdapter.itemCount == 1){
+                        this@PoolListBottomSheetFragment.dialog?.dismiss()
+                    }
                     dialog.show(parentFragmentManager, dialog.tag)
                     poolListAdapter.refresh()
                 }
@@ -121,11 +123,20 @@ class PoolListBottomSheetFragment(
 
     }
 
-    private fun recyclerItemClickEvent(room: CarPoolRoom){
+    private fun pagingDataLoadFlow() {
+        lifecycleScope.launch {
+            poolListAdapter.loadStateFlow.collectLatest {
+                if (it.append is LoadState.Loading) loadingDialog.show()
+                else loadingDialog.dismiss()
+            }
+        }
+    }
+
+    private fun recyclerItemClickEvent(room: CarPoolRoom) {
         // 채팅방 입장
         this.room = room
-        joinedRoom?.let{
-            if(it.roomId != room.roomId) {
+        joinedRoom?.let {
+            if (it.roomId != room.roomId) {
                 // 이미 참여중인 채팅방이 존재함
                 val dialog = CustomDialog(
                     title = "채팅방 입장",
@@ -136,7 +147,7 @@ class PoolListBottomSheetFragment(
             }
         }
 
-        viewModel.joinRoom(room,user)
+        viewModel.joinRoom(room, user)
         loadingDialog.show()
     }
 
@@ -161,8 +172,8 @@ class PoolListBottomSheetFragment(
         loadingDialog.show()
     }
 
-    fun visibilityNoPoolRoomLayout(isVisible: Boolean){
-        if(isVisible) binding.layoutNoPoolRoom.visibility = View.VISIBLE
+    fun visibilityNoPoolRoomLayout(isVisible: Boolean) {
+        if (isVisible) binding.layoutNoPoolRoom.visibility = View.VISIBLE
         else binding.layoutNoPoolRoom.visibility = View.GONE
     }
 }

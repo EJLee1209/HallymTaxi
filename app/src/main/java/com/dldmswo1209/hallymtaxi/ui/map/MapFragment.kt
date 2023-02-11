@@ -75,9 +75,7 @@ class MapFragment: Fragment() {
         setObservers()
         setEditorActionListener()
         onShortCutButtonClickListener()
-
     }
-
     private fun init(){
         locationService = LocationService(requireActivity())
         moveCamera(hallym_lat, hallym_lng, 2f)
@@ -328,6 +326,20 @@ class MapFragment: Fragment() {
         }
     }
 
+    fun onClickSearchIcon() {
+        if (binding.etStartPoint.isFocused) {
+            val keyword = binding.etStartPoint.text.toString()
+            searchAddressFromKeyword(keyword, isStartPoint = true, getCurrentAddress = false)
+        } else {
+            val keyword = binding.etEndPoint.text.toString()
+            searchAddressFromKeyword(keyword, isStartPoint = false, getCurrentAddress = false)
+        }
+    }
+
+    fun onClickInitSearchIcon() {
+        val keyword = binding.etInitSearch.text.toString()
+        searchAddressFromKeyword(keyword, isStartPoint = false, getCurrentAddress = true)
+    }
 
     override fun onResume() {
         super.onResume()
