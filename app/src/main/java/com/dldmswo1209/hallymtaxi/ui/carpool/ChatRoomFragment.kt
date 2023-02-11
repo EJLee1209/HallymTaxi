@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
@@ -224,23 +225,34 @@ class ChatRoomFragment: Fragment() {
                         content = "마감하기를 하면\n인원을 더이상 추가할 수 없습니다.\n마감할까요?",
                         negativeButtonVisible = true,
                         positiveButton = "마감하기",
-                        positiveCallback = {
-                            if(room.closed) return@CustomDialog
-                            val chat = Chat(roomId = room.roomId, userId = currentUser.uid, msg= "-카풀이 마감됐습니다-", messageType = CHAT_ETC)
-                            viewModel.deactivateRoom(room.roomId)
-                            CoroutineScope(Dispatchers.IO).launch {
-                                async {
-                                    viewModel.sendMessage(chat, currentUser.name, tokenList)
-                                }.await()
-                                viewModel.detachChatList(room.roomId)
-                            }
-                        }
+                        positiveCallback = { deactivateRoomPositiveCallback() }
                     )
                     deactivateDialog.show(parentFragmentManager, deactivateDialog.tag)
 
                     true
                 }
             }
+        }
+    }
+
+    private fun deactivateRoomPositiveCallback() {
+        if (room.participants.first() != currentUser) {
+            Toast.makeText(requireContext(), "방장 권한입니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (room.closed) return
+        val chat = Chat(
+            roomId = room.roomId,
+            userId = currentUser.uid,
+            msg = "-카풀이 마감됐습니다-",
+            messageType = CHAT_ETC
+        )
+        viewModel.deactivateRoom(room.roomId)
+        CoroutineScope(Dispatchers.IO).launch {
+            async {
+                viewModel.sendMessage(chat, currentUser.name, tokenList)
+            }.await()
+            viewModel.detachChatList(room.roomId)
         }
     }
 
@@ -254,6 +266,17 @@ class ChatRoomFragment: Fragment() {
                     messageType = CHAT_EXIT
                 ), currentUser.name, tokenList
             )
+            if(room.participants.first() == currentUser && room.userCount >= 2){
+                // 방장이 나감
+                viewModel.sendMessage(
+                    Chat(
+                        roomId = room.roomId,
+                        userId = currentUser.uid,
+                        msg = "-${room.participants[1].name}님은 이제 방장 입니다-",
+                        messageType = CHAT_ETC
+                    ), currentUser.name, tokenList
+                )
+            }
         }
         messages.forEachIndexed { idx, chat ->
             if (chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid) {
@@ -269,6 +292,7 @@ class ChatRoomFragment: Fragment() {
                 return@forEachIndexed
             }
         }
+
         viewModel.exitRoom(currentUser, room)
         onClickBack()
     }
