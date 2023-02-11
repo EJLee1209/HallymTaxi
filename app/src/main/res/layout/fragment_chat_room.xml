@@ -24,20 +24,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="42dp"
             android:background="@null"
             android:onClick="@{()->fragment.onClickBack()}"
             android:padding="10dp"
             android:src="@drawable/ic_left_arrow"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/tv_room_title"
+            app:layout_constraintBottom_toBottomOf="@id/tv_room_title"/>
 
         <TextView
             android:id="@+id/tv_room_title"
             style="@style/Text20.White.Bold"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="70dp"
             android:gravity="center"
             app:layout_constraintEnd_toStartOf="@id/btn_menu"
             app:layout_constraintStart_toEndOf="@id/btn_back"

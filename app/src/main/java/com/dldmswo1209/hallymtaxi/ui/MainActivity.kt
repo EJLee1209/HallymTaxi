@@ -20,6 +20,8 @@ import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -57,6 +59,9 @@ class MainActivity : AppCompatActivity() {
         getIntentExtraData()
         setObserver()
         bottomNavigationSetup()
+
+        MobileAds.initialize(this){}
+        binding.adMainBanner.loadAd(AdRequest.Builder().build())
 
     }
 

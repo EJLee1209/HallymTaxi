@@ -22,7 +22,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/top_bar"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:background="@color/hallym_blue_3351b9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +37,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginTop="50dp"/>
+                android:layout_marginTop="70dp"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
