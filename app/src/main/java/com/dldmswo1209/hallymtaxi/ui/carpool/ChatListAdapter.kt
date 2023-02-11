@@ -18,7 +18,6 @@ class ChatListAdapter(
 ) : ListAdapter<Chat, RecyclerView.ViewHolder>(diffUtil) {
     override fun getItemViewType(position: Int): Int {
         val item = currentList[position]
-        Log.d("testt", "getItemViewType: ${item.messageType}")
         return when(item.messageType) {
             CHAT_JOIN -> JOINED_MESSAGE
             CHAT_EXIT -> EXIT_MESSAGE
@@ -116,11 +115,9 @@ class ChatListAdapter(
                 (holder as SystemMessageViewHolder).bind(currentList[position])
             }
             MY_CHAT -> {
-                Log.d("testt", "내 메세지 생성: ")
                 (holder as MyViewHolder).bind(currentList[position])
             }
             OTHER_CHAT -> {
-                Log.d("testt", "다른사람 메세지 생성: ")
                 (holder as OtherViewHolder).bind(currentList[position])
             }
         }

@@ -25,6 +25,7 @@ import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
 import com.dldmswo1209.hallymtaxi.model.*
+import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import kotlinx.coroutines.*
@@ -192,6 +193,7 @@ class ChatRoomFragment: Fragment() {
 
     fun onClickBack(){
         findNavController().navigate(R.id.action_chatRoomFragment_to_navigation_map)
+        (activity as MainActivity).interstitialAdShow()
     }
 
     fun onClickMenu(){
