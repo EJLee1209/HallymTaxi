@@ -244,7 +244,7 @@ class ChatRoomFragment: Fragment() {
         val chat = Chat(
             roomId = room.roomId,
             userId = currentUser.uid,
-            msg = "-카풀이 마감됐습니다-",
+            msg = "카풀이 마감됐습니다",
             messageType = CHAT_ETC
         )
         viewModel.deactivateRoom(room.roomId)
@@ -262,7 +262,7 @@ class ChatRoomFragment: Fragment() {
                 Chat(
                     roomId = room.roomId,
                     userId = currentUser.uid,
-                    msg = "-${currentUser.name}님이 나갔습니다-",
+                    msg = "${currentUser.name}님이 나갔습니다",
                     messageType = CHAT_EXIT
                 ), currentUser.name, tokenList
             )
@@ -272,7 +272,7 @@ class ChatRoomFragment: Fragment() {
                     Chat(
                         roomId = room.roomId,
                         userId = currentUser.uid,
-                        msg = "-${room.participants[1].name}님은 이제 방장 입니다-",
+                        msg = "${room.participants[1].name}님은 이제 방장 입니다",
                         messageType = CHAT_ETC
                     ), currentUser.name, tokenList
                 )

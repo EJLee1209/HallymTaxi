@@ -6,6 +6,7 @@ import android.app.DirectAction
 import android.content.Context
 import android.content.Intent
 import android.graphics.Path.Direction
+import android.system.Os.remove
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
@@ -135,6 +136,7 @@ class MainViewModel(
     fun subscribeUser() : LiveData<User>? {
         val user = MutableLiveData<User>()
 
+        Log.d("firebaseSnapshotTestt", "subscribeUser 호출")
         if (auth.currentUser == null) return null
         getFcmToken()
         userListener = fireStore.collection("User").document(auth.currentUser!!.uid).addSnapshotListener { value, error->
@@ -169,6 +171,7 @@ class MainViewModel(
 
     fun subscribeMyRoom(user: User) : LiveData<CarPoolRoom?> {
         val room = MutableLiveData<CarPoolRoom?>()
+        Log.d("firebaseSnapshotTestt", "subscribeMyRoom 호출")
 
         myRoomListener = fireStore.collection("Room").whereArrayContains("participants", user)
             .addSnapshotListener { value, error ->
@@ -217,12 +220,17 @@ class MainViewModel(
     }
 
     fun userListenerRemove(){
-        userListener?.remove()
-
+        userListener?.let{
+            Log.d("firebaseSnapshotTestt", "유저 정보 리스너 제거")
+            it.remove()
+        }
     }
 
     fun myRoomListenerRemove(){
-        myRoomListener?.remove()
+        myRoomListener?.let{
+            Log.d("firebaseSnapshotTestt", "현재 방 정보 리스너 제거")
+            it.remove()
+        }
     }
 
     fun getFcmToken() {

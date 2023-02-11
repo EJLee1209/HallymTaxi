@@ -111,7 +111,7 @@ class PoolListBottomSheetFragment(
                 }else{ // 입장 실패(다이얼로그로 표시)
                     val dialog = CustomDialog(
                         title = "채팅방 입장 실패",
-                        content = "채팅방 인원 초과 혹은\n삭제된 채팅방 입니다"
+                        content = "채팅방 인원 초과 혹은\n마감된 채팅방 입니다"
                     ) {}
                     dialog.show(parentFragmentManager, dialog.tag)
                     poolListAdapter.refresh()
