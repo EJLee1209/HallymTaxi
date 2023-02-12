@@ -24,18 +24,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:navGraph="@navigation/main_navigation" />
 
-        <com.google.android.gms.ads.AdView
-            xmlns:ads="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/ad_main_banner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            ads:adSize="BANNER"
-            ads:adUnitId="@string/banner1_test_id"
-            ads:layout_constraintEnd_toEndOf="parent"
-            ads:layout_constraintStart_toStartOf="parent"
-            ads:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="20dp"/>
-
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/navigation_main"
             android:layout_width="0dp"

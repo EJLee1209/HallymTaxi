@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -21,9 +20,6 @@ import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.model.User
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
-import com.google.android.gms.ads.*
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -41,7 +37,6 @@ class MainActivity : AppCompatActivity() {
     private var user: User? = null
     private lateinit var globalVariable: GlobalVariable
     private lateinit var firebaseAnalytics: FirebaseAnalytics
-    private var mInterstitialAd: InterstitialAd? = null
     //권한 가져오기
     companion object{
         val permissions = arrayOf(
@@ -61,7 +56,6 @@ class MainActivity : AppCompatActivity() {
         getIntentExtraData()
         setObserver()
         bottomNavigationSetup()
-        bannerAdSettings()
     }
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기
@@ -134,40 +128,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun bannerAdSettings() {
-        MobileAds.initialize(this) {}
-        binding.adMainBanner.loadAd(AdRequest.Builder().build())
-    }
-
-    private fun interstitialAdLoad() {
-        InterstitialAd.load(
-            this,
-            getString(R.string.test_ad_id),
-            AdRequest.Builder().build(),
-            object : InterstitialAdLoadCallback() {
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                    Log.e("testt", "onAdFailedToLoad: $adError")
-                    mInterstitialAd = null
-                }
-
-                override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                    Log.d("testt", "onAdLoaded: is successful")
-                    mInterstitialAd = interstitialAd
-                }
-            })
-    }
-
-    fun interstitialAdShow(){
-        mInterstitialAd?.show(this@MainActivity) ?: run {
-            Log.d("testt", "아직 광고를 로드하지 못함")
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         checkNetwork.registerNetworkListener()
-        interstitialAdLoad()
     }
 
     override fun onPause() {

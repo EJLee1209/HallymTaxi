@@ -193,7 +193,6 @@ class ChatRoomFragment: Fragment() {
 
     fun onClickBack(){
         findNavController().navigate(R.id.action_chatRoomFragment_to_navigation_map)
-        (activity as MainActivity).interstitialAdShow()
     }
 
     fun onClickMenu(){

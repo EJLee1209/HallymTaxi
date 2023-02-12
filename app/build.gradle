@@ -111,8 +111,10 @@ dependencies {
     // paging3
     implementation "androidx.paging:paging-runtime:$paging_version"
 
-    // admob
-    implementation 'com.google.android.gms:play-services-ads:21.5.0'
+    // This dependency is downloaded from the Google’s Maven repository.
+    // So, make sure you also include that repository in your project's build.gradle file.
+    implementation 'com.google.android.play:app-update:2.0.1'
 
-
+    // For Kotlin users also add the Kotlin extensions library for Play In-App Update:
+    implementation 'com.google.android.play:app-update-ktx:2.0.1'
 }
