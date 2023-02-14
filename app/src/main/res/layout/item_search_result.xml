@@ -6,7 +6,7 @@
     <data>
         <variable
             name="place"
-            type="com.dldmswo1209.hallymtaxi.model.Place" />
+            type="com.dldmswo1209.hallymtaxi.data.model.Place" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

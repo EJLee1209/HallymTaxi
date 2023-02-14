@@ -6,7 +6,7 @@
     <data>
         <variable
             name="chat"
-            type="com.dldmswo1209.hallymtaxi.model.Chat" />
+            type="com.dldmswo1209.hallymtaxi.data.model.Chat" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

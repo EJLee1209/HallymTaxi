@@ -1,7 +1,8 @@
 package com.dldmswo1209.hallymtaxi.retrofit
 
-import com.dldmswo1209.hallymtaxi.model.ResultSearchKeyword
-import com.dldmswo1209.hallymtaxi.private_key.API_KEY
+import com.dldmswo1209.hallymtaxi.data.model.ResultSearchKeyword
+import com.dldmswo1209.hallymtaxi.util.Keys.API_KEY
+import com.dldmswo1209.hallymtaxi.util.Keys.KAKAO_BASE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -18,8 +19,6 @@ interface KakaoApiClient {
     ): ResultSearchKeyword
 
     companion object{
-        private const val KAKAO_BASE_URL = "https://dapi.kakao.com/" // 카카오 api
-
         fun create() : KakaoApiClient{
             return Retrofit.Builder()
                 .baseUrl(KAKAO_BASE_URL)

@@ -5,45 +5,45 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.*
-import com.dldmswo1209.hallymtaxi.common.CustomDialog.Companion.checkNetworkDialog
+import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.databinding.FragmentRegisterBinding
-import com.dldmswo1209.hallymtaxi.model.User
-import com.dldmswo1209.hallymtaxi.ui.compose.RegisterScreen
-import com.dldmswo1209.hallymtaxi.vm.WelcomeViewModel
+import com.dldmswo1209.hallymtaxi.data.model.User
+import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
+import com.dldmswo1209.hallymtaxi.ui.welcome.compose.RegisterScreen
+import com.dldmswo1209.hallymtaxi.vm.AuthViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RegisterFragment: Fragment() {
 
     private lateinit var binding: FragmentRegisterBinding
     private var email = ""
-    private val viewModel : WelcomeViewModel by viewModels { ViewModelFactory(application = requireActivity().application) }
+    private val viewModel : AuthViewModel by viewModels()
     private lateinit var callback: OnBackPressedCallback
 
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
-        ViewMarginDynamicChanger(requireContext())
+        ViewMarginDynamicChanger(requireActivity())
     }
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드가 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {
-                val tvRegisterTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireContext())
-                val tvRegisterTitleSmallTopMarginValue = MetricsUtil.convertDpToPixel(5, requireContext())
+                val tvRegisterTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireActivity())
+                val tvRegisterTitleSmallTopMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
 
                 changeConstraintMarginTopBottom(binding.tvRegisterTitle,0,0,tvRegisterTitleOriginalTopMarginValue,tvRegisterTitleSmallTopMarginValue, isVisible)
             }
         }
     }
     private val loadingDialog by lazy{
-        LoadingDialog(requireContext())
+        LoadingDialog(requireActivity())
     }
 
     override fun onCreateView(
@@ -88,6 +88,7 @@ class RegisterFragment: Fragment() {
         binding.composeViewRegisterArea.setContent {
 
             val isCreated = viewModel.isCreatedUser.observeAsState(initial = false)
+
             if(isCreated.value){
                 loadingDialog.dismiss()
             }

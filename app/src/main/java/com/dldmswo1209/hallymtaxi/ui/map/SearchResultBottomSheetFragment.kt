@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.dldmswo1209.hallymtaxi.common.BottomSheetBehaviorSetting
 import com.dldmswo1209.hallymtaxi.databinding.FragmentSearchResultBottomSheetBinding
-import com.dldmswo1209.hallymtaxi.model.Place
+import com.dldmswo1209.hallymtaxi.data.model.Place
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class SearchResultBottomSheetFragment(

@@ -11,10 +11,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentPoolListBottomSheetBinding
-import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
-import com.dldmswo1209.hallymtaxi.model.Place
-import com.dldmswo1209.hallymtaxi.model.User
+import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
+import com.dldmswo1209.hallymtaxi.data.model.Place
+import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
+import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.*
@@ -31,7 +33,7 @@ class PoolListBottomSheetFragment(
     private var joinedRoom: CarPoolRoom? = null // 참여 중인 방
     private var room: CarPoolRoom? = null // 참여하려는 방
     private lateinit var user: User
-    private lateinit var globalVariable: GlobalVariable
+    private lateinit var myApplication: MyApplication
 
     private val loadingDialog by lazy {
         LoadingDialog(requireContext())
@@ -61,9 +63,9 @@ class PoolListBottomSheetFragment(
 
     private fun init() {
         binding.fragment = this
-        globalVariable = requireActivity().application as GlobalVariable
+        myApplication = requireActivity().application as MyApplication
 
-        user = globalVariable.getUser() ?: kotlin.run {
+        user = myApplication.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return
@@ -77,7 +79,7 @@ class PoolListBottomSheetFragment(
     }
 
     private fun setObserver() {
-        globalVariable.myRoom.observe(viewLifecycleOwner) { room ->
+        myApplication.myRoom.observe(viewLifecycleOwner) { room ->
             joinedRoom = room
             poolListAdapter.roomId = room?.roomId
         }

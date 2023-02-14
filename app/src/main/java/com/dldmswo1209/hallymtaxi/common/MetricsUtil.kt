@@ -6,7 +6,6 @@ import android.util.DisplayMetrics
 
 object MetricsUtil {
 
-
     fun convertDpToPixel(dp: Int, context: Context?): Int {
         return if (context != null) {
             val resources = context.resources

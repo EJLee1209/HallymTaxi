@@ -9,10 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.dldmswo1209.hallymtaxi.common.GlobalVariable
+import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomHistoryBinding
-import com.dldmswo1209.hallymtaxi.model.User
+import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.ChatListAdapter
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
@@ -21,7 +21,7 @@ class ChatRoomHistoryFragment: Fragment() {
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
     private lateinit var binding: FragmentChatRoomHistoryBinding
     private lateinit var roomId: String
-    private lateinit var globalVariable: GlobalVariable
+    private lateinit var myApplication: MyApplication
     private lateinit var user: User
     private lateinit var chatListAdapter: ChatListAdapter
 
@@ -43,8 +43,8 @@ class ChatRoomHistoryFragment: Fragment() {
     private fun init(){
         val args : ChatRoomHistoryFragmentArgs by navArgs()
         roomId = args.roomId
-        globalVariable = requireActivity().application as GlobalVariable
-        user = globalVariable.getUser() ?: kotlin.run {
+        myApplication = requireActivity().application as MyApplication
+        user = myApplication.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return

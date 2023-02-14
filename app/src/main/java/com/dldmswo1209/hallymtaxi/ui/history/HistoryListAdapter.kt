@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dldmswo1209.hallymtaxi.databinding.ItemHistoryBinding
-import com.dldmswo1209.hallymtaxi.model.RoomInfo
+import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 
 class HistoryListAdapter(
     val onClick: (RoomInfo)->Unit

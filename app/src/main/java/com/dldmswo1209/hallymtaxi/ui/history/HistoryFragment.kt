@@ -13,13 +13,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
-import com.dldmswo1209.hallymtaxi.common.GlobalVariable
+import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.TimeService
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentHistoryBinding
-import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
-import com.dldmswo1209.hallymtaxi.model.RoomInfo
-import com.dldmswo1209.hallymtaxi.model.User
+import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
+import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
+import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 
@@ -29,7 +29,7 @@ class HistoryFragment : Fragment() {
     private lateinit var user: User
     private var joinedRoom: CarPoolRoom? = null
     private var history: List<RoomInfo> = listOf()
-    private lateinit var globalVariable: GlobalVariable
+    private lateinit var myApplication: MyApplication
     private lateinit var historyListAdapter: HistoryListAdapter
 
     override fun onCreateView(
@@ -50,8 +50,8 @@ class HistoryFragment : Fragment() {
     }
 
     private fun init() {
-        globalVariable = requireActivity().application as GlobalVariable
-        user = globalVariable.getUser() ?: kotlin.run {
+        myApplication = requireActivity().application as MyApplication
+        user = myApplication.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return
@@ -68,7 +68,7 @@ class HistoryFragment : Fragment() {
     }
 
     private fun setObservers() {
-        globalVariable.myRoom.observe(viewLifecycleOwner){
+        myApplication.myRoom.observe(viewLifecycleOwner){
             Log.d("testt", "myRoom: ${it}")
             if(it == null) {
                 if(history.isEmpty()) binding.layoutNoPoolRoom.visibility = View.VISIBLE

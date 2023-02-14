@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dldmswo1209.hallymtaxi.databinding.ItemSearchResultBinding
-import com.dldmswo1209.hallymtaxi.model.Place
+import com.dldmswo1209.hallymtaxi.data.model.Place
 
 class SearchResultListAdapter(val onClick: (Place)->Unit): ListAdapter<Place, SearchResultListAdapter.ResultViewHolder>(diffUtil) {
 

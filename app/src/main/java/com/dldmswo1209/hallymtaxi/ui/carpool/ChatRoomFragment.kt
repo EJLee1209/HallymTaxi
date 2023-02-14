@@ -23,10 +23,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.*
+import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
+import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
 import com.dldmswo1209.hallymtaxi.model.*
-import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import kotlinx.coroutines.*
 
@@ -34,7 +36,7 @@ class ChatRoomFragment: Fragment() {
 
     private lateinit var binding: FragmentChatRoomBinding
     private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
-    private lateinit var globalVariable: GlobalVariable
+    private lateinit var myApplication: MyApplication
 
     private lateinit var room : CarPoolRoom
     private var roomInfo: RoomInfo? = null
@@ -86,8 +88,8 @@ class ChatRoomFragment: Fragment() {
         val args: ChatRoomFragmentArgs by navArgs()
         room = args.room
 
-        globalVariable = requireActivity().application as GlobalVariable
-        currentUser = globalVariable.getUser() ?: kotlin.run {
+        myApplication = requireActivity().application as MyApplication
+        currentUser = myApplication.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return
@@ -126,7 +128,7 @@ class ChatRoomFragment: Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     private fun setObserver(){
         viewModel.detachChatList(room.roomId)
-        globalVariable.myRoom.observe(viewLifecycleOwner){ room->
+        myApplication.myRoom.observe(viewLifecycleOwner){ room->
             if(room == null) {
                 val deletedRoomDialog = CustomDialog(
                     title = "채팅방 입장 오류",
@@ -308,14 +310,14 @@ class ChatRoomFragment: Fragment() {
 
     override fun onStart() {
         super.onStart()
-        globalVariable.setIsViewChatRoom(true)
+        myApplication.setIsViewChatRoom(true)
         viewModel.detachRoomInfo(room.roomId)
         notificationManager.cancelAll()
     }
 
     override fun onPause() {
         super.onPause()
-        globalVariable.setIsViewChatRoom(false)
+        myApplication.setIsViewChatRoom(false)
     }
 
     override fun onDetach() {

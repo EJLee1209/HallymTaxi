@@ -8,8 +8,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
-import com.dldmswo1209.hallymtaxi.common.CustomDialog.Companion.checkNetworkDialog
-import com.dldmswo1209.hallymtaxi.common.GlobalVariable
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkDialog
+import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
@@ -20,13 +20,13 @@ class SplashActivity : AppCompatActivity() {
     private val checkNetwork by lazy{
         CheckNetwork(this)
     }
-    private lateinit var globalVariable: GlobalVariable
+    private lateinit var myApplication: MyApplication
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        globalVariable = application as GlobalVariable
+        myApplication = application as MyApplication
 
         if(checkNetwork.getCurrentNetworkHasTransport()){
             checkLoginInfo()
@@ -38,7 +38,7 @@ class SplashActivity : AppCompatActivity() {
 
     private fun checkLoginInfo(){
         viewModel.getUserInfo()?.observe(this@SplashActivity){
-            globalVariable.setUser(it)
+            myApplication.setUser(it)
             val intent = Intent(this@SplashActivity, MainActivity::class.java).apply {
                 putExtra("userInfo", it)
             }

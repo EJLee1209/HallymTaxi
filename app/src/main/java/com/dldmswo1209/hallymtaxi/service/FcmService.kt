@@ -9,10 +9,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.common.GlobalVariable
-import com.dldmswo1209.hallymtaxi.model.Chat
-import com.dldmswo1209.hallymtaxi.model.RoomInfo
-import com.dldmswo1209.hallymtaxi.repository.RoomRepository
+import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.data.model.Chat
+import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
+import com.dldmswo1209.hallymtaxi.data.repository.RoomRepository
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -39,7 +39,7 @@ class FcmService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        val globalVariable = application as GlobalVariable
+        val myApplication = application as MyApplication
         val notificationManager = NotificationManagerCompat.from(applicationContext)
 
         if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
@@ -79,7 +79,7 @@ class FcmService : FirebaseMessagingService() {
                     NotificationCompat.PRIORITY_MAX
             }
 
-        if (!globalVariable.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
+        if (!myApplication.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
             notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
             roomRepo.insertRoomInfo(RoomInfo(roomId, message, dateTime, true, isActivate = true))
         } else {

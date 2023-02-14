@@ -1,7 +1,6 @@
 package com.dldmswo1209.hallymtaxi.ui.welcome
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,31 +13,35 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.common.*
+import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
 import com.dldmswo1209.hallymtaxi.databinding.FragmentEmailVerifyCodeBinding
-import com.dldmswo1209.hallymtaxi.model.STATUS_FAIL
-import com.dldmswo1209.hallymtaxi.model.STATUS_OK
-import com.dldmswo1209.hallymtaxi.ui.compose.VerifyCodeTextField
-import com.dldmswo1209.hallymtaxi.vm.WelcomeViewModel
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
+import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
+import com.dldmswo1209.hallymtaxi.ui.welcome.compose.VerifyCodeTextField
+import com.dldmswo1209.hallymtaxi.util.ServerResponse
+import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.vm.AuthViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Timer
 import kotlin.concurrent.timer
-
+@AndroidEntryPoint
 class EmailVerifyCodeFragment: Fragment() {
     private lateinit var binding: FragmentEmailVerifyCodeBinding
-    private val viewModel : WelcomeViewModel by viewModels { ViewModelFactory(application = requireActivity().application) }
+    private val viewModel : AuthViewModel by viewModels()
     private var email = ""
     private var copyCode = ""
     private var codeEffectiveTimer: Timer? = null
 
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
-        ViewMarginDynamicChanger(requireContext())
+        ViewMarginDynamicChanger(requireActivity())
     }
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {
-                val tvRegisterTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireContext())
-                val tvRegisterTitleSmallTopMarginValue = MetricsUtil.convertDpToPixel(5, requireContext())
-                val btnVerifyOriginalBottomMarginValue = MetricsUtil.convertDpToPixel(47, requireContext())
-                val btnVerifySmallBottomMarginValue = MetricsUtil.convertDpToPixel(5, requireContext())
+                val tvRegisterTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireActivity())
+                val tvRegisterTitleSmallTopMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
+                val btnVerifyOriginalBottomMarginValue = MetricsUtil.convertDpToPixel(47, requireActivity())
+                val btnVerifySmallBottomMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
 
                 // 키보드 상태에따라 margin 동적 변경
                 changeConstraintMarginTopBottom(binding.btnVerify,btnVerifyOriginalBottomMarginValue,btnVerifySmallBottomMarginValue,0,0,isVisible)
@@ -47,7 +50,7 @@ class EmailVerifyCodeFragment: Fragment() {
         }
     }
     private val loadingDialog by lazy{
-        LoadingDialog(requireContext())
+        LoadingDialog(requireActivity())
     }
 
     override fun onCreateView(
@@ -80,22 +83,24 @@ class EmailVerifyCodeFragment: Fragment() {
     }
 
     private fun setObserver(){
-        viewModel.isVerified.observe(viewLifecycleOwner){
-            loadingDialog.dismiss()
-            when(it.status){
-                STATUS_OK->{
-                    if(it.message == "인증이 완료되었습니다."){
+        viewModel.isVerified.observe(viewLifecycleOwner){state->
+            when(state) {
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                    binding.tvErrorCode.text = state.error
+                    binding.tvErrorCode.visibility = View.VISIBLE
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    if(state.data.message == ServerResponse.MESSAGE_VERIFY_SUCCESS){
                         val action = EmailVerifyCodeFragmentDirections.actionNavigationEmailVerifyCodeToNavigationRegister(email)
                         findNavController().navigate(action)
                     }else{
-                        // 인증 코드 불일치
                         binding.tvErrorCode.visibility = View.VISIBLE
                     }
-                }
-                STATUS_FAIL->{
-                    // 인증 실패
-                    binding.tvErrorCode.text = it.message
-                    binding.tvErrorCode.visibility = View.VISIBLE
                 }
             }
         }
@@ -139,7 +144,6 @@ class EmailVerifyCodeFragment: Fragment() {
             return
         }
         viewModel.requestVerify(email, copyCode)
-        loadingDialog.show()
     }
 
     fun clickBackBtn(){

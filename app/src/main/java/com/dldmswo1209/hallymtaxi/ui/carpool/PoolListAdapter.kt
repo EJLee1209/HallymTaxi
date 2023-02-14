@@ -7,11 +7,11 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.common.DistanceManager
-import com.dldmswo1209.hallymtaxi.common.GlobalVariable
+import com.dldmswo1209.hallymtaxi.common.location.DistanceManager
+import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.databinding.ItemPoolBinding
-import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
-import com.dldmswo1209.hallymtaxi.model.Place
+import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
+import com.dldmswo1209.hallymtaxi.data.model.Place
 
 class PoolListAdapter(
     val activity: Activity,
@@ -20,8 +20,8 @@ class PoolListAdapter(
     val onClickRoom: (CarPoolRoom)->Unit,
     ): PagingDataAdapter<CarPoolRoom, PoolListAdapter.ViewHolder>(diffUtil) {
 
-    private val globalVariable = activity.application as GlobalVariable
-    var roomId = globalVariable.getMyRoomId()
+    private val myApplication = activity.application as MyApplication
+    var roomId = myApplication.getMyRoomId()
 
     inner class ViewHolder(private val binding: ItemPoolBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(room: CarPoolRoom){

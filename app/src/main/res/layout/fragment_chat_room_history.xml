@@ -9,7 +9,7 @@
             type="com.dldmswo1209.hallymtaxi.ui.history.ChatRoomHistoryFragment"/>
         <variable
             name="roomInfo"
-            type="com.dldmswo1209.hallymtaxi.model.RoomInfo" />
+            type="com.dldmswo1209.hallymtaxi.data.model.RoomInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

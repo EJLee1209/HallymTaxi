@@ -14,11 +14,12 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dldmswo1209.hallymtaxi.common.context
+import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.model.*
-import com.dldmswo1209.hallymtaxi.pagingSource.FirestorePagingSource
-import com.dldmswo1209.hallymtaxi.pagingSource.PAGE_SIZE
-import com.dldmswo1209.hallymtaxi.repository.MainRepository
-import com.dldmswo1209.hallymtaxi.repository.RoomRepository
+import com.dldmswo1209.hallymtaxi.paging.FirestorePagingSource
+import com.dldmswo1209.hallymtaxi.paging.PAGE_SIZE
+import com.dldmswo1209.hallymtaxi.data.repository.MainRepository
+import com.dldmswo1209.hallymtaxi.data.repository.RoomRepository
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ListenerRegistration

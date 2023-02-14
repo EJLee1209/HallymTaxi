@@ -2,6 +2,6 @@ google-services.json
 
 /src/main/jniLibs
 libs
-/src/main/java/com/dldmswo1209/hallymtaxi/private_key
+/src/main/java/com/dldmswo1209/hallymtaxi/util
 
 src/main/res/values

@@ -10,25 +10,30 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.*
-import com.dldmswo1209.hallymtaxi.common.CustomDialog.Companion.checkNetworkDialog
+import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.databinding.FragmentLoginBinding
-import com.dldmswo1209.hallymtaxi.vm.WelcomeViewModel
+import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
+import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.vm.AuthViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginFragment: Fragment() {
     private lateinit var binding: FragmentLoginBinding
-    private val viewModel : WelcomeViewModel by viewModels { ViewModelFactory(application = requireActivity().application) }
+    private val viewModel : AuthViewModel by viewModels()
     private val loadingDialog by lazy{
-        LoadingDialog(requireContext())
+        LoadingDialog(requireActivity())
     }
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
-        ViewMarginDynamicChanger(requireContext())
+        ViewMarginDynamicChanger(requireActivity())
     }
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
-            val tvLoginTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireContext())
-            val tvLoginTitleSmallTopMarginValue = MetricsUtil.convertDpToPixel(5, requireContext())
-            val btnLoginOriginalBottomMarginValue = MetricsUtil.convertDpToPixel(47, requireContext())
-            val btnLoginSmallBottomMarginValue = MetricsUtil.convertDpToPixel(5, requireContext())
+            val tvLoginTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireActivity())
+            val tvLoginTitleSmallTopMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
+            val btnLoginOriginalBottomMarginValue = MetricsUtil.convertDpToPixel(47, requireActivity())
+            val btnLoginSmallBottomMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
 
             viewMarginDynamicChanger.changeConstraintMarginTopBottom(binding.tvLoginTitle,0,0,tvLoginTitleOriginalTopMarginValue,tvLoginTitleSmallTopMarginValue, isVisible)
             viewMarginDynamicChanger.changeConstraintMarginTopBottom(binding.btnLogin,btnLoginOriginalBottomMarginValue,btnLoginSmallBottomMarginValue,0,0,isVisible)
@@ -51,22 +56,29 @@ class LoginFragment: Fragment() {
         KeyboardUtils.addKeyboardToggleListener((activity as WelcomeActivity), keyboardStateListener)
         binding.etEmail.setFocusAndShowKeyboard(requireContext())
 
-        viewModel.loginResult.observe(viewLifecycleOwner){
-            loadingDialog.dismiss()
-            if(it){
-                // 로그인 성공
-                startActivity(Intent(requireContext(), SplashActivity::class.java))
-                requireActivity().finish()
-            }else{
-                // 로그인 실패
-                binding.tvErrorMessage.visibility = View.VISIBLE
+        viewModel.login.observe(viewLifecycleOwner){state->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    // 로그인 실패
+                    loadingDialog.dismiss()
+                    binding.tvErrorMessage.visibility = View.VISIBLE
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    // 로그인 성공
+                    startActivity(Intent(requireActivity(), SplashActivity::class.java))
+                    requireActivity().finish()
+                }
             }
         }
     }
 
     fun clickLoginBtn(){
-        binding.etEmail.clearFocusAndHideKeyboard(requireContext())
-        binding.etPassword.clearFocusAndHideKeyboard(requireContext())
+        binding.etEmail.clearFocusAndHideKeyboard(requireActivity())
+        binding.etPassword.clearFocusAndHideKeyboard(requireActivity())
 
         if(!getNetworkAvailable()){
             checkNetworkDialog(parentFragmentManager)
@@ -75,13 +87,12 @@ class LoginFragment: Fragment() {
         val email = binding.etEmail.text.toString()
         val password = binding.etPassword.text.toString()
         viewModel.login(email, password)
-        loadingDialog.show()
     }
 
     fun clickBackBtn(){
         findNavController().popBackStack()
-        binding.etEmail.clearFocusAndHideKeyboard(requireContext())
-        binding.etPassword.clearFocusAndHideKeyboard(requireContext())
+        binding.etEmail.clearFocusAndHideKeyboard(requireActivity())
+        binding.etPassword.clearFocusAndHideKeyboard(requireActivity())
     }
 
     private fun getNetworkAvailable() : Boolean = (activity as WelcomeActivity).isNetworkActivate

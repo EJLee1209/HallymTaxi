@@ -6,7 +6,7 @@
     <data>
         <variable
             name="room"
-            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
+            type="com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom" />
         <variable
             name="fragment"
             type="com.dldmswo1209.hallymtaxi.ui.map.MapFragment" />
@@ -22,7 +22,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="13dp"
-            android:layout_marginTop="75dp"
+            android:layout_marginTop="50dp"
             android:background="@drawable/background_white_r20"
             android:elevation="10dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -66,7 +66,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="13dp"
-            android:layout_marginTop="75dp"
+            android:layout_marginTop="50dp"
             android:background="@drawable/background_white_r20"
             android:elevation="10dp"
             android:visibility="gone"

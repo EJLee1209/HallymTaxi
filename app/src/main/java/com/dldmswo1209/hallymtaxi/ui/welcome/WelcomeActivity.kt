@@ -10,10 +10,12 @@ import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.ui.MainActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class WelcomeActivity : AppCompatActivity() {
-    val checkNetwork by lazy{
+    private val checkNetwork by lazy{
         CheckNetwork(this)
     }
     var isNetworkActivate = false

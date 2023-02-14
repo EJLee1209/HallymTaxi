@@ -13,9 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.common.GlobalVariable
-import com.dldmswo1209.hallymtaxi.common.LocationService
+import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.common.location.LocationService
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
+import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentMapBinding
 import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
@@ -44,7 +45,7 @@ class MapFragment: Fragment() {
     private var poolListBottomSheet : PoolListBottomSheetFragment? = null
     private var joinedRoom: CarPoolRoom? = null
     private lateinit var user : User
-    private lateinit var globalVariable: GlobalVariable
+    private lateinit var myApplication: MyApplication
 
 
     companion object{
@@ -72,8 +73,8 @@ class MapFragment: Fragment() {
     private fun init(){
         locationService = LocationService(requireActivity())
         moveCamera(hallym_lat, hallym_lng, 2f)
-        globalVariable = requireActivity().application as GlobalVariable
-        user = globalVariable.getUser() ?: kotlin.run {
+        myApplication = requireActivity().application as MyApplication
+        user = myApplication.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return
@@ -83,11 +84,11 @@ class MapFragment: Fragment() {
     }
 
     private fun setObservers(){
-        globalVariable.myRoom.observe(viewLifecycleOwner){room->
+        myApplication.myRoom.observe(viewLifecycleOwner){ room->
             if(room != null){
                 binding.viewCurrentMyRoom.visibility = View.VISIBLE
                 binding.room = room
-                globalVariable.setMyRoomId(room.roomId)
+                myApplication.setMyRoomId(room.roomId)
             }else{
                 binding.viewCurrentMyRoom.visibility = View.GONE
             }

@@ -7,10 +7,10 @@
 
         <variable
             name="room_info"
-            type="com.dldmswo1209.hallymtaxi.model.RoomInfo" />
+            type="com.dldmswo1209.hallymtaxi.data.model.RoomInfo" />
         <variable
             name="room"
-            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
+            type="com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom" />
 
         <variable
             name="fragment"
@@ -25,7 +25,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/top_bar"
             android:layout_width="0dp"
-            android:layout_height="120dp"
+            android:layout_height="100dp"
             android:background="@color/hallym_blue_3351b9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,7 +36,7 @@
                 style="@style/Text20.White.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="70dp"
+                android:layout_marginTop="50dp"
                 android:text="@string/history"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

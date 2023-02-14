@@ -7,7 +7,7 @@
 
         <variable
             name="room_info"
-            type="com.dldmswo1209.hallymtaxi.model.RoomInfo" />
+            type="com.dldmswo1209.hallymtaxi.data.model.RoomInfo" />
 
     </data>
 

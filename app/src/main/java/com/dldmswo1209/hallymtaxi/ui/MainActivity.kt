@@ -15,10 +15,10 @@ import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.FirebaseAnalyticsManager
-import com.dldmswo1209.hallymtaxi.common.GlobalVariable
+import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
-import com.dldmswo1209.hallymtaxi.model.User
+import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     }
     var isNetworkActivate = false
     private var user: User? = null
-    private lateinit var globalVariable: GlobalVariable
+    private lateinit var myApplication: MyApplication
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     //권한 가져오기
     companion object{
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        globalVariable = application as GlobalVariable
+        myApplication = application as MyApplication
         firebaseAnalytics = Firebase.analytics
 
         requestPermission()
@@ -74,14 +74,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewModel.subscribeUser()?.observe(this){
-            globalVariable.setUser(it)
+            myApplication.setUser(it)
         } ?: kotlin.run {
             startActivity(Intent(this, SplashActivity::class.java))
         }
 
         user?.let {
             viewModel.subscribeMyRoom(it).observe(this){room->
-                globalVariable.setMyRoom(room)
+                myApplication.setMyRoom(room)
             }
         }
 

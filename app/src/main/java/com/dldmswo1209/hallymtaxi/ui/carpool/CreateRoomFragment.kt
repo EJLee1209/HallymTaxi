@@ -13,11 +13,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentCreateRoomBinding
-import com.dldmswo1209.hallymtaxi.model.CarPoolRoom
-import com.dldmswo1209.hallymtaxi.model.GENDER_OPTION_NONE
-import com.dldmswo1209.hallymtaxi.model.Place
-import com.dldmswo1209.hallymtaxi.model.User
+import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
+import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_NONE
+import com.dldmswo1209.hallymtaxi.data.model.Place
+import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
+import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.ui.map.MapFragment.Companion.SEARCH_RESULT_BOTTOM_SHEET_TAG
 import com.dldmswo1209.hallymtaxi.ui.map.SearchResultBottomSheetFragment
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
@@ -36,7 +38,7 @@ class CreateRoomFragment: Fragment() {
     private lateinit var currentUser : User
     private var isClicked = false
     private lateinit var gender : String
-    private lateinit var globalVariable: GlobalVariable
+    private lateinit var myApplication: MyApplication
     private var isToday = true
 
     private val loadingDialog by lazy{
@@ -65,9 +67,9 @@ class CreateRoomFragment: Fragment() {
         val args : CreateRoomFragmentArgs by navArgs()
         startPlace = args.startPlace
         endPlace = args.endPlace
-        globalVariable = requireActivity().application as GlobalVariable
+        myApplication = requireActivity().application as MyApplication
 
-        currentUser = globalVariable.getUser() ?: kotlin.run {
+        currentUser = myApplication.getUser() ?: kotlin.run {
             startActivity(Intent(requireContext(), SplashActivity::class.java))
             requireActivity().finish()
             return

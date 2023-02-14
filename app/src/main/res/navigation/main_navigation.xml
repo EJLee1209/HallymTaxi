@@ -36,7 +36,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_menu"
-        android:name="com.dldmswo1209.hallymtaxi.ui.MenuFragment"
+        android:name="com.dldmswo1209.hallymtaxi.ui.menu.MenuFragment"
         android:label="MenuFragment" />
     <fragment
         android:id="@+id/navigation_create_room"

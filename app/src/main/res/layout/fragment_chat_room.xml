@@ -11,7 +11,7 @@
 
         <variable
             name="room"
-            type="com.dldmswo1209.hallymtaxi.model.CarPoolRoom" />
+            type="com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
