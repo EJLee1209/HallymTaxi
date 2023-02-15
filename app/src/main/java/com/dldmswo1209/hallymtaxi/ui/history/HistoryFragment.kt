@@ -13,19 +13,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide.init
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.TimeService
-import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentHistoryBinding
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HistoryFragment : Fragment() {
     private lateinit var binding: FragmentHistoryBinding
-    private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
+    private val viewModel: MainViewModel by viewModels()
     private lateinit var user: User
     private var joinedRoom: CarPoolRoom? = null
     private var history: List<RoomInfo> = listOf()

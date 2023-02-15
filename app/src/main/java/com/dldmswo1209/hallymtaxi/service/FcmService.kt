@@ -8,18 +8,20 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.room.Room
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.data.database.AppDatabase
 import com.dldmswo1209.hallymtaxi.data.model.Chat
 import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
-import com.dldmswo1209.hallymtaxi.data.repository.RoomRepository
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import javax.inject.Inject
 
 class FcmService : FirebaseMessagingService() {
     private var broadcaster: LocalBroadcastManager? = null
-
+    private var roomDB: AppDatabase? = null
     companion object {
         const val CHANNEL_ID = "com.dldmswo1209.hallymtaxi"
         const val CHANNEL_NAME = "com.dldmswo1209.hallymtaxi"
@@ -27,7 +29,10 @@ class FcmService : FirebaseMessagingService() {
 
     override fun onCreate() {
         super.onCreate()
-        broadcaster = LocalBroadcastManager.getInstance(this);
+        broadcaster = LocalBroadcastManager.getInstance(this)
+        roomDB = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "hallymTaxi.db")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     override fun onNewToken(token: String) {
@@ -63,8 +68,7 @@ class FcmService : FirebaseMessagingService() {
             messageType = messageType
         )
 
-        val roomRepo = RoomRepository(this)
-        roomRepo.saveChat(chat) // 채팅 저장
+        roomDB?.chatDao()?.saveChat(chat) // 채팅 저장
 
         val pendingIntent = createPendingIntent(roomId)
 
@@ -81,9 +85,9 @@ class FcmService : FirebaseMessagingService() {
 
         if (!myApplication.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
             notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
-            roomRepo.insertRoomInfo(RoomInfo(roomId, message, dateTime, true, isActivate = true))
+            roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, true, isActivate = true))
         } else {
-            roomRepo.insertRoomInfo(RoomInfo(roomId, message, dateTime, false, isActivate = true))
+            roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, false, isActivate = true))
         }
 
         val notificationMessage = Intent("newMessage")

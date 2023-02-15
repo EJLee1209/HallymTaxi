@@ -1,6 +1,5 @@
 package com.dldmswo1209.hallymtaxi.ui.carpool
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -10,9 +9,7 @@ import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.ItemMyChatBinding
 import com.dldmswo1209.hallymtaxi.databinding.ItemOtherChatBinding
 import com.dldmswo1209.hallymtaxi.databinding.ItemSystemMessageBinding
-import com.dldmswo1209.hallymtaxi.model.*
 
-// 유저리스트를 넣어주면 될듯
 
 class ChatListAdapter(
     private val currentUser: User
@@ -51,7 +48,6 @@ class ChatListAdapter(
             binding.executePendingBindings()
         }
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {

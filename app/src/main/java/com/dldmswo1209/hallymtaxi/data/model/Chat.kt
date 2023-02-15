@@ -22,7 +22,9 @@ data class Chat(
     @ColumnInfo(name = "dateTime")
     val dateTime: String = Timestamp.now().toDate().dateToString(), // 보낸 시간
     @ColumnInfo(name = "messageType")
-    val messageType: String = "" // 종류(입장/퇴장/일반 메세지)
+    val messageType: String = "", // 종류(입장/퇴장/일반 메세지)
+    @ColumnInfo(name = "sendSuccess")
+    var sendSuccess: Boolean = false // 메세지 전송 완료 여부
 )
 
 const val CHAT_NORMAL = "NORMAL"

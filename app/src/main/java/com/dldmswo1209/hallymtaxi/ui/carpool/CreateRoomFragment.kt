@@ -22,15 +22,17 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.ui.map.MapFragment.Companion.SEARCH_RESULT_BOTTOM_SHEET_TAG
 import com.dldmswo1209.hallymtaxi.ui.map.SearchResultBottomSheetFragment
+import com.dldmswo1209.hallymtaxi.util.UiState
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-
+@AndroidEntryPoint
 class CreateRoomFragment: Fragment() {
 
     private lateinit var binding: FragmentCreateRoomBinding
-    private val viewModel : MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
+    private val viewModel : MainViewModel by viewModels()
 
     private var maxCount = 4
     private lateinit var startPlace: Place
@@ -42,7 +44,7 @@ class CreateRoomFragment: Fragment() {
     private var isToday = true
 
     private val loadingDialog by lazy{
-        LoadingDialog(requireContext())
+        LoadingDialog(requireActivity())
     }
 
     override fun onCreateView(
@@ -55,46 +57,102 @@ class CreateRoomFragment: Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        init()
-        datePickerSetUp()
+        getArgsData()
+        setUpUi()
         setObserver()
+        datePickerSetUp()
         genderOptionCheckedListener()
         setEditorActionListener()
-
     }
 
-    private fun init(){
-        val args : CreateRoomFragmentArgs by navArgs()
+    private fun getArgsData() {
+        val args: CreateRoomFragmentArgs by navArgs()
         startPlace = args.startPlace
         endPlace = args.endPlace
         myApplication = requireActivity().application as MyApplication
 
         currentUser = myApplication.getUser() ?: kotlin.run {
-            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            startActivity(Intent(requireActivity(), SplashActivity::class.java))
             requireActivity().finish()
             return
         }
-
-        binding.timePicker.setMinutePicker()
-
-        etTextUpdate()
-
-        if(currentUser.gender == "male"){
-            gender = "남성"
-            binding.tvGenderOption.text = "남자끼리 탑승하기"
-        }else if(currentUser.gender == "female"){
-            gender = "여성"
-            binding.tvGenderOption.text = "여자끼리 탑승하기"
-        }else{ // 성별 none 탑승 옵션을 없애야 함
-            binding.genderOptionLayout.visibility = View.GONE
-        }
-
-        binding.fragment = this
     }
 
-    private fun etTextUpdate(){
+    private fun setUpUi() {
+        binding.timePicker.setMinutePicker()
+
+        if (currentUser.gender == "male") {
+            gender = "남성"
+            binding.tvGenderOption.text = "남자끼리 탑승하기"
+        } else if (currentUser.gender == "female") {
+            gender = "여성"
+            binding.tvGenderOption.text = "여자끼리 탑승하기"
+        } else { // 성별 none 탑승 옵션을 없애야 함
+            binding.genderOptionLayout.visibility = View.GONE
+        }
+        binding.fragment = this
+
+        etTextUpdate()
+    }
+
+    private fun etTextUpdate() {
         binding.etStartPoint.setText(startPlace.place_name)
         binding.etEndPoint.setText(endPlace.place_name)
+    }
+
+    private fun setObserver(){
+        viewModel.createRoom.observe(viewLifecycleOwner){ state ->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                    val failToCreateRoomDialog = CustomDialog(
+                        title = state.error ?: "채팅방 생성 실패",
+                        content = "네트워크 상태를 확인해주세요",
+                    )
+                    failToCreateRoomDialog.show(parentFragmentManager, failToCreateRoomDialog.tag)
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    val action = CreateRoomFragmentDirections.actionNavigationCreateRoomToChatRoomFragment(room = state.data)
+                    findNavController().navigate(action)
+                }
+            }
+
+        }
+
+        viewModel.startPoint.observe(viewLifecycleOwner){ state->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    showBottomSheetDialog(state.data.documents, true)
+                }
+            }
+        }
+
+        viewModel.endPoint.observe(viewLifecycleOwner){ state->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    showBottomSheetDialog(state.data.documents, false)
+                }
+            }
+        }
     }
 
     private fun datePickerSetUp(){
@@ -108,21 +166,6 @@ class CreateRoomFragment: Fragment() {
             setOnValueChangedListener { picker, oldVal, newVal ->
                 isToday = datePickerItems[newVal] == "오늘"
             }
-        }
-    }
-    private fun setObserver(){
-        viewModel.isCreated.observe(viewLifecycleOwner){ room ->
-            loadingDialog.dismiss()
-            val action = CreateRoomFragmentDirections.actionNavigationCreateRoomToChatRoomFragment(room = room)
-            findNavController().navigate(action)
-        }
-
-        viewModel.startPoint.observe(viewLifecycleOwner){
-            showBottomSheetDialog(it.documents, true)
-        }
-
-        viewModel.endPoint.observe(viewLifecycleOwner){
-            showBottomSheetDialog(it.documents, false)
         }
     }
 

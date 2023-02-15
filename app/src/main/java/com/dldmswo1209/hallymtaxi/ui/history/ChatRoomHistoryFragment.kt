@@ -10,15 +10,16 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.common.MyApplication
-import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomHistoryBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.ChatListAdapter
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ChatRoomHistoryFragment: Fragment() {
-    private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
+    private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: FragmentChatRoomHistoryBinding
     private lateinit var roomId: String
     private lateinit var myApplication: MyApplication

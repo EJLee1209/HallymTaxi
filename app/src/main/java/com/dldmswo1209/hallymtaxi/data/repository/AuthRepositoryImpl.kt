@@ -1,12 +1,20 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
+import android.content.Intent
+import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.User
+import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.dldmswo1209.hallymtaxi.util.AuthResponse.EMAIL_EXIST
 import com.dldmswo1209.hallymtaxi.util.AuthResponse.EMAIL_VALID
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.util.UiState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AuthRepositoryImpl(
     private val auth: FirebaseAuth,
@@ -59,6 +67,50 @@ class AuthRepositoryImpl(
                 UiState.Failure("로그인 실패, 이메일 또는 비밀번호를 확인해주세요")
             )
         }
+    }
+
+    override fun logoutUser(uid: String, result: (UiState<String>) -> Unit) {
+        val userInfo = mapOf<String, Any>(
+            "fcmToken" to ""
+        )
+        fireStore.collection(FireStoreTable.USER).document(uid)
+            .update(userInfo)
+            .addOnSuccessListener {
+                result.invoke(
+                    UiState.Success("로그아웃 성공")
+                )
+                auth.signOut()
+            }
+            .addOnFailureListener {
+                result.invoke(
+                    UiState.Success("로그아웃 실패")
+                )
+            }
+    }
+
+    override fun getUserInfo(result: (UiState<User>) -> Unit) {
+        if (auth.currentUser == null) {
+            result.invoke(
+                UiState.Failure("로그인 필요")
+            )
+            return
+        }
+        fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
+            .get()
+            .addOnSuccessListener {
+                if(it == null){
+                    result.invoke(
+                        UiState.Failure("유저 정보가 없습니다")
+                    )
+                    return@addOnSuccessListener
+                }
+
+                it.toObject(User::class.java)?.let { user->
+                    result.invoke(
+                        UiState.Success(user)
+                    )
+                } ?: kotlin.run { result.invoke(UiState.Failure("유저 정보가 없습니다")) }
+            }
     }
 
 }

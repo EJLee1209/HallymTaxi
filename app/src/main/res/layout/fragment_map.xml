@@ -129,7 +129,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <net.daum.mf.map.api.MapView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mapview"
             android:layout_width="0dp"
             android:layout_height="0dp"

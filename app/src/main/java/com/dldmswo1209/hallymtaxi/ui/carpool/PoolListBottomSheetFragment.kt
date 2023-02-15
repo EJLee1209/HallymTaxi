@@ -10,25 +10,29 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import com.dldmswo1209.hallymtaxi.common.*
+import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentPoolListBottomSheetBinding
-import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
-import com.dldmswo1209.hallymtaxi.data.model.Place
-import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
+import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
+import com.dldmswo1209.hallymtaxi.util.FireStoreResponse.JOIN_ROOM_ALREADY_JOINED
+import com.dldmswo1209.hallymtaxi.util.FireStoreResponse.JOIN_ROOM_SUCCESS
+import com.dldmswo1209.hallymtaxi.util.UiState
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 
+@AndroidEntryPoint
 class PoolListBottomSheetFragment(
     private val onCreateRoomBtnClick: () -> Unit,
     private val joinRoomCallback: (CarPoolRoom) -> Unit,
     private val endPlace: Place,
 ) : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentPoolListBottomSheetBinding
-    private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
+    private val viewModel: MainViewModel by viewModels()
 
     private var joinedRoom: CarPoolRoom? = null // 참여 중인 방
     private var room: CarPoolRoom? = null // 참여하려는 방
@@ -36,12 +40,12 @@ class PoolListBottomSheetFragment(
     private lateinit var myApplication: MyApplication
 
     private val loadingDialog by lazy {
-        LoadingDialog(requireContext())
+        LoadingDialog(requireActivity())
     }
     private lateinit var poolListAdapter: PoolListAdapter
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return BottomSheetBehaviorSetting.bottomSheetBehaviorSetting(requireContext(), theme)
+        return BottomSheetBehaviorSetting.bottomSheetBehaviorSetting(requireActivity(), theme)
     }
 
     override fun onCreateView(
@@ -66,7 +70,7 @@ class PoolListBottomSheetFragment(
         myApplication = requireActivity().application as MyApplication
 
         user = myApplication.getUser() ?: kotlin.run {
-            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            startActivity(Intent(requireActivity(), SplashActivity::class.java))
             requireActivity().finish()
             return
         }
@@ -92,18 +96,13 @@ class PoolListBottomSheetFragment(
             }
         }
 
-        viewModel.isJoined.observe(viewLifecycleOwner) {
-            CoroutineScope(Dispatchers.Main).launch {
-                withContext(Dispatchers.Default) {
-                    loadingDialog.dismiss()
-                    delay(100)
+        viewModel.joinRoom.observe(viewLifecycleOwner) { state->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
                 }
-                if (it) { // 입장 성공
-                    room?.let { room ->
-                        joinRoomCallback(room)
-                    }
-
-                } else { // 입장 실패(다이얼로그로 표시)
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
                     val dialog = CustomDialog(
                         title = "채팅방 입장 실패",
                         content = "채팅방 인원 초과 혹은\n마감된 채팅방 입니다"
@@ -114,9 +113,21 @@ class PoolListBottomSheetFragment(
                     dialog.show(parentFragmentManager, dialog.tag)
                     poolListAdapter.refresh()
                 }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+
+                    room?.let { room ->
+                        if(state.data == JOIN_ROOM_SUCCESS){
+                            val receiveTokens = mutableListOf<String>()
+                            val chat = Chat(roomId = room.roomId, userId = user.uid, userName = user.name ,msg = "${user.name}님이 입장하셨습니다" , messageType = CHAT_JOIN)
+                            room.participants.forEach { if(it.fcmToken != user.fcmToken) receiveTokens.add(it.fcmToken) }
+                            viewModel.sendMessage(chat = chat, user.name, receiveTokens)
+                        }
+                        joinRoomCallback(room)
+                    }
+                }
             }
         }
-
     }
 
     private fun pagingDataLoadFlow() {

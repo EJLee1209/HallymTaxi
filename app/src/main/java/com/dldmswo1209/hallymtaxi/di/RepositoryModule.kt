@@ -1,9 +1,10 @@
 package com.dldmswo1209.hallymtaxi.di
 
-import com.dldmswo1209.hallymtaxi.data.repository.AuthRepository
-import com.dldmswo1209.hallymtaxi.data.repository.AuthRepositoryImpl
-import com.dldmswo1209.hallymtaxi.data.repository.ServerRepository
-import com.dldmswo1209.hallymtaxi.data.repository.ServerRepositoryImpl
+import com.dldmswo1209.hallymtaxi.data.database.AppDatabase
+import com.dldmswo1209.hallymtaxi.data.database.ChatDao
+import com.dldmswo1209.hallymtaxi.data.database.RoomInfoDao
+import com.dldmswo1209.hallymtaxi.data.repository.*
+import com.dldmswo1209.hallymtaxi.retrofit.KakaoApiClient
 import com.dldmswo1209.hallymtaxi.retrofit.MainServerApiClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,4 +30,24 @@ object RepositoryModule {
         auth: FirebaseAuth,
         fireStore: FirebaseFirestore
     ) : AuthRepository = AuthRepositoryImpl(auth, fireStore)
+
+    @Provides
+    @Singleton
+    fun provideFireStoreRepository(
+        fireStore: FirebaseFirestore
+    ) : FireStoreRepository = FireStoreRepositoryImpl(fireStore)
+
+    @Provides
+    @Singleton
+    fun provideRoomRepository(
+        chatDao: ChatDao,
+        roomInfoDao: RoomInfoDao
+    ) : DatabaseRepository = DatabaseRepositoryImpl(chatDao, roomInfoDao)
+
+    @Provides
+    @Singleton
+    fun provideKakaoRepository(
+        client: KakaoApiClient
+    ) : KakaoRepository = KakaoRepositoryImpl(client)
+
 }

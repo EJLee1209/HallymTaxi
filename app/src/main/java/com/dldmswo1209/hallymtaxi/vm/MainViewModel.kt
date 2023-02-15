@@ -1,8 +1,6 @@
 package com.dldmswo1209.hallymtaxi.vm
 
-import android.app.Activity
 import android.app.Application
-import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
@@ -15,60 +13,119 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dldmswo1209.hallymtaxi.common.context
 import com.dldmswo1209.hallymtaxi.data.model.*
-import com.dldmswo1209.hallymtaxi.model.*
-import com.dldmswo1209.hallymtaxi.paging.FirestorePagingSource
-import com.dldmswo1209.hallymtaxi.paging.PAGE_SIZE
-import com.dldmswo1209.hallymtaxi.data.repository.MainRepository
-import com.dldmswo1209.hallymtaxi.data.repository.RoomRepository
-import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
-import com.google.firebase.auth.ktx.auth
+import com.dldmswo1209.hallymtaxi.data.repository.*
+import com.dldmswo1209.hallymtaxi.ui.carpool.FirestorePagingSource
+import com.dldmswo1209.hallymtaxi.ui.carpool.PAGE_SIZE
+import com.dldmswo1209.hallymtaxi.util.FireStoreTable
+import com.dldmswo1209.hallymtaxi.util.UiState
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
+import javax.inject.Inject
 
-class MainViewModel(
-    private val mainRepository: MainRepository,
-    private val roomRepository: RoomRepository,
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val fireStoreRepository: FireStoreRepository,
+    private val databaseRepository: DatabaseRepository,
+    private val authRepository: AuthRepository,
+    private val kakaoRepository: KakaoRepository,
+    private val serverRepository: ServerRepository,
+    private val fireStore: FirebaseFirestore,
+    private val auth: FirebaseAuth,
     application: Application
 ) : AndroidViewModel(application) {
-    private val fireStore = Firebase.firestore
-    private val auth = Firebase.auth
 
     private var userListener: ListenerRegistration? = null
     private var myRoomListener: ListenerRegistration? = null
 
-    private var _startPoint = MutableLiveData<ResultSearchKeyword>()
-    val startPoint: LiveData<ResultSearchKeyword> = _startPoint
+    private var _user = MutableLiveData<UiState<User>>()
+    val user : LiveData<UiState<User>> = _user
 
-    private var _endPoint = MutableLiveData<ResultSearchKeyword>()
-    val endPoint: LiveData<ResultSearchKeyword> = _endPoint
+    private var _logout = MutableLiveData<UiState<String>>()
+    val logout : LiveData<UiState<String>> = _logout
 
-    private var _isCreated = MutableLiveData<CarPoolRoom>()
-    val isCreated: LiveData<CarPoolRoom> = _isCreated
+    private var _startPoint = MutableLiveData<UiState<ResultSearchKeyword>>()
+    val startPoint: LiveData<UiState<ResultSearchKeyword>> = _startPoint
 
-    private var _isJoined = MutableLiveData<Boolean>()
-    val isJoined: LiveData<Boolean> = _isJoined
+    private var _endPoint = MutableLiveData<UiState<ResultSearchKeyword>>()
+    val endPoint: LiveData<UiState<ResultSearchKeyword>> = _endPoint
 
-    private var _chatList = MutableLiveData<List<Chat>>()
-    val chatList : LiveData<List<Chat>> = _chatList
+    private var _createRoom = MutableLiveData<UiState<CarPoolRoom>>()
+    val createRoom: LiveData<UiState<CarPoolRoom>> = _createRoom
+
+    private var _joinRoom = MutableLiveData<UiState<String>>()
+    val joinRoom: LiveData<UiState<String>> = _joinRoom
 
     private var _roomInfo = MutableLiveData<RoomInfo>()
     val roomInfo : LiveData<RoomInfo> = _roomInfo
 
+    private var _chatList = MutableLiveData<List<Chat>>()
+    val chatList : LiveData<List<Chat>> = _chatList
+
+    private var _sendPush = MutableLiveData<UiState<Boolean>>()
+    val sendPush: LiveData<UiState<Boolean>> = _sendPush
+
     private var _roomHistory = MutableLiveData<List<RoomInfo>>()
     val roomHistory : LiveData<List<RoomInfo>> = _roomHistory
 
+    private var _exitRoom = MutableLiveData<UiState<String>>()
+    val exitRoom : LiveData<UiState<String>> = _exitRoom
+
+    private var _deactivateRoom = MutableLiveData<UiState<String>>()
+    val deactivateRoom : LiveData<UiState<String>> = _deactivateRoom
+
+    fun getUserInfo(){
+        authRepository.getUserInfo { _user.postValue(it) }
+    }
+
+    fun subscribeUser() : LiveData<User>? {
+        val user = MutableLiveData<User>()
+
+        if (auth.currentUser == null) return null
+        getFcmToken()
+        userListener = fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
+            .addSnapshotListener { value, error->
+                if(error != null){
+                    return@addSnapshotListener
+                }
+                value?.let {snapshot->
+                    user.value = snapshot.toObject<User>()
+                }
+            }
+
+        return user
+    }
+
+    fun logout(uid: String) {
+        authRepository.logoutUser(uid){ _logout.postValue(it) }
+    }
+
+    fun searchKeyword(keyword: String, isStartPoint: Boolean) = viewModelScope.launch {
+        try {
+            if (isStartPoint) {
+                _startPoint.postValue(UiState.Loading)
+                kakaoRepository.searchKeyword(keyword){ _startPoint.postValue(it) }
+            }
+            else {
+                _endPoint.postValue(UiState.Loading)
+                kakaoRepository.searchKeyword(keyword){ _endPoint.postValue(it) }
+            }
+        } catch (e: Exception) {
+            networkErrorMessage(e)
+        }
+    }
+
     fun detachRoomPaging(genderOption: String) : Flow<PagingData<CarPoolRoom>> {
-        val query = fireStore.collection("Room")
+        val query = fireStore.collection(FireStoreTable.ROOM)
             .whereEqualTo("closed", false) // 이미 마감한 방 필터링
             .whereIn("genderOption", listOf(genderOption, GENDER_OPTION_NONE)) // 성별 옵션에 부합하지 않는 방 필터링
             .whereGreaterThanOrEqualTo("departureTime", LocalDateTime.now().toString()) // 출발시간이 이미 지난 방 필터링
@@ -83,104 +140,31 @@ class MainViewModel(
         ){
             FirestorePagingSource(query)
         }.flow.cachedIn(viewModelScope)
-
-    }
-
-    fun logout(activity: Activity, uid: String) {
-        myRoomListenerRemove()
-        userListenerRemove()
-
-        val userInfo = mapOf<String, Any>(
-            "fcmToken" to ""
-        )
-        CoroutineScope(Dispatchers.IO).launch {
-            fireStore.collection("User").document(uid).update(userInfo).await()
-
-            auth.signOut()
-            activity.finish()
-            activity.startActivity(Intent(activity, WelcomeActivity::class.java))
-        }
-    }
-
-
-
-    fun searchKeyword(keyword: String, isStartPoint: Boolean) = viewModelScope.launch {
-        try {
-            if (isStartPoint) _startPoint.postValue(mainRepository.searchKeyword(keyword))
-            else _endPoint.postValue(mainRepository.searchKeyword(keyword))
-        } catch (e: Exception) {
-            networkErrorMessage(e)
-        }
-    }
-
-    fun getUserInfo(): LiveData<User>? {
-        val user = MutableLiveData<User>()
-
-        if (auth.currentUser == null) return null
-        getFcmToken()
-        fireStore.collection("User").document(auth.currentUser!!.uid).get().addOnSuccessListener {
-            if(it == null){
-                Log.d("testt", "getUserInfo: fail to get user info")
-                return@addOnSuccessListener
-            }
-
-            user.value = it.toObject<User>()
-            Log.d("testt", "getUserInfo()")
-        }
-        return user
-    }
-
-    fun subscribeUser() : LiveData<User>? {
-        val user = MutableLiveData<User>()
-
-        Log.d("firebaseSnapshotTestt", "subscribeUser 호출")
-        if (auth.currentUser == null) return null
-        getFcmToken()
-        userListener = fireStore.collection("User").document(auth.currentUser!!.uid).addSnapshotListener { value, error->
-            if(error != null){
-                Log.d("testt", "getUserInfo: fail to get user info")
-                return@addSnapshotListener
-            }
-            value?.let {snapshot->
-                user.value = snapshot.toObject<User>()
-                Log.d("testt", "subscribeUser()")
-            }
-        }
-        return user
     }
 
     fun createRoom(room: CarPoolRoom, user: User) {
-        mainRepository.createRoom(room, user).observeForever {
-            _isCreated.value = it
-        }
+        _createRoom.postValue(UiState.Loading)
+        fireStoreRepository.createRoom(room, user){ _createRoom.postValue(it) }
     }
 
     fun joinRoom(room: CarPoolRoom, user: User) {
-        mainRepository.joinRoom(room, user).observeForever {
-            _isJoined.value = it
-        }
-    }
-
-
-    suspend fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {
-        mainRepository.sendMessage(chat, userName, receiveTokens)
+        _joinRoom.postValue(UiState.Loading)
+        fireStoreRepository.joinRoom(room, user){ _joinRoom.postValue(it) }
     }
 
     fun subscribeMyRoom(user: User) : LiveData<CarPoolRoom?> {
         val room = MutableLiveData<CarPoolRoom?>()
-        Log.d("firebaseSnapshotTestt", "subscribeMyRoom 호출")
 
-        myRoomListener = fireStore.collection("Room").whereArrayContains("participants", user)
+        myRoomListener = fireStore.collection(FireStoreTable.ROOM)
+            .whereArrayContains("participants", user)
             .addSnapshotListener { value, error ->
                 if(error != null){
-                    Log.d("testt", "getMyRoom: ${error}")
                     return@addSnapshotListener
                 }
                 value?.let {querySnapshot ->
                     if(!querySnapshot.isEmpty) {
                         val snapshot = querySnapshot.first()
-                        room.postValue(snapshot.toObject())
-                        Log.d("testt", "subscribeMyRoom: ${room.value}")
+                        room.postValue(snapshot.toObject(CarPoolRoom::class.java))
                     }else{
                         room.postValue(null) // 참여중인 방이 없음 null 반환
                     }
@@ -192,28 +176,50 @@ class MainViewModel(
 
 
     fun exitRoom(user: User, room: CarPoolRoom) {
-        mainRepository.exitRoom(user, room)
+        _exitRoom.postValue(UiState.Loading)
+        fireStoreRepository.exitRoom(user, room){ _exitRoom.postValue(it) }
     }
 
     fun deactivateRoom(roomId: String) {
-        mainRepository.deactivateRoom(roomId)
+        _deactivateRoom.postValue(UiState.Loading)
+        fireStoreRepository.deactivateRoom(roomId){ _deactivateRoom.postValue(it) }
+    }
+
+    fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {
+        _sendPush.postValue(UiState.Loading)
+        CoroutineScope(Dispatchers.IO).launch {
+            databaseRepository.saveChat(chat)
+            if(chat.messageType != CHAT_EXIT) {
+                databaseRepository.insertRoomInfo(RoomInfo(chat.roomId, chat.msg, chat.dateTime, false, isActivate = true))
+            }
+        }
+        receiveTokens.forEachIndexed { index, token->
+            if(!token.isNullOrEmpty()){
+                serverRepository.sendPushMessage(token, chat.roomId, chat.userId, userName, chat.msg, chat.messageType){
+                    if(receiveTokens.last() == token) _sendPush.postValue(it)
+                }
+            }
+        }
+    }
+
+    fun updateChat(chat: Chat) = viewModelScope.launch(Dispatchers.IO) {
+        databaseRepository.updateChat(chat)
     }
 
     fun insertRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
-        Log.d("testt", "roomInfo 저장!: ${roomInfo}")
-        roomRepository.insertRoomInfo(roomInfo)
+        databaseRepository.insertRoomInfo(roomInfo)
     }
 
     fun detachRoomInfo(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
-        _roomInfo.postValue(roomRepository.detachRoomInfo(roomId))
+        _roomInfo.postValue(databaseRepository.detachRoomInfo(roomId))
     }
 
     fun updateRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
-        roomRepository.updateRoomInfo(roomInfo)
+        databaseRepository.updateRoomInfo(roomInfo)
     }
 
     fun detachRoomInfoHistory() = viewModelScope.launch(Dispatchers.IO) {
-        _roomHistory.postValue(roomRepository.detachRoomInfoHistory())
+        _roomHistory.postValue(databaseRepository.detachRoomInfoHistory())
     }
 
     fun userListenerRemove(){
@@ -243,11 +249,11 @@ class MainViewModel(
 
     private fun updateFcmToken(token: String){
         if(auth.currentUser == null) return
-        mainRepository.updateFcmToken(auth.currentUser!!.uid, token)
+        fireStoreRepository.updateFcmToken(auth.currentUser!!.uid, token)
     }
 
     fun detachChatList(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
-        _chatList.postValue(roomRepository.detachChatList(roomId))
+        _chatList.postValue(databaseRepository.detachChatList(roomId))
     }
 
     private fun networkErrorMessage(e: Exception){

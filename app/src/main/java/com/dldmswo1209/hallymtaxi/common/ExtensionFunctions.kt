@@ -9,6 +9,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.NumberPicker
 import android.widget.TimePicker
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -74,3 +76,7 @@ fun Date.dateToString(format: String = "yyyy-MM-dd HH:mm:ss", local : Locale = L
     return formatter.format(this)
 }
 
+
+fun Fragment.toast(msg: String){
+    Toast.makeText(requireActivity(), msg, Toast.LENGTH_SHORT).show()
+}

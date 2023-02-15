@@ -26,16 +26,18 @@ import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
-import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
+import com.dldmswo1209.hallymtaxi.util.UiState
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
+@AndroidEntryPoint
 class ChatRoomFragment: Fragment() {
 
     private lateinit var binding: FragmentChatRoomBinding
-    private val viewModel: MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
+    private val viewModel: MainViewModel by viewModels()
     private lateinit var myApplication: MyApplication
 
     private lateinit var room : CarPoolRoom
@@ -47,7 +49,7 @@ class ChatRoomFragment: Fragment() {
 
     private lateinit var callback: OnBackPressedCallback
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
-        ViewMarginDynamicChanger(requireContext())
+        ViewMarginDynamicChanger(requireActivity())
     }
     private val notificationManager : NotificationManagerCompat by lazy{
         NotificationManagerCompat.from(requireActivity().applicationContext)
@@ -57,8 +59,8 @@ class ChatRoomFragment: Fragment() {
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {
-                val originalEditTextMarginBottom = MetricsUtil.convertDpToPixel(27, requireContext())
-                val smallEditTextMarginBottom = MetricsUtil.convertDpToPixel(5, requireContext())
+                val originalEditTextMarginBottom = MetricsUtil.convertDpToPixel(27, requireActivity())
+                val smallEditTextMarginBottom = MetricsUtil.convertDpToPixel(5, requireActivity())
 
                 changeConstraintMarginTopBottom(binding.inputLayout,originalEditTextMarginBottom,smallEditTextMarginBottom,0,0, isVisible)
                 scrollToLastItem()
@@ -90,7 +92,7 @@ class ChatRoomFragment: Fragment() {
 
         myApplication = requireActivity().application as MyApplication
         currentUser = myApplication.getUser() ?: kotlin.run {
-            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            startActivity(Intent(requireActivity(), SplashActivity::class.java))
             requireActivity().finish()
             return
         }
@@ -129,7 +131,8 @@ class ChatRoomFragment: Fragment() {
     private fun setObserver(){
         viewModel.detachChatList(room.roomId)
         myApplication.myRoom.observe(viewLifecycleOwner){ room->
-            if(room == null) {
+            Log.d("testt", "subscribeMyRoom: ${room}")
+            if(room == null && !isFirst) {
                 val deletedRoomDialog = CustomDialog(
                     title = "채팅방 입장 오류",
                     content = "참여할 수 없는 채팅방입니다.",
@@ -138,25 +141,28 @@ class ChatRoomFragment: Fragment() {
                 deletedRoomDialog.show(parentFragmentManager, deletedRoomDialog.tag)
                 return@observe
             }
-            val isBefore = TimeService.isBefore(room.departureTime, "T")
-            if(!isBefore && isFirst){
-                // 출발시간이 지남
-                val finishedRoom = CustomDialog(
-                    title = "출발시간 초과",
-                    content = "출발시간이 지난 채팅방 입니다.\n더 이상 카풀 목록에 표시되지 않습니다.",
-                    positiveCallback = { exitRoom() },
-                    positiveButton = "나가기",
-                    negativeButtonVisible = true,
-                    negativeButton = "취소",
-                )
-                finishedRoom.show(parentFragmentManager, finishedRoom.tag)
+
+            room?.let {
+                val isBefore = TimeService.isBefore(room.departureTime, "T")
+                if(!isBefore && isFirst){
+                    // 출발시간이 지남
+                    val finishedRoom = CustomDialog(
+                        title = "출발시간 초과",
+                        content = "출발시간이 지난 채팅방 입니다.\n더 이상 카풀 목록에 표시되지 않습니다.",
+                        positiveCallback = { exitRoom() },
+                        positiveButton = "나가기",
+                        negativeButtonVisible = true,
+                        negativeButton = "취소",
+                    )
+                    finishedRoom.show(parentFragmentManager, finishedRoom.tag)
+                }
+
+                binding.room = room
+                this.room = room
+                tokenList = mutableListOf()
+
+                room.participants.forEach { if(it.fcmToken != currentUser.fcmToken) tokenList.add(it.fcmToken) }
             }
-
-            binding.room = room
-            this.room = room
-            tokenList = mutableListOf()
-
-            room.participants.forEach { if(it.fcmToken != currentUser.fcmToken) tokenList.add(it.fcmToken) }
             isFirst = false
         }
 
@@ -171,6 +177,28 @@ class ChatRoomFragment: Fragment() {
             it.isNewMessage = false
             roomInfo = it
             viewModel.updateRoomInfo(it)
+        }
+
+        viewModel.sendPush.observe(viewLifecycleOwner){ state->
+            viewModel.detachChatList(room.roomId)
+
+            when(state){
+                is UiState.Loading ->{}
+                is UiState.Failure ->{
+
+                }
+                is UiState.Success ->{
+                    val lastMsg = messages.last()
+                    lastMsg.sendSuccess = true
+                    CoroutineScope(Dispatchers.IO).launch {
+                        withContext(Dispatchers.Default) {
+                            viewModel.updateChat(lastMsg)
+                            delay(100)
+                        }
+                        viewModel.detachChatList(room.roomId)
+                    }
+                }
+            }
         }
     }
     private fun registerBroadcastReceiver() {
@@ -298,14 +326,16 @@ class ChatRoomFragment: Fragment() {
         val msg = binding.etMsg.text.toString()
         val chat = Chat(roomId = room.roomId, userId = currentUser.uid, msg= msg, messageType = CHAT_NORMAL)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            async {
-                viewModel.sendMessage(chat, currentUser.name, tokenList.toList())
-            }.await()
-            viewModel.detachChatList(room.roomId)
-        }
-
+        viewModel.sendMessage(chat, currentUser.name, tokenList.toList())
         binding.etMsg.text.clear()
+//        CoroutineScope(Dispatchers.IO).launch {
+//            async {
+//                viewModel.sendMessage(chat, currentUser.name, tokenList.toList())
+//            }.await()
+//            viewModel.detachChatList(room.roomId)
+//        }
+
+
     }
 
     override fun onStart() {

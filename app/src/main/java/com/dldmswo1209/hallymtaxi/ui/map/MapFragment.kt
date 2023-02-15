@@ -2,37 +2,39 @@ package com.dldmswo1209.hallymtaxi.ui.map
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.location.LocationService
-import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
+import com.dldmswo1209.hallymtaxi.common.toast
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentMapBinding
-import com.dldmswo1209.hallymtaxi.model.*
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.PoolListBottomSheetFragment
+import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
+import com.dldmswo1209.hallymtaxi.util.UiState
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import net.daum.mf.map.api.CameraPosition
 import net.daum.mf.map.api.CameraUpdateFactory
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
+import net.daum.mf.map.api.MapView
 
-
-class MapFragment: Fragment() {
-
+@AndroidEntryPoint
+class MapFragment : Fragment() {
     private lateinit var binding: FragmentMapBinding
     private lateinit var locationService : LocationService
-    private val viewModel : MainViewModel by viewModels { ViewModelFactory(requireActivity().application) }
+    private val viewModel : MainViewModel by viewModels()
     private var isSearching = false
     private var isStartPointSearching = false
     private var startPlaceMarker = MapPOIItem()
@@ -46,6 +48,10 @@ class MapFragment: Fragment() {
     private var joinedRoom: CarPoolRoom? = null
     private lateinit var user : User
     private lateinit var myApplication: MyApplication
+    private val loadingDialog by lazy{
+        LoadingDialog(requireActivity())
+    }
+    private lateinit var mapView: MapView
 
 
     companion object{
@@ -58,7 +64,7 @@ class MapFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentMapBinding.inflate(inflater, container, false)
+        binding = FragmentMapBinding.inflate(layoutInflater)
         return binding.root
     }
 
@@ -71,11 +77,14 @@ class MapFragment: Fragment() {
         onShortCutButtonClickListener()
     }
     private fun init(){
+        mapView = MapView(requireActivity())
+        binding.mapview.addView(mapView)
+
         locationService = LocationService(requireActivity())
         moveCamera(hallym_lat, hallym_lng, 2f)
         myApplication = requireActivity().application as MyApplication
         user = myApplication.getUser() ?: kotlin.run {
-            startActivity(Intent(requireContext(), SplashActivity::class.java))
+            startActivity(Intent(requireActivity(), SplashActivity::class.java))
             requireActivity().finish()
             return
         }
@@ -85,6 +94,7 @@ class MapFragment: Fragment() {
 
     private fun setObservers(){
         myApplication.myRoom.observe(viewLifecycleOwner){ room->
+            Log.d("testt", "subscribeMyRoom: ${room}")
             if(room != null){
                 binding.viewCurrentMyRoom.visibility = View.VISIBLE
                 binding.room = room
@@ -95,28 +105,52 @@ class MapFragment: Fragment() {
             joinedRoom = room
         }
 
-        viewModel.startPoint.observe(viewLifecycleOwner){ result->
-            val placeList = result.documents
+        viewModel.startPoint.observe(viewLifecycleOwner){ state->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                    toast("현재 주소를 찾지 못했습니다")
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    val placeList = state.data.documents
+                    if(isStartPointSearching){ // 출발지를 검색한 경우
+                        showBottomSheetDialog(placeList, isStartPoint = true, isSearchResult = true, tag = SEARCH_RESULT_BOTTOM_SHEET_TAG)
+                    }else{ // 그냥 현재 위치를 가져온 경우
+                        if(placeList.isNotEmpty()){
+                            searchResultClickEvent(placeList.first(), true) // 검색결과 첫번째 장소를 전달
+                        }else{
+                            // 출발지 주소 검색 실패
+                            toast("현재 주소를 찾지 못했습니다")
+                        }
+                    }
+                    isStartPointSearching = false
 
-            if(isStartPointSearching){ // 출발지를 검색한 경우
-                showBottomSheetDialog(placeList, isStartPoint = true, isSearchResult = true, tag = SEARCH_RESULT_BOTTOM_SHEET_TAG)
-            }else{ // 그냥 현재 위치를 가져온 경우
-                if(placeList.isNotEmpty()){
-                    searchResultClickEvent(placeList.first(), true) // 검색결과 첫번째 장소를 전달
-                }else{
-                    // 출발지 주소 검색 실패
-                    Toast.makeText(requireContext(), "현재 주소를 찾지 못했습니다", Toast.LENGTH_SHORT).show()
                 }
             }
-            isStartPointSearching = false
         }
 
-        viewModel.endPoint.observe(viewLifecycleOwner){ result->
-            val placeList = result.documents
-            if(isSearching){
-                showBottomSheetDialog(placeList, isStartPoint = false, isSearchResult = true, tag = SEARCH_RESULT_BOTTOM_SHEET_TAG)
+        viewModel.endPoint.observe(viewLifecycleOwner){ state->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                    toast("현재 주소를 찾지 못했습니다")
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    val placeList = state.data.documents
+                    if(isSearching){
+                        showBottomSheetDialog(placeList, isStartPoint = false, isSearchResult = true, tag = SEARCH_RESULT_BOTTOM_SHEET_TAG)
+                    }
+                    isSearching = false
+                }
             }
-            isSearching = false
         }
         locationService.address.observe(viewLifecycleOwner){
             if(it.isNotBlank()){
@@ -124,14 +158,26 @@ class MapFragment: Fragment() {
             }
         }
 
-        viewModel.isJoined.observe(viewLifecycleOwner){
-            if(it){
-                // 채팅방 입장
-                joinedRoom?.let { room->
-                    val action = MapFragmentDirections.actionNavigationMapToChatRoomFragment(room)
-                    findNavController().navigate(action)
+        viewModel.joinRoom.observe(viewLifecycleOwner){state->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                    toast("현재 주소를 찾지 못했습니다")
+                }
+                is UiState.Success ->{
+                    // 채팅방 입장
+                    loadingDialog.dismiss()
+                    joinedRoom?.let { room->
+                        val action = MapFragmentDirections.actionNavigationMapToChatRoomFragment(room)
+                        findNavController().navigate(action)
+                    }
                 }
             }
+
+
         }
     }
 
@@ -202,22 +248,22 @@ class MapFragment: Fragment() {
         if(isStartPoint){
             binding.etStartPoint.setText(place.road_address_name)
             startPlace = place
-            binding.mapview.removePOIItem(startPlaceMarker) // 이전 마커 제거
+            mapView.removePOIItem(startPlaceMarker) // 이전 마커 제거
             newMarker.customImageResourceId = R.drawable.start_marker
             startPlaceMarker = newMarker
-            binding.mapview.addPOIItem(startPlaceMarker) // 마커 추가
+            mapView.addPOIItem(startPlaceMarker) // 마커 추가
 
         }else{
             binding.etEndPoint.setText(place.road_address_name)
             endPlace = place
-            binding.mapview.removePOIItem(endPlaceMarker) // 이전 마커 제거
+            mapView.removePOIItem(endPlaceMarker) // 이전 마커 제거
             newMarker.customImageResourceId = R.drawable.end_marker
             endPlaceMarker = newMarker
-            binding.mapview.addPOIItem(endPlaceMarker) // 마커 추가
+            mapView.addPOIItem(endPlaceMarker) // 마커 추가
         }
-        if(binding.mapview.poiItems.size == 2){ // 출발지, 목적지 모두 입력 완료
+        if(mapView.poiItems.size == 2){ // 출발지, 목적지 모두 입력 완료
             if(startPlace != null && endPlace != null){
-                binding.mapview.selectPOIItem(endPlaceMarker, true)
+                mapView.selectPOIItem(endPlaceMarker, true)
                 setCameraCenterAllPOIItems()
                 showBottomSheetDialog(isSearchResult = false, tag = POOL_LIST_BOTTOM_SHEET_TAG) // 카풀방 리스트 보여주기
             }
@@ -245,13 +291,13 @@ class MapFragment: Fragment() {
     private fun moveCamera(lat: Double, lng: Double, zoomLevel: Float) {
         val cameraPosition = CameraPosition(MapPoint.mapPointWithGeoCoord(lat,lng), zoomLevel)
         val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
-        binding.mapview.moveCamera(cameraUpdate)
+        mapView.moveCamera(cameraUpdate)
     }
 
     private fun setCameraCenterAllPOIItems(){
-        binding.mapview.fitMapViewAreaToShowAllPOIItems()
-        binding.mapview.zoomOut(true)
-        binding.mapview.zoomOut(true)
+        mapView.fitMapViewAreaToShowAllPOIItems()
+        mapView.zoomOut(true)
+        mapView.zoomOut(true)
     }
 
     // 장소 검색결과 또는 카풀방 리스트 보여주기
@@ -347,5 +393,4 @@ class MapFragment: Fragment() {
         super.onPause()
         searchResultBottomSheet?.dialog?.dismiss()
     }
-
 }

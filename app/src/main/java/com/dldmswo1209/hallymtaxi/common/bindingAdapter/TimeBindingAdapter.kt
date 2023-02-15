@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.common
 
+import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import java.time.LocalDate
@@ -35,4 +36,9 @@ fun parsingDepartureTime(view: TextView, timestamp: String?){
             view.text = "$date $time"
         }
     }
+}
+
+@BindingAdapter("dateTimeVisibility")
+fun dateTimeVisibility(view: TextView, sendSuccess : Boolean){
+    view.visibility = if(sendSuccess) View.VISIBLE else View.GONE
 }

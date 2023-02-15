@@ -16,18 +16,18 @@ import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.FirebaseAnalyticsManager
 import com.dldmswo1209.hallymtaxi.common.MyApplication
-import com.dldmswo1209.hallymtaxi.common.ViewModelFactory
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModels { ViewModelFactory(application) }
+    private val viewModel: MainViewModel by viewModels()
 
     private var navController : NavController? = null
     private val checkNetwork by lazy{
