@@ -14,13 +14,9 @@ interface FireStoreRepository {
 
     fun createRoom(room: CarPoolRoom, user: User, result: (UiState<CarPoolRoom>) -> Unit)
     fun joinRoom(room: CarPoolRoom, user: User, result: (UiState<String>) -> Unit)
-
     fun deleteRoom(roomId: String)
-
     fun exitRoom(user: User, room: CarPoolRoom, result: (UiState<String>)->Unit)
-
     fun deactivateRoom(roomId: String, result: (UiState<String>)->Unit)
-
     fun updateFcmToken(uid: String, token: String)
 
 }

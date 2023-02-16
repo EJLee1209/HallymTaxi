@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -16,6 +17,7 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -55,6 +57,7 @@ class ChatRoomFragment: Fragment() {
         NotificationManagerCompat.from(requireActivity().applicationContext)
     }
     private var isFirst = true
+    private var mLastClickTime = 0L
 
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
@@ -111,7 +114,15 @@ class ChatRoomFragment: Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
     private fun setRecyclerAdapter(){
-        chatListAdapter = ChatListAdapter(currentUser)
+        chatListAdapter = ChatListAdapter(currentUser){ chatId->
+            CoroutineScope(Dispatchers.Main).launch {
+                async {
+                    viewModel.deleteChat(chatId)
+                    delay(200)
+                }.await()
+                viewModel.detachChatList(room.roomId)
+            }
+        }
         binding.rvMessage.adapter = chatListAdapter
     }
     private fun editTextWatcher(){
@@ -131,8 +142,7 @@ class ChatRoomFragment: Fragment() {
     private fun setObserver(){
         viewModel.detachChatList(room.roomId)
         myApplication.myRoom.observe(viewLifecycleOwner){ room->
-            Log.d("testt", "subscribeMyRoom: ${room}")
-            if(room == null && !isFirst) {
+            if(room == null) {
                 val deletedRoomDialog = CustomDialog(
                     title = "채팅방 입장 오류",
                     content = "참여할 수 없는 채팅방입니다.",
@@ -142,27 +152,25 @@ class ChatRoomFragment: Fragment() {
                 return@observe
             }
 
-            room?.let {
-                val isBefore = TimeService.isBefore(room.departureTime, "T")
-                if(!isBefore && isFirst){
-                    // 출발시간이 지남
-                    val finishedRoom = CustomDialog(
-                        title = "출발시간 초과",
-                        content = "출발시간이 지난 채팅방 입니다.\n더 이상 카풀 목록에 표시되지 않습니다.",
-                        positiveCallback = { exitRoom() },
-                        positiveButton = "나가기",
-                        negativeButtonVisible = true,
-                        negativeButton = "취소",
-                    )
-                    finishedRoom.show(parentFragmentManager, finishedRoom.tag)
-                }
-
-                binding.room = room
-                this.room = room
-                tokenList = mutableListOf()
-
-                room.participants.forEach { if(it.fcmToken != currentUser.fcmToken) tokenList.add(it.fcmToken) }
+            val isBefore = TimeService.isBefore(room.departureTime, "T")
+            if(!isBefore && isFirst){
+                // 출발시간이 지남
+                val finishedRoom = CustomDialog(
+                    title = "출발시간 초과",
+                    content = "출발시간이 지난 채팅방 입니다.\n더 이상 카풀 목록에 표시되지 않습니다.",
+                    positiveCallback = { exitRoom() },
+                    positiveButton = "나가기",
+                    negativeButtonVisible = true,
+                    negativeButton = "취소",
+                )
+                finishedRoom.show(parentFragmentManager, finishedRoom.tag)
             }
+
+            binding.room = room
+            this.room = room
+            tokenList = mutableListOf()
+
+            room.participants.forEach { if(it.fcmToken != currentUser.fcmToken) tokenList.add(it.fcmToken) }
             isFirst = false
         }
 
@@ -185,21 +193,27 @@ class ChatRoomFragment: Fragment() {
             when(state){
                 is UiState.Loading ->{}
                 is UiState.Failure ->{
-
+                    CoroutineScope(Dispatchers.Main).launch {
+                        async {
+                            viewModel.updateChatById(state.error!!, SEND_STATE_FAIL)
+                            delay(200)
+                        }.await()
+                        viewModel.detachChatList(room.roomId)
+                    }
                 }
                 is UiState.Success ->{
-                    val lastMsg = messages.last()
-                    lastMsg.sendSuccess = true
-                    CoroutineScope(Dispatchers.IO).launch {
-                        withContext(Dispatchers.Default) {
-                            viewModel.updateChat(lastMsg)
-                            delay(100)
-                        }
+                    CoroutineScope(Dispatchers.Main).launch {
+                        async {
+                            viewModel.updateChatById(state.data, SEND_STATE_SUCCESS)
+                            delay(200)
+                        }.await()
                         viewModel.detachChatList(room.roomId)
                     }
                 }
             }
         }
+
+
     }
     private fun registerBroadcastReceiver() {
         // 새로운 메세지가 온 경우 브로드 캐스트 리시버를 통해 알 수 있음
@@ -323,19 +337,17 @@ class ChatRoomFragment: Fragment() {
     }
 
     fun onClickSend(){
-        val msg = binding.etMsg.text.toString()
-        val chat = Chat(roomId = room.roomId, userId = currentUser.uid, msg= msg, messageType = CHAT_NORMAL)
+        if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
+            return
+        }
+        mLastClickTime = SystemClock.elapsedRealtime()
 
+        val msg = binding.etMsg.text.toString()
+        if(msg.isBlank()) return
+
+        val chat = Chat(roomId = room.roomId, userId = currentUser.uid, msg= msg, messageType = CHAT_NORMAL)
         viewModel.sendMessage(chat, currentUser.name, tokenList.toList())
         binding.etMsg.text.clear()
-//        CoroutineScope(Dispatchers.IO).launch {
-//            async {
-//                viewModel.sendMessage(chat, currentUser.name, tokenList.toList())
-//            }.await()
-//            viewModel.detachChatList(room.roomId)
-//        }
-
-
     }
 
     override fun onStart() {

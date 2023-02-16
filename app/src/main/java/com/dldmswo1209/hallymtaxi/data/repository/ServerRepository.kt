@@ -13,7 +13,7 @@ interface ServerRepository {
         userName: String,
         message: String,
         messageType: String,
-        id: String = "",
-        result: (UiState<Boolean>) -> Unit
+        id: String,
+        result: (UiState<String>) -> Unit
     )
 }

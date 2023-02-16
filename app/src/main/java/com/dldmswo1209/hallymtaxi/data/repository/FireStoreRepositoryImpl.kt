@@ -58,11 +58,7 @@ class FireStoreRepositoryImpl(
                             .addOnSuccessListener {
                                 // 입장 성공
                                 room.participants.add(user)
-//                                room.participants.forEach { if(it.fcmToken != user.fcmToken) receiveTokens.add(it.fcmToken) }
                                 result.invoke(UiState.Success(FireStoreResponse.JOIN_ROOM_SUCCESS))
-//                                CoroutineScope(Dispatchers.Main).launch {
-//                                    sendMessage(chat = Chat(roomId = room.roomId, userId = user.uid, userName = user.name ,msg = "${user.name}님이 입장하셨습니다" , messageType = CHAT_JOIN), user.name, receiveTokens)
-//                                }
                             }
                             .addOnFailureListener {
                                 // 입장 실패

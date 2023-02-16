@@ -71,8 +71,8 @@ class MainViewModel @Inject constructor(
     private var _chatList = MutableLiveData<List<Chat>>()
     val chatList : LiveData<List<Chat>> = _chatList
 
-    private var _sendPush = MutableLiveData<UiState<Boolean>>()
-    val sendPush: LiveData<UiState<Boolean>> = _sendPush
+    private var _sendPush = MutableLiveData<UiState<String>>()
+    val sendPush: LiveData<UiState<String>> = _sendPush
 
     private var _roomHistory = MutableLiveData<List<RoomInfo>>()
     val roomHistory : LiveData<List<RoomInfo>> = _roomHistory
@@ -187,23 +187,30 @@ class MainViewModel @Inject constructor(
 
     fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {
         _sendPush.postValue(UiState.Loading)
-        CoroutineScope(Dispatchers.IO).launch {
-            databaseRepository.saveChat(chat)
-            if(chat.messageType != CHAT_EXIT) {
-                databaseRepository.insertRoomInfo(RoomInfo(chat.roomId, chat.msg, chat.dateTime, false, isActivate = true))
-            }
-        }
+        saveChat(chat)
+
         receiveTokens.forEachIndexed { index, token->
             if(!token.isNullOrEmpty()){
-                serverRepository.sendPushMessage(token, chat.roomId, chat.userId, userName, chat.msg, chat.messageType){
+                serverRepository.sendPushMessage(token, chat.roomId, chat.userId, userName, chat.msg, chat.messageType, chat.id){
                     if(receiveTokens.last() == token) _sendPush.postValue(it)
                 }
             }
         }
     }
 
-    fun updateChat(chat: Chat) = viewModelScope.launch(Dispatchers.IO) {
-        databaseRepository.updateChat(chat)
+    fun saveChat(chat: Chat) = viewModelScope.launch(Dispatchers.IO) {
+        databaseRepository.saveChat(chat)
+        if(chat.messageType != CHAT_EXIT) {
+            databaseRepository.insertRoomInfo(RoomInfo(chat.roomId, chat.msg, chat.dateTime, false, isActivate = true))
+        }
+    }
+
+    fun updateChatById(id: String, sendSuccess: String) = viewModelScope.launch(Dispatchers.IO) {
+        databaseRepository.updateChatById(id, sendSuccess)
+    }
+
+    fun deleteChat(id: String) = viewModelScope.launch(Dispatchers.IO) {
+        databaseRepository.deleteChat(id)
     }
 
     fun insertRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {

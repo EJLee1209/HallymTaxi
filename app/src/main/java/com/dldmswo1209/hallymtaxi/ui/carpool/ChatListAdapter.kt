@@ -12,7 +12,8 @@ import com.dldmswo1209.hallymtaxi.databinding.ItemSystemMessageBinding
 
 
 class ChatListAdapter(
-    private val currentUser: User
+    private val currentUser: User,
+    private val onClickRemove: (String) -> Unit
 ) : ListAdapter<Chat, RecyclerView.ViewHolder>(diffUtil) {
     override fun getItemViewType(position: Int): Int {
         val item = currentList[position]
@@ -30,6 +31,9 @@ class ChatListAdapter(
         fun bind(chat: Chat) {
             binding.chat = chat
             binding.executePendingBindings()
+            binding.btnRemoveChat.setOnClickListener{
+                onClickRemove(chat.id)
+            }
         }
     }
 

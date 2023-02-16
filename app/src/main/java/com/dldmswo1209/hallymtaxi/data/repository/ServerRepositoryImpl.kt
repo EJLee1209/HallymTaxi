@@ -116,7 +116,7 @@ class ServerRepositoryImpl(
         message: String,
         messageType: String,
         id: String,
-        result: (UiState<Boolean>) -> Unit
+        result: (UiState<String>) -> Unit
     ) {
         client.sendPushMessage(token, id, roomId, userId, userName, message, messageType)
             .enqueue(object : Callback<Boolean> {
@@ -124,17 +124,17 @@ class ServerRepositoryImpl(
                     response.body()?.let { sent->
                         if(sent){
                             result.invoke(
-                                UiState.Success(true)
+                                UiState.Success(id)
                             )
                         }else{
                             result.invoke(
-                                UiState.Failure("Fail to Send Message")
+                                UiState.Failure(id)
                             )
                         }
 
                     }?: kotlin.run {
                         result.invoke(
-                            UiState.Failure("No Response")
+                            UiState.Failure(id)
                         )
                     }
 
@@ -142,7 +142,7 @@ class ServerRepositoryImpl(
 
                 override fun onFailure(call: Call<Boolean>, t: Throwable) {
                     result.invoke(
-                        UiState.Failure(t.message)
+                        UiState.Failure(id)
                     )
                 }
 

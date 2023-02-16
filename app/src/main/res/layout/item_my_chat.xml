@@ -26,6 +26,19 @@
             app:layout_constraintEnd_toStartOf="@id/tv_message"
             tools:visibility="visible" />
 
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_remove_chat"
+            cancelButtonVisibility="@{chat.sendSuccess}"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="@null"
+            android:clickable="true"
+            android:src="@drawable/ic_baseline_cancel_24"
+            android:tint="@color/hallym_red_E43429"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/tv_message"
+            app:layout_constraintEnd_toStartOf="@id/tv_message" />
+
         <TextView
             android:id="@+id/tv_time"
             style="@style/Text12.Blue"

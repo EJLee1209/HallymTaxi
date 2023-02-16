@@ -11,13 +11,12 @@ import com.dldmswo1209.hallymtaxi.data.model.Chat
 interface ChatDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun saveChat(vararg chat: Chat)
-
-    @Update
-    fun updateChat(vararg chat: Chat)
-
+    @Query("UPDATE Chat SET sendSuccess = :sendSuccess WHERE id = :id")
+    fun updateChatById(id: String, sendSuccess: String)
+    @Query("DELETE FROM Chat WHERE id = :id")
+    fun deleteChat(id: String)
     @Query("SELECT * FROM chat WHERE roomId = :roomId")
     fun detachChatList(roomId: String): List<Chat>
-
     @Query("DELETE FROM chat WHERE roomId = :roomId")
     fun deleteChatHistory(vararg roomId: String)
 

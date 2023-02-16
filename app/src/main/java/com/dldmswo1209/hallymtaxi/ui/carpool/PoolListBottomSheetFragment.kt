@@ -9,14 +9,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import com.dldmswo1209.hallymtaxi.common.*
+import com.dldmswo1209.hallymtaxi.common.BottomSheetBehaviorSetting
+import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentPoolListBottomSheetBinding
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
-import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
-import com.dldmswo1209.hallymtaxi.util.FireStoreResponse.JOIN_ROOM_ALREADY_JOINED
 import com.dldmswo1209.hallymtaxi.util.FireStoreResponse.JOIN_ROOM_SUCCESS
 import com.dldmswo1209.hallymtaxi.util.UiState
 import com.dldmswo1209.hallymtaxi.vm.MainViewModel
@@ -117,13 +116,29 @@ class PoolListBottomSheetFragment(
                     loadingDialog.dismiss()
 
                     room?.let { room ->
-                        if(state.data == JOIN_ROOM_SUCCESS){
-                            val receiveTokens = mutableListOf<String>()
-                            val chat = Chat(roomId = room.roomId, userId = user.uid, userName = user.name ,msg = "${user.name}님이 입장하셨습니다" , messageType = CHAT_JOIN)
-                            room.participants.forEach { if(it.fcmToken != user.fcmToken) receiveTokens.add(it.fcmToken) }
-                            viewModel.sendMessage(chat = chat, user.name, receiveTokens)
+                        CoroutineScope(Dispatchers.Main).launch{
+                            withContext(Dispatchers.Default) {
+                                if (state.data == JOIN_ROOM_SUCCESS) {
+                                    val receiveTokens = mutableListOf<String>()
+                                    val chat = Chat(
+                                        roomId = room.roomId,
+                                        userId = user.uid,
+                                        userName = user.name,
+                                        msg = "${user.name}님이 입장하셨습니다",
+                                        messageType = CHAT_JOIN
+                                    )
+                                    room.participants.forEach {
+                                        if (it.fcmToken != user.fcmToken) receiveTokens.add(
+                                            it.fcmToken
+                                        )
+                                    }
+                                    viewModel.sendMessage(chat = chat, user.name, receiveTokens)
+                                }
+                                delay(200)
+                            }
+                            joinRoomCallback(room)
                         }
-                        joinRoomCallback(room)
+
                     }
                 }
             }

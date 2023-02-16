@@ -51,7 +51,7 @@ class ChatRoomHistoryFragment: Fragment() {
             return
         }
         binding.fragment = this
-        chatListAdapter = ChatListAdapter(user)
+        chatListAdapter = ChatListAdapter(user){}
         binding.rvMessage.adapter = chatListAdapter
     }
 
