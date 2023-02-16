@@ -19,6 +19,7 @@ import com.dldmswo1209.hallymtaxi.ui.carpool.PAGE_SIZE
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.util.UiState
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -52,6 +53,9 @@ class MainViewModel @Inject constructor(
 
     private var _logout = MutableLiveData<UiState<String>>()
     val logout : LiveData<UiState<String>> = _logout
+
+    private var _updateToken = MutableLiveData<UiState<String>>()
+    val updateToken : LiveData<UiState<String>> = _updateToken
 
     private var _startPoint = MutableLiveData<UiState<ResultSearchKeyword>>()
     val startPoint: LiveData<UiState<ResultSearchKeyword>> = _startPoint
@@ -91,7 +95,6 @@ class MainViewModel @Inject constructor(
         val user = MutableLiveData<User>()
 
         if (auth.currentUser == null) return null
-        getFcmToken()
         userListener = fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
             .addSnapshotListener { value, error->
                 if(error != null){
@@ -243,21 +246,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getFcmToken() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.d("testt", "getFcmToken: failed", task.exception)
-                return@addOnCompleteListener
-            }
-
-            updateFcmToken(token = task.result)
+    fun updateFcmToken() {
+        fireStoreRepository.updateFcmToken{
+            _updateToken.postValue(it)
         }
     }
 
-    private fun updateFcmToken(token: String){
-        if(auth.currentUser == null) return
-        fireStoreRepository.updateFcmToken(auth.currentUser!!.uid, token)
-    }
 
     fun detachChatList(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
         _chatList.postValue(databaseRepository.detachChatList(roomId))

@@ -1,16 +1,20 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
+import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.util.UiState
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.messaging.FirebaseMessaging
 
 class FireStoreRepositoryImpl(
-    private val fireStore: FirebaseFirestore
+    private val fireStore: FirebaseFirestore,
+    private val auth: FirebaseAuth
 ): FireStoreRepository {
     override fun createRoom(room: CarPoolRoom, user: User, result: (UiState<CarPoolRoom>) -> Unit) {
         val ref = fireStore.collection(FireStoreTable.ROOM).document()
@@ -113,8 +117,37 @@ class FireStoreRepositoryImpl(
             }
     }
 
-    override fun updateFcmToken(uid: String, token: String) {
-        fireStore.collection("User").document(uid).update(mapOf("fcmToken" to token))
-
+    override fun updateFcmToken(result: (UiState<String>)->Unit) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                result.invoke(
+                    UiState.Failure(task.result)
+                )
+                return@addOnCompleteListener
+            }
+            if(auth.currentUser == null){
+                result.invoke(
+                    UiState.Failure("로그인 필요")
+                )
+                return@addOnCompleteListener
+            }
+            fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
+                .update(mapOf("fcmToken" to task.result))
+                .addOnSuccessListener {
+                    result.invoke(
+                        UiState.Success(task.result)
+                    )
+                }
+                .addOnFailureListener {
+                    result.invoke(
+                        UiState.Failure(task.result)
+                    )
+                }
+        }
+            .addOnFailureListener {
+                result.invoke(
+                    UiState.Failure("기기의 토큰 값을 가져오지 못했습니다")
+                )
+            }
     }
 }

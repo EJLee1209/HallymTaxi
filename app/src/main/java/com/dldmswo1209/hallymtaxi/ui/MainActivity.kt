@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
     var isNetworkActivate = false
     private var user: User? = null
     private lateinit var myApplication: MyApplication
-    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     //권한 가져오기
     companion object{
         val permissions = arrayOf(
@@ -50,7 +51,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         myApplication = application as MyApplication
-        firebaseAnalytics = Firebase.analytics
 
         requestPermission()
         getIntentExtraData()
@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         }else{
             intent.getSerializableExtra("userInfo") as User
         }
+        Log.d("testt", "main user: ${user}")
     }
     private fun setObserver(){
         checkNetwork.isConnected.observe(this){
@@ -74,13 +75,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewModel.subscribeUser()?.observe(this){
+            Log.d("testt", "subscribeUser 옵저버 등록: ")
             myApplication.setUser(it)
         } ?: kotlin.run {
             startActivity(Intent(this, SplashActivity::class.java))
         }
 
         user?.let {
+            Log.d("testt", "subscribeMyRoom 옵저버 등록: ")
             viewModel.subscribeMyRoom(it).observe(this){room->
+                Log.d("testt", "main my room : ${room}")
                 myApplication.setMyRoom(room)
             }
         }
@@ -102,28 +106,6 @@ class MainActivity : AppCompatActivity() {
                 // 바텀 네비게이션이 표시되지 않는 Fragment
                 else{
                     binding.navigationMain.visibility = View.GONE
-                }
-
-                when(destination.id){
-                    R.id.navigation_map -> {
-                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("지도를 봤습니다", "MapFragment")
-                    }
-                    R.id.navigation_menu -> {
-                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("메뉴를 봤습니다", "MenuFragment")
-                    }
-                    R.id.navigation_history ->{
-                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("히스토리를 봤습니다", "HistoryFragment")
-                    }
-                    R.id.chatRoomFragment ->{
-                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("채팅방을 봤습니다", "ChatRoomFragment")
-                    }
-                    R.id.chatRoomHistoryFragment->{
-                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("히스토리 채팅방을 봤습니다", "ChatRoomHistoryFragment")
-                    }
-                    R.id.navigation_create_room->{
-                        FirebaseAnalyticsManager.analyticsScreenViewLogEvent("채팅방 만드는 화면을 봤습니다", "CreateRoomFragment")
-                    }
-
                 }
             }
         }

@@ -15,6 +15,7 @@ import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.dldmswo1209.hallymtaxi.util.UiState
@@ -44,17 +45,28 @@ class SplashActivity : AppCompatActivity() {
     private fun init() {
         myApplication = application as MyApplication
         if (checkNetwork.getCurrentNetworkHasTransport()) {
-            viewModel.getUserInfo()
+            viewModel.updateFcmToken()
         } else {
             checkNetworkDialog(supportFragmentManager)
         }
     }
 
     private fun setObserver(){
+        viewModel.updateToken.observe(this){ state->
+            when (state) {
+                is UiState.Loading -> {}
+                is UiState.Failure -> {
+                    startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
+                }
+                is UiState.Success -> {
+                    viewModel.getUserInfo()
+                }
+            }
+        }
         checkNetwork.isConnected.observe(this) {
             if (it) {
                 Toast.makeText(this, "네트워크 연결 성공", Toast.LENGTH_SHORT).show()
-                viewModel.getUserInfo()
+                viewModel.updateFcmToken()
             }
         }
         viewModel.user.observe(this){ state->
@@ -73,6 +85,7 @@ class SplashActivity : AppCompatActivity() {
                 }
             }
         }
+
     }
 
     override fun onResume() {

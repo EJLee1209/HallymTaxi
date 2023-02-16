@@ -60,6 +60,7 @@ class AuthViewModel @Inject constructor(
     }
 
     fun requestVerify(email: String, code: String) = viewModelScope.launch(Dispatchers.IO) {
+        _isVerified.postValue(UiState.Loading)
         serverRepository.requestVerify(email, code){
             _isVerified.postValue(it)
         }
@@ -72,6 +73,7 @@ class AuthViewModel @Inject constructor(
     }
 
     fun login(email: String, password: String){
+        _login.postValue(UiState.Loading)
         authRepository.loginUser(email, password){
             _login.postValue(it)
         }

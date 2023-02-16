@@ -334,6 +334,7 @@ class ChatRoomFragment: Fragment() {
 
         viewModel.exitRoom(currentUser, room)
         onClickBack()
+        myApplication.setMyRoom(null)
     }
 
     fun onClickSend(){
