@@ -14,10 +14,10 @@ import androidx.paging.cachedIn
 import com.dldmswo1209.hallymtaxi.common.context
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.data.repository.*
-import com.dldmswo1209.hallymtaxi.ui.carpool.FirestorePagingSource
-import com.dldmswo1209.hallymtaxi.ui.carpool.PAGE_SIZE
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.data.remote.FirestorePagingSource
+import com.dldmswo1209.hallymtaxi.data.remote.PAGE_SIZE
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
