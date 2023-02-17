@@ -22,8 +22,8 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.ui.map.MapFragment.Companion.SEARCH_RESULT_BOTTOM_SHEET_TAG
 import com.dldmswo1209.hallymtaxi.ui.map.SearchResultBottomSheetFragment
-import com.dldmswo1209.hallymtaxi.util.UiState
-import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import java.time.LocalDateTime

@@ -1,20 +1,12 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
-import android.content.Intent
-import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.User
-import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.dldmswo1209.hallymtaxi.util.AuthResponse.EMAIL_EXIST
 import com.dldmswo1209.hallymtaxi.util.AuthResponse.EMAIL_VALID
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
-import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.data.UiState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class AuthRepositoryImpl(
     private val auth: FirebaseAuth,

@@ -1,4 +1,4 @@
-package com.dldmswo1209.hallymtaxi.vm
+package com.dldmswo1209.hallymtaxi.viewmodel
 
 import android.app.Application
 import android.util.Log
@@ -17,16 +17,13 @@ import com.dldmswo1209.hallymtaxi.data.repository.*
 import com.dldmswo1209.hallymtaxi.ui.carpool.FirestorePagingSource
 import com.dldmswo1209.hallymtaxi.ui.carpool.PAGE_SIZE
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
-import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.data.UiState
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -190,6 +187,7 @@ class MainViewModel @Inject constructor(
 
     fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {
         _sendPush.postValue(UiState.Loading)
+        if(receiveTokens.isEmpty()) chat.sendSuccess = SEND_STATE_SUCCESS
         saveChat(chat)
 
         receiveTokens.forEachIndexed { index, token->
@@ -232,14 +230,14 @@ class MainViewModel @Inject constructor(
         _roomHistory.postValue(databaseRepository.detachRoomInfoHistory())
     }
 
-    fun userListenerRemove(){
+    private fun userListenerRemove(){
         userListener?.let{
             Log.d("firebaseSnapshotTestt", "유저 정보 리스너 제거")
             it.remove()
         }
     }
 
-    fun myRoomListenerRemove(){
+    private fun myRoomListenerRemove(){
         myRoomListener?.let{
             Log.d("firebaseSnapshotTestt", "현재 방 정보 리스너 제거")
             it.remove()

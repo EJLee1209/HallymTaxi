@@ -14,7 +14,7 @@ import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomHistoryBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.ChatListAdapter
-import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

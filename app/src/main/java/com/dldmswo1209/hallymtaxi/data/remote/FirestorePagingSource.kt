@@ -1,4 +1,4 @@
-package com.dldmswo1209.hallymtaxi.ui.carpool
+package com.dldmswo1209.hallymtaxi.data.remote
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState

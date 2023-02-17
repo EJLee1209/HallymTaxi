@@ -1,14 +1,14 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
 import com.dldmswo1209.hallymtaxi.data.model.ResultSearchKeyword
-import com.dldmswo1209.hallymtaxi.retrofit.KakaoApiClient
-import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.data.remote.KakaoApi
+import com.dldmswo1209.hallymtaxi.data.UiState
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class KakaoRepositoryImpl(
-    private val client: KakaoApiClient
+    private val client: KakaoApi
 ) : KakaoRepository {
     override fun searchKeyword(keyword: String, result: (UiState<ResultSearchKeyword>) -> Unit) {
         client.getSearchKeyword(query = keyword).enqueue(object: Callback<ResultSearchKeyword>{

@@ -1,4 +1,4 @@
-package com.dldmswo1209.hallymtaxi.vm
+package com.dldmswo1209.hallymtaxi.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -12,7 +12,7 @@ import com.dldmswo1209.hallymtaxi.data.repository.ServerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.data.UiState
 import kotlinx.coroutines.Dispatchers
 
 @HiltViewModel

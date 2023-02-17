@@ -19,8 +19,8 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.ui.welcome.compose.VerifyCodeTextField
 import com.dldmswo1209.hallymtaxi.util.ServerResponse
-import com.dldmswo1209.hallymtaxi.util.UiState
-import com.dldmswo1209.hallymtaxi.vm.AuthViewModel
+import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Timer
 import kotlin.concurrent.timer

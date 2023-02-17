@@ -1,7 +1,7 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
 import com.dldmswo1209.hallymtaxi.data.model.User
-import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.data.UiState
 
 interface AuthRepository {
     fun checkEmail(email: String, result: (UiState<String>) -> Unit)

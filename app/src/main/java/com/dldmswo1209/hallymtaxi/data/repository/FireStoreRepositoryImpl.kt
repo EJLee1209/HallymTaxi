@@ -1,11 +1,10 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
-import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
-import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.data.UiState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -71,7 +70,6 @@ class FireStoreRepositoryImpl(
                                 )
                             }
                     }
-
                 }
 
             }else{
@@ -80,10 +78,6 @@ class FireStoreRepositoryImpl(
                 )
             }
         }
-    }
-
-    override fun deleteRoom(roomId: String) {
-        fireStore.collection("Room").document(roomId).delete()
     }
 
     override fun exitRoom(user: User, room: CarPoolRoom, result: (UiState<String>) -> Unit) {
@@ -96,7 +90,7 @@ class FireStoreRepositoryImpl(
                 transaction.update(docRef,"userCount",userCount)
                 transaction.update(docRef, "participants", FieldValue.arrayRemove(user))
             }else{
-                deleteRoom(room.roomId)// 채팅방에 유저수가 0이므로 채팅방 삭제
+                fireStore.collection("Room").document(room.roomId).delete()
             }
             result.invoke(UiState.Success("채팅방 퇴장"))
         }

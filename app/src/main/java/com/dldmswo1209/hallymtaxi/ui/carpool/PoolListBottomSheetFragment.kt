@@ -17,8 +17,8 @@ import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.util.FireStoreResponse.JOIN_ROOM_SUCCESS
-import com.dldmswo1209.hallymtaxi.util.UiState
-import com.dldmswo1209.hallymtaxi.vm.MainViewModel
+import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*

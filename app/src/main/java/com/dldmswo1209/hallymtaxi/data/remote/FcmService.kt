@@ -1,4 +1,4 @@
-package com.dldmswo1209.hallymtaxi.service
+package com.dldmswo1209.hallymtaxi.data.remote
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -17,7 +17,6 @@ import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import javax.inject.Inject
 
 class FcmService : FirebaseMessagingService() {
     private var broadcaster: LocalBroadcastManager? = null

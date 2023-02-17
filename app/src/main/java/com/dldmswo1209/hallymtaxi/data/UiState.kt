@@ -1,4 +1,4 @@
-package com.dldmswo1209.hallymtaxi.util
+package com.dldmswo1209.hallymtaxi.data
 
 sealed class UiState<out T> {
     // Loading, Success, Failure

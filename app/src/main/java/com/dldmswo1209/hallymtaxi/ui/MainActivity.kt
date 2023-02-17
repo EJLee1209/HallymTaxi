@@ -15,14 +15,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
-import com.dldmswo1209.hallymtaxi.common.FirebaseAnalyticsManager
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
-import com.dldmswo1209.hallymtaxi.vm.MainViewModel
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
+import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -1,7 +1,7 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
 import com.dldmswo1209.hallymtaxi.data.model.VerifyInfo
-import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.data.UiState
 
 interface ServerRepository {
     fun sendVerifyMail(email: String, result: (UiState<VerifyInfo>) -> Unit)

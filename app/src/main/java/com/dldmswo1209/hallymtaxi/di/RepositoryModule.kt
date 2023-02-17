@@ -1,11 +1,10 @@
 package com.dldmswo1209.hallymtaxi.di
 
-import com.dldmswo1209.hallymtaxi.data.database.AppDatabase
 import com.dldmswo1209.hallymtaxi.data.database.ChatDao
 import com.dldmswo1209.hallymtaxi.data.database.RoomInfoDao
 import com.dldmswo1209.hallymtaxi.data.repository.*
-import com.dldmswo1209.hallymtaxi.retrofit.KakaoApiClient
-import com.dldmswo1209.hallymtaxi.retrofit.MainServerApiClient
+import com.dldmswo1209.hallymtaxi.data.remote.KakaoApi
+import com.dldmswo1209.hallymtaxi.data.remote.MainServerApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -21,7 +20,7 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideServerRepository(
-        client: MainServerApiClient,
+        client: MainServerApi,
     ) : ServerRepository = ServerRepositoryImpl(client)
 
     @Provides
@@ -48,7 +47,7 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideKakaoRepository(
-        client: KakaoApiClient
+        client: KakaoApi
     ) : KakaoRepository = KakaoRepositoryImpl(client)
 
 }

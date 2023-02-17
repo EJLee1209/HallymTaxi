@@ -1,24 +1,22 @@
-package com.dldmswo1209.hallymtaxi.retrofit
+package com.dldmswo1209.hallymtaxi.data.remote
 
 import com.dldmswo1209.hallymtaxi.data.model.VerifyInfo
-import com.dldmswo1209.hallymtaxi.util.Keys.BASE_URL
+import com.dldmswo1209.hallymtaxi.util.Keys.API_EMAIL_CREATE
+import com.dldmswo1209.hallymtaxi.util.Keys.API_EMAIL_VERIFY
+import com.dldmswo1209.hallymtaxi.util.Keys.API_MESSAGE_PUSH
 import retrofit2.Call
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface MainServerApiClient {
+interface MainServerApi {
     // 인증 요청 생성
-    @POST("api/email/create")
+    @POST(API_EMAIL_CREATE)
     fun sendVerifyMail(
         @Query("email") email: String = ""
     ): Call<VerifyInfo>
 
     // 인증 요청
-    @POST("api/email/verify")
+    @POST(API_EMAIL_VERIFY)
     fun requestVerify(
         @Query("email") email: String,
         @Query("code") code: String
@@ -27,7 +25,7 @@ interface MainServerApiClient {
     // 인증 상태 확인
 
     // 푸시 메세지
-    @POST("/api/message/push")
+    @POST(API_MESSAGE_PUSH)
     fun sendPushMessage(
         @Query("token") token: String,
         @Query("id") id: String,

@@ -1,8 +1,8 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
 import com.dldmswo1209.hallymtaxi.data.model.VerifyInfo
-import com.dldmswo1209.hallymtaxi.retrofit.MainServerApiClient
-import com.dldmswo1209.hallymtaxi.util.UiState
+import com.dldmswo1209.hallymtaxi.data.remote.MainServerApi
+import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.util.ServerResponse.MESSAGE_INVALID_CODE
 import com.dldmswo1209.hallymtaxi.util.ServerResponse.MESSAGE_NO_REQUEST_USER
 import com.dldmswo1209.hallymtaxi.util.ServerResponse.MESSAGE_TIME_OUT
@@ -14,7 +14,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class ServerRepositoryImpl(
-    private val client: MainServerApiClient,
+    private val client: MainServerApi,
 ) : ServerRepository {
 
     override fun sendVerifyMail(email: String, result: (UiState<VerifyInfo>) -> Unit) {

@@ -1,7 +1,8 @@
 google-services.json
 
 /src/main/jniLibs
-libs
-/src/main/java/com/dldmswo1209/hallymtaxi/util/Constants.kt
-
 src/main/res/values
+/src/main/java/com/dldmswo1209/hallymtaxi/util
+
+proguard-rules.pro
+libs

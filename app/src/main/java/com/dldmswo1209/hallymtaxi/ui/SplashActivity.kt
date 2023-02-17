@@ -1,13 +1,8 @@
 package com.dldmswo1209.hallymtaxi.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,15 +10,10 @@ import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.common.MyApplication
-import com.dldmswo1209.hallymtaxi.data.model.User
-import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
-import com.dldmswo1209.hallymtaxi.util.UiState
-import com.dldmswo1209.hallymtaxi.vm.MainViewModel
-import com.kakao.util.maps.helper.Utility
+import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")

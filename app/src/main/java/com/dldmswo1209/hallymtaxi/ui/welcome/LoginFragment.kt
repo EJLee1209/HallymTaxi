@@ -14,8 +14,8 @@ import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.databinding.FragmentLoginBinding
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
-import com.dldmswo1209.hallymtaxi.util.UiState
-import com.dldmswo1209.hallymtaxi.vm.AuthViewModel
+import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
