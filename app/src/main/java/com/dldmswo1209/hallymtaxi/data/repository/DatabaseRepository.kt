@@ -4,7 +4,6 @@ import com.dldmswo1209.hallymtaxi.data.model.Chat
 import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 
 interface DatabaseRepository {
-
     fun saveChat(chat: Chat)
     fun updateChatById(id: String, sendSuccess: String)
     fun deleteChat(id: String)
