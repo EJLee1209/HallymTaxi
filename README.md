@@ -20,12 +20,6 @@
 
 <br>
 
-## ⚙️ 기술 스택
-
-
-<br>
-<br>
-
 ## 🏗 아키텍쳐
 <img src="https://velog.velcdn.com/images%2Fdddooo9%2Fpost%2F02803dfe-c2e7-4cea-9cf7-74d757e60f2d%2Fimage.png"/>
 
@@ -38,6 +32,24 @@
 - ui : ui 코드 <br>
 - viewmodel : State Holder 클래스 <br>
 
+<br>
+
+## ⚙️ 사용 기술 및 라이브러리
+- Android Studio(Kotlin)
+- MVVM Pattern
+- Jetpack Compose
+- Dagger Hilt
+- Room
+- Paging 3.0
+- Coroutine
+- Retrofit2
+- Navigation
+- KAKAO MAP API
+- Lottie
+- Firebase FireStore
+- Firebase Authentication 
+- Firebase Cloud Messaging
+ 
 <br>
 
 ## 🏃🏻 기술적 도전
