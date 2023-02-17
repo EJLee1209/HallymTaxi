@@ -29,7 +29,7 @@
 - common : 전역에서 사용되는 클래스 또는 BindingAdapter <br>
 - data : local DB, Model, Repository 등 비즈니스 로직 포함 <br>
 - di : 의존성 주입을 위한 Module <br>
-- ui : ui 코드 <br>
+- ui : UI 로직 포함 <br>
 - viewmodel : State Holder 클래스 <br>
 
 <br>
