@@ -27,13 +27,16 @@
 <br>
 
 ## 🏗 아키텍쳐
-<img src="https://developer.android.com/static/topic/libraries/architecture/images/mad-arch-overview.png?hl=ko"/>
-안드로이드 권장 아키텍쳐 적용
+<img src="https://velog.velcdn.com/images%2Fdddooo9%2Fpost%2F02803dfe-c2e7-4cea-9cf7-74d757e60f2d%2Fimage.png"/>
 
 <br>
 
 ## 🗂 폴더 구조
-
+- common : 전역에서 사용되는 클래스 또는 BindingAdapter <br>
+- data : local DB, Model, Repository 등 비즈니스 로직 포함 <br>
+- di : 의존성 주입을 위한 Module <br>
+- ui : ui 코드 <br>
+- viewmodel : State Holder 클래스 <br>
 
 <br>
 
