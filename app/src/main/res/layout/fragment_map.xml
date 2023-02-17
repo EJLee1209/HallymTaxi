@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="room"
             type="com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom" />
+
         <variable
             name="fragment"
             type="com.dldmswo1209.hallymtaxi.ui.map.MapFragment" />
@@ -52,11 +54,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="13dp"
                 android:layout_marginEnd="16dp"
+                android:onClick="@{()->fragment.onClickInitSearchIcon()}"
                 android:src="@drawable/ic_search"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:onClick="@{()->fragment.onClickInitSearchIcon()}"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -121,11 +123,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="13dp"
                 android:layout_marginEnd="21dp"
+                android:onClick="@{()->fragment.onClickSearchIcon()}"
                 android:src="@drawable/ic_search"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:onClick="@{()->fragment.onClickSearchIcon()}"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -142,17 +144,17 @@
             android:id="@+id/shortcut_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
+            android:clipToPadding="false"
             android:paddingHorizontal="12dp"
-            app:layout_constraintTop_toBottomOf="@id/init_search_layout"
             android:scrollbarSize="0dp"
-            android:clipToPadding="false">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/init_search_layout">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="9dp"
-                android:clipToPadding="false">
+                android:clipToPadding="false"
+                android:padding="9dp">
 
                 <TextView
                     android:id="@+id/btn_short_cut_chuncheon_station"
@@ -161,10 +163,10 @@
                     android:layout_height="30dp"
                     android:layout_marginEnd="5dp"
                     android:background="@drawable/selector_toggle_button"
+                    android:elevation="8dp"
                     android:paddingHorizontal="24dp"
                     android:paddingVertical="6dp"
-                    android:text="춘천역"
-                    android:elevation="8dp"/>
+                    android:text="춘천역" />
 
                 <TextView
                     android:id="@+id/btn_short_cut_hallym"
@@ -173,10 +175,10 @@
                     android:layout_height="30dp"
                     android:layout_marginEnd="5dp"
                     android:background="@drawable/selector_toggle_button"
+                    android:elevation="8dp"
                     android:paddingHorizontal="24dp"
                     android:paddingVertical="6dp"
-                    android:text="한림대"
-                    android:elevation="8dp"/>
+                    android:text="한림대" />
 
                 <TextView
                     android:id="@+id/btn_short_cut_myeong_dong"
@@ -185,10 +187,10 @@
                     android:layout_height="30dp"
                     android:layout_marginEnd="5dp"
                     android:background="@drawable/selector_toggle_button"
+                    android:elevation="8dp"
                     android:paddingHorizontal="24dp"
                     android:paddingVertical="6dp"
-                    android:text="명동입구"
-                    android:elevation="8dp"/>
+                    android:text="명동입구" />
 
                 <TextView
                     android:id="@+id/btn_short_cut_bus_terminal"
@@ -197,10 +199,10 @@
                     android:layout_height="30dp"
                     android:layout_marginEnd="5dp"
                     android:background="@drawable/selector_toggle_button"
+                    android:elevation="8dp"
                     android:paddingHorizontal="24dp"
                     android:paddingVertical="6dp"
-                    android:text="버스터미널"
-                    android:elevation="8dp"/>
+                    android:text="버스터미널" />
 
                 <TextView
                     android:id="@+id/btn_short_cut_kangwon_univ"
@@ -209,92 +211,104 @@
                     android:layout_height="30dp"
                     android:layout_marginEnd="5dp"
                     android:background="@drawable/selector_toggle_button"
+                    android:elevation="8dp"
                     android:paddingHorizontal="24dp"
                     android:paddingVertical="6dp"
-                    android:text="강원대학교"
-                    android:elevation="8dp"/>
+                    android:text="강원대학교" />
 
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
         </HorizontalScrollView>
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/view_current_my_room"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/background_grey_r10"
-            android:backgroundTint="@color/hallym_blue_3351b9"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginHorizontal="21dp"
             android:layout_marginBottom="102dp"
-            android:elevation="10dp"
+            android:backgroundTint="@color/hallym_blue_3351b9"
+            android:clickable="true"
+            android:onClick="@{()->fragment.onClickViewMyCurrentRoom()}"
             android:visibility="gone"
-            android:onClick="@{()->fragment.onClickViewMyCurrentRoom()}">
+            app:cardCornerRadius="10dp"
+            app:cardElevation="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible">
 
-            <TextView
-                style="@style/TextSubTitle.White.Bold"
-                android:id="@+id/tv_place_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="한림대학교 대학본부"
-                android:text="@{room.startPlace.place_name}"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"/>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/iv_down_right_arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/corner_down_right_white"
-                app:layout_constraintTop_toBottomOf="@id/tv_place_name"
-                app:layout_constraintStart_toStartOf="@id/tv_place_name"
-                android:layout_marginTop="2dp"/>
+                <TextView
+                    android:id="@+id/tv_place_name"
+                    style="@style/TextSubTitle.White.Bold"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="12dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="@{room.startPlace.place_name}"
+                    app:layout_constraintEnd_toStartOf="@id/tv_start_time"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="한림대학교 대학본부" />
 
-            <TextView
-                style="@style/TextSubTitle.White.Bold"
-                android:id="@+id/tv_end_place_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="춘천역 경춘선"
-                android:text="@{room.endPlace.place_name}"
-                app:layout_constraintTop_toBottomOf="@id/tv_place_name"
-                app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
-                android:layout_marginTop="3dp"
-                android:layout_marginStart="6dp"
-                android:paddingBottom="12dp"/>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_down_right_arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:src="@drawable/corner_down_right_white"
+                    app:layout_constraintStart_toStartOf="@id/tv_place_name"
+                    app:layout_constraintTop_toBottomOf="@id/tv_place_name" />
 
-            <TextView
-                style="@style/Text12.White"
-                android:id="@+id/tv_start_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="오후 2:40"
-                departure_time="@{room.departureTime}"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="8dp"/>
+                <TextView
+                    android:id="@+id/tv_end_place_name"
+                    style="@style/TextSubTitle.White.Bold"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="3dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingBottom="12dp"
+                    android:text="@{room.endPlace.place_name}"
+                    app:layout_constraintEnd_toEndOf="@id/tv_place_name"
+                    app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
+                    app:layout_constraintTop_toBottomOf="@id/tv_place_name"
+                    tools:text="춘천역 경춘선" />
 
-            <TextView
-                style="@style/TextHeadline5.White.Bold"
-                android:id="@+id/tv_user_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_start_time"
-                android:layout_marginEnd="19dp"
-                android:paddingBottom="11dp"
-                tools:text="2/4"
-                android:text="@{@string/room_count_format(room.userCount, room.userMaxCount)}"/>
+                <TextView
+                    android:id="@+id/tv_start_time"
+                    style="@style/Text12.White"
+                    departure_time="@{room.departureTime}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="오후 2:40" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tv_user_count"
+                    style="@style/TextHeadline5.White.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="19dp"
+                    android:paddingBottom="11dp"
+                    android:text="@{@string/room_count_format(room.userCount, room.userMaxCount)}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_start_time"
+                    tools:text="2/4" />
 
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

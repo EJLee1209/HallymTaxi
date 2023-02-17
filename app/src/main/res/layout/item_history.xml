@@ -11,100 +11,110 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/hallym_white_ffffff"
+        android:clickable="true"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp">
 
-        <TextView
-            android:id="@+id/tv_start_place_name"
-            style="@style/TextSubTitle.Black.Bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="18dp"
-            android:text="@{room_info.startPlaceName}"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="한림대학교 대학본부" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.utils.widget.ImageFilterView
-            android:id="@+id/iv_down_right_arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/corner_down_right_blue"
-            android:tint="@color/hallym_grey_667080"
-            app:layout_constraintStart_toStartOf="@id/tv_start_place_name"
-            app:layout_constraintTop_toBottomOf="@id/tv_start_place_name" />
+            <TextView
+                android:id="@+id/tv_start_place_name"
+                style="@style/TextSubTitle.Black.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="18dp"
+                android:text="@{room_info.startPlaceName}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="한림대학교 대학본부" />
 
-        <TextView
-            android:id="@+id/tv_end_place_name"
-            style="@style/TextSubTitle.Black.Bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1.4dp"
-            android:text="@{room_info.endPlaceName}"
-            app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
-            app:layout_constraintTop_toBottomOf="@id/tv_start_place_name"
-            tools:text="춘천역 경춘선" />
+            <androidx.constraintlayout.utils.widget.ImageFilterView
+                android:id="@+id/iv_down_right_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/corner_down_right_blue"
+                android:tint="@color/hallym_grey_667080"
+                app:layout_constraintStart_toStartOf="@id/tv_start_place_name"
+                app:layout_constraintTop_toBottomOf="@id/tv_start_place_name" />
 
-        <TextView
-            android:id="@+id/tv_last_msg"
-            style="@style/Text14.667080"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="8.6dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:paddingBottom="17dp"
-            android:text="@{room_info.lastMsg}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_end_place_name"
-            tools:text="안녕하세요. 반갑습니다!" />
+            <TextView
+                android:id="@+id/tv_end_place_name"
+                style="@style/TextSubTitle.Black.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1.4dp"
+                android:text="@{room_info.endPlaceName}"
+                app:layout_constraintStart_toEndOf="@id/iv_down_right_arrow"
+                app:layout_constraintTop_toBottomOf="@id/tv_start_place_name"
+                tools:text="춘천역 경춘선" />
 
-        <TextView
-            android:id="@+id/tv_last_date_title"
-            style="@style/Text14.d9d9d9.Bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="마지막 대화"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="17dp"
-            android:layout_marginEnd="14dp"/>
+            <TextView
+                android:id="@+id/tv_last_msg"
+                style="@style/Text14.667080"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginTop="8.6dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingBottom="17dp"
+                android:text="@{room_info.lastMsg}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_end_place_name"
+                tools:text="안녕하세요. 반갑습니다!" />
 
-        <TextView
-            android:id="@+id/tv_last_date"
-            style="@style/Text14.d9d9d9.Bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/tv_last_date_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="14dp"
-            android:layout_marginTop="5dp"
-            date="@{room_info.lastReceiveMsgDateTime}"
-            tools:text="2023-01-29"/>
+            <TextView
+                android:id="@+id/tv_last_date_title"
+                style="@style/Text14.d9d9d9.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="마지막 대화"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="17dp"
+                android:layout_marginEnd="14dp"/>
 
-        <TextView
-            android:id="@+id/tv_last_time"
-            style="@style/Text14.d9d9d9.Bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:layout_marginEnd="14dp"
-            time="@{room_info.lastReceiveMsgDateTime.toString()}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_last_date"
-            tools:text="오후 03:12" />
+            <TextView
+                android:id="@+id/tv_last_date"
+                style="@style/Text14.d9d9d9.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/tv_last_date_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="14dp"
+                android:layout_marginTop="5dp"
+                date="@{room_info.lastReceiveMsgDateTime}"
+                tools:text="2023-01-29"/>
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/hallym_grey_f5f5f5"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/tv_last_time"
+                style="@style/Text14.d9d9d9.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="14dp"
+                time="@{room_info.lastReceiveMsgDateTime.toString()}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_last_date"
+                tools:text="오후 03:12" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/hallym_grey_f5f5f5"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 </layout>

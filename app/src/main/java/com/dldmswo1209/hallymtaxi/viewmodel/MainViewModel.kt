@@ -109,6 +109,12 @@ class MainViewModel @Inject constructor(
         authRepository.logoutUser(uid){ _logout.postValue(it) }
     }
 
+    fun updateFcmToken() {
+        fireStoreRepository.updateFcmToken{
+            _updateToken.postValue(it)
+        }
+    }
+
     fun searchKeyword(keyword: String, isStartPoint: Boolean) = viewModelScope.launch {
         try {
             if (isStartPoint) {
@@ -230,27 +236,6 @@ class MainViewModel @Inject constructor(
         _roomHistory.postValue(databaseRepository.detachRoomInfoHistory())
     }
 
-    private fun userListenerRemove(){
-        userListener?.let{
-            Log.d("firebaseSnapshotTestt", "유저 정보 리스너 제거")
-            it.remove()
-        }
-    }
-
-    private fun myRoomListenerRemove(){
-        myRoomListener?.let{
-            Log.d("firebaseSnapshotTestt", "현재 방 정보 리스너 제거")
-            it.remove()
-        }
-    }
-
-    fun updateFcmToken() {
-        fireStoreRepository.updateFcmToken{
-            _updateToken.postValue(it)
-        }
-    }
-
-
     fun detachChatList(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
         _chatList.postValue(databaseRepository.detachChatList(roomId))
     }
@@ -259,6 +244,14 @@ class MainViewModel @Inject constructor(
         Toast.makeText(this@MainViewModel.context, "네트워크 연결상태를 확인해주세요", Toast.LENGTH_SHORT)
             .show()
         e.printStackTrace()
+    }
+
+    private fun userListenerRemove(){
+        userListener?.remove()
+    }
+
+    private fun myRoomListenerRemove(){
+        myRoomListener?.remove()
     }
 
     override fun onCleared() {

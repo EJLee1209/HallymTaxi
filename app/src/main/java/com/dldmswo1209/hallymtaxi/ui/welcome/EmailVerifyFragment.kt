@@ -28,6 +28,8 @@ class EmailVerifyFragment: Fragment() {
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
         ViewMarginDynamicChanger(requireActivity())
     }
+    private var isFirst = true
+
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드가 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {
@@ -91,10 +93,10 @@ class EmailVerifyFragment: Fragment() {
                     viewModel.sendVerifyMail(email)
                 }
             }
-
         }
 
         viewModel.isSentMail.observe(viewLifecycleOwner){state->
+            if(!isFirst) return@observe
             when(state){
                 is UiState.Loading -> {
                     loadingDialog?.show()
@@ -108,6 +110,7 @@ class EmailVerifyFragment: Fragment() {
                     val action =
                         EmailVerifyFragmentDirections.actionNavigationEmailVerifyToNavigationEmailVerifyCode(email)
                     findNavController().navigate(action)
+                    isFirst = false
                 }
             }
         }
@@ -132,6 +135,7 @@ class EmailVerifyFragment: Fragment() {
         }
         email = "${binding.etEmail.text}@hallym.ac.kr"
         viewModel.checkEmail(email)
+        isFirst = true
     }
 
     fun clickBackBtn(){
