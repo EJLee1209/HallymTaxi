@@ -37,7 +37,11 @@
     <fragment
         android:id="@+id/navigation_menu"
         android:name="com.dldmswo1209.hallymtaxi.ui.menu.MenuFragment"
-        android:label="MenuFragment" />
+        android:label="MenuFragment" >
+        <action
+            android:id="@+id/action_navigation_menu_to_favoriteListFragment"
+            app:destination="@id/favoriteListFragment" />
+    </fragment>
     <fragment
         android:id="@+id/navigation_create_room"
         android:name="com.dldmswo1209.hallymtaxi.ui.carpool.CreateRoomFragment"
@@ -56,10 +60,6 @@
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/slide_out_right" />
     </fragment>
-    <dialog
-        android:id="@+id/poolListBottomSheetFragment"
-        android:name="com.dldmswo1209.hallymtaxi.ui.carpool.PoolListBottomSheetFragment"
-        android:label="PoolListBottomSheetFragment" />
     <fragment
         android:id="@+id/chatRoomFragment"
         android:name="com.dldmswo1209.hallymtaxi.ui.carpool.ChatRoomFragment"
@@ -82,4 +82,16 @@
             app:argType="string"
             android:defaultValue='""' />
     </fragment>
+    <fragment
+        android:id="@+id/favoriteListFragment"
+        android:name="com.dldmswo1209.hallymtaxi.ui.menu.FavoriteListFragment"
+        android:label="FavoriteListFragment" >
+        <action
+            android:id="@+id/action_favoriteListFragment_to_favoriteMapFragment"
+            app:destination="@id/favoriteMapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/favoriteMapFragment"
+        android:name="com.dldmswo1209.hallymtaxi.ui.menu.FavoriteMapFragment"
+        android:label="FavoriteMapFragment" />
 </navigation>

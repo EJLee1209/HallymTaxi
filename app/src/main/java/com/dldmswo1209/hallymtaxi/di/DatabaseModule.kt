@@ -23,7 +23,6 @@ object DatabaseModule {
             .fallbackToDestructiveMigration()
             .build()
 
-
     @Provides
     @Singleton
     fun provideChatDao(
@@ -35,4 +34,11 @@ object DatabaseModule {
     fun provideRoomInfoDao(
         appDatabase: AppDatabase
     ) = appDatabase.roomInfoDao()
+
+    @Provides
+    @Singleton
+    fun provideFavoriteDao(
+        appDatabase: AppDatabase
+    ) = appDatabase.favoriteDao()
+
 }

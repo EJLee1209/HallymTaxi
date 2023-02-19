@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="fragment"
             type="com.dldmswo1209.hallymtaxi.ui.carpool.ChatRoomFragment" />
@@ -81,6 +80,34 @@
             app:layout_constraintTop_toTopOf="@id/bg_white"
             tools:text="인원 2명" />
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/alone_guide_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_user_count"
+            android:gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible"
+            aloneGuideVisibility = "@{room.userCount}">
+
+            <androidx.constraintlayout.utils.widget.ImageFilterView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/img_character"/>
+
+            <TextView
+                style="@style/Text13.Black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/notify_when_friend_come_in"
+                android:gravity="center"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_message"
             android:layout_width="0dp"
@@ -92,7 +119,9 @@
             app:layout_constraintBottom_toTopOf="@id/input_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_user_count" />
+            app:layout_constraintTop_toBottomOf="@id/tv_user_count"
+            tools:listitem="@layout/item_other_chat"/>
+
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/input_layout"

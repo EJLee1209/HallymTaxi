@@ -26,3 +26,8 @@ fun dateTimeVisibility(view: TextView, sendSuccess : String){
 fun cancelButtonVisibility(view: View, sendSuccess: String){
     view.visibility = if(sendSuccess == SEND_STATE_FAIL) View.VISIBLE else View.GONE
 }
+
+@BindingAdapter("aloneGuideVisibility")
+fun aloneGuideVisibility(view: View, userCount: Int){
+    view.visibility = if(userCount == 1) View.VISIBLE else View.GONE
+}

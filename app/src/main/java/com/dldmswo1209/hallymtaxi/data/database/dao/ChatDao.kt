@@ -1,11 +1,13 @@
-package com.dldmswo1209.hallymtaxi.data.database
+package com.dldmswo1209.hallymtaxi.data.database.dao
 
+import android.provider.ContactsContract
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.dldmswo1209.hallymtaxi.data.model.Chat
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChatDao {

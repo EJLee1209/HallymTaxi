@@ -84,6 +84,9 @@ class MainViewModel @Inject constructor(
     private var _deactivateRoom = MutableLiveData<UiState<String>>()
     val deactivateRoom : LiveData<UiState<String>> = _deactivateRoom
 
+    private var _favorites = MutableLiveData<List<Place>>()
+    val favorites : LiveData<List<Place>> = _favorites
+
     fun getUserInfo(){
         authRepository.getUserInfo { _user.postValue(it) }
     }
@@ -238,6 +241,18 @@ class MainViewModel @Inject constructor(
 
     fun detachChatList(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
         _chatList.postValue(databaseRepository.detachChatList(roomId))
+    }
+
+    fun getFavorites() = viewModelScope.launch(Dispatchers.IO) {
+        _favorites.postValue(databaseRepository.getFavorites())
+    }
+
+    fun saveFavorite(place: Place) = viewModelScope.launch(Dispatchers.IO) {
+        databaseRepository.saveFavorite(place)
+    }
+
+    fun deleteFavorite(place: Place) = viewModelScope.launch(Dispatchers.IO) {
+        databaseRepository.deleteFavorite(place)
     }
 
     private fun networkErrorMessage(e: Exception){

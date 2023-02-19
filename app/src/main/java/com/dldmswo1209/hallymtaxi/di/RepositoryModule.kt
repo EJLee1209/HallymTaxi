@@ -1,7 +1,8 @@
 package com.dldmswo1209.hallymtaxi.di
 
-import com.dldmswo1209.hallymtaxi.data.database.ChatDao
-import com.dldmswo1209.hallymtaxi.data.database.RoomInfoDao
+import com.dldmswo1209.hallymtaxi.data.database.dao.ChatDao
+import com.dldmswo1209.hallymtaxi.data.database.dao.FavoriteDao
+import com.dldmswo1209.hallymtaxi.data.database.dao.RoomInfoDao
 import com.dldmswo1209.hallymtaxi.data.repository.*
 import com.dldmswo1209.hallymtaxi.data.remote.KakaoApi
 import com.dldmswo1209.hallymtaxi.data.remote.MainServerApi
@@ -41,8 +42,9 @@ object RepositoryModule {
     @Singleton
     fun provideRoomRepository(
         chatDao: ChatDao,
-        roomInfoDao: RoomInfoDao
-    ) : DatabaseRepository = DatabaseRepositoryImpl(chatDao, roomInfoDao)
+        roomInfoDao: RoomInfoDao,
+        favoriteDao: FavoriteDao
+    ) : DatabaseRepository = DatabaseRepositoryImpl(chatDao, roomInfoDao, favoriteDao)
 
     @Provides
     @Singleton

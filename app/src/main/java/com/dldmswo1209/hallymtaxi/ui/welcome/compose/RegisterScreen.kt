@@ -175,7 +175,7 @@ fun RegisterScreen(
             }
             2 -> {
                 nameOk = true
-                guideText = "성별을 선택해주세요"
+                guideText = "성별을 선택해주세요(잘못 기재시 제재 대상이 됩니다)"
                 focusManager.clearFocus()
             }
             3 -> {

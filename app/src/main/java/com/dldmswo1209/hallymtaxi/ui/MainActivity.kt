@@ -19,6 +19,7 @@ import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
+import com.google.android.gms.common.api.GoogleApiClient
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         getIntentExtraData()
         setObserver()
         bottomNavigationSetup()
+
     }
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기
@@ -63,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         }else{
             intent.getSerializableExtra("userInfo") as User
         }
-        Log.d("testt", "main user: ${user}")
     }
     private fun setObserver(){
         checkNetwork.isConnected.observe(this){
@@ -71,16 +72,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewModel.subscribeUser()?.observe(this){
-            Log.d("testt", "subscribeUser 옵저버 등록: ")
             myApplication.setUser(it)
         } ?: kotlin.run {
             startActivity(Intent(this, SplashActivity::class.java))
         }
 
         user?.let {
-            Log.d("testt", "subscribeMyRoom 옵저버 등록: ")
             viewModel.subscribeMyRoom(it).observe(this){room->
-                Log.d("testt", "main my room : ${room}")
                 myApplication.setMyRoom(room)
             }
         }

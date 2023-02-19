@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.databinding.FragmentMenuBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
@@ -73,9 +75,15 @@ class MenuFragment: Fragment() {
             }
         }
     }
+
+
     fun onClickLogout(){
         user?.let {
             viewModel.logout(it.uid)
         }
+    }
+
+    fun onClickFavorite(){
+        findNavController().navigate(R.id.action_navigation_menu_to_favoriteListFragment)
     }
 }
