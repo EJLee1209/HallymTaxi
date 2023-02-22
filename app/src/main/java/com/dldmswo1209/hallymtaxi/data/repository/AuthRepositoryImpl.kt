@@ -103,6 +103,33 @@ class AuthRepositoryImpl(
                     )
                 } ?: kotlin.run { result.invoke(UiState.Failure("유저 정보가 없습니다")) }
             }
+            .addOnFailureListener {
+                result.invoke(
+                    UiState.Failure("유저 정보를 가져오지 못했습니다")
+                )
+            }
+    }
+
+    override fun updateUserName(newName: String, result: (UiState<String>) -> Unit) {
+        if (auth.currentUser == null) {
+            result.invoke(
+                UiState.Failure("로그인 필요")
+            )
+            return
+        }
+        fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
+            .update("name", newName)
+            .addOnSuccessListener {
+                result.invoke(
+                    UiState.Success("이름 변경 성공")
+                )
+            }
+            .addOnFailureListener {
+                result.invoke(
+                    UiState.Failure("이름 변경 실패")
+                )
+            }
+
     }
 
 }

@@ -86,4 +86,8 @@ class MenuFragment: Fragment() {
     fun onClickFavorite(){
         findNavController().navigate(R.id.action_navigation_menu_to_favoriteListFragment)
     }
+
+    fun onClickUserInfo(){
+        findNavController().navigate(R.id.action_navigation_menu_to_userInfoFragment)
+    }
 }

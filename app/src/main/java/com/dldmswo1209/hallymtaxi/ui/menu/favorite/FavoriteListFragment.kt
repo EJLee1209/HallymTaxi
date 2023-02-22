@@ -59,16 +59,19 @@ class FavoriteListFragment : Fragment() {
         viewModel.getFavorites()
         viewModel.favorites.observe(viewLifecycleOwner) { favorites ->
             adapter.submitList(favorites)
+            if(favorites.isEmpty()){
+                binding.noFavorite.visibility = View.VISIBLE
+            }else{
+                binding.noFavorite.visibility = View.GONE
+            }
         }
 
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun onClickUpdate() {
         updateUI()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun onClickAdd() {
         if(!isEditMode){
             findNavController().navigate(R.id.action_favoriteListFragment_to_favoriteMapFragment)

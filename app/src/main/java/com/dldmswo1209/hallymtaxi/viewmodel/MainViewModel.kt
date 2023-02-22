@@ -87,6 +87,9 @@ class MainViewModel @Inject constructor(
     private var _favorites = MutableLiveData<List<Place>>()
     val favorites : LiveData<List<Place>> = _favorites
 
+    private var _updateUserName = MutableLiveData<UiState<String>>()
+    val updateUserName : LiveData<UiState<String>> = _updateUserName
+
     fun getUserInfo(){
         authRepository.getUserInfo { _user.postValue(it) }
     }
@@ -110,6 +113,10 @@ class MainViewModel @Inject constructor(
 
     fun logout(uid: String) {
         authRepository.logoutUser(uid){ _logout.postValue(it) }
+    }
+
+    fun updateUserName(newName: String) {
+        authRepository.updateUserName(newName) { _updateUserName.postValue(it) }
     }
 
     fun updateFcmToken() {

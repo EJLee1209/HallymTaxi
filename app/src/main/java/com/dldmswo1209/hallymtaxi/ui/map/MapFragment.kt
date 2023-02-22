@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.R
+import com.dldmswo1209.hallymtaxi.common.MetricsUtil
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.location.LocationService
 import com.dldmswo1209.hallymtaxi.common.toast
@@ -260,7 +261,7 @@ class MapFragment : Fragment() {
             ConstraintSet.TOP,
             binding.searchLayout.id,
             ConstraintSet.BOTTOM,
-            9
+            MetricsUtil.convertDpToPixel(9, requireActivity())
         )
 
         constraintSet.applyTo(constraintLayout)

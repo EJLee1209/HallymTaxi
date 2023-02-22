@@ -26,20 +26,16 @@ class SearchResultBottomSheetFragment(
         savedInstanceState: Bundle?,
     ): View? {
         binding = FragmentSearchResultBottomSheetBinding.inflate(inflater, container, false)
-        val filteredSearchList = mutableListOf<Place>()
         val adapter = SearchResultListAdapter(onClick = {
             onClickPlace(it)
             dialog?.dismiss()
         })
 
-        searchList.forEach {
-            if (it.road_address_name.isNotBlank()) filteredSearchList.add(it)
-        }
         binding.resultRecyclerView.adapter = adapter.apply {
-            if (filteredSearchList.isEmpty()) {
+            if (searchList.isEmpty()) {
                 binding.tvNoResult.visibility = View.VISIBLE
             } else {
-                submitList(filteredSearchList)
+                submitList(searchList)
             }
         }
         return binding.root

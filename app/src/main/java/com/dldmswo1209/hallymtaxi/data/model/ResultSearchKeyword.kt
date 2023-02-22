@@ -14,7 +14,7 @@ data class ResultSearchKeyword(
 data class Place(
     val place_name: String = "",
     val address_name: String = "",
-    val road_address_name: String = "",
+    var road_address_name: String = "",
     val x: Double = 0.0, // longitude
     val y: Double = 0.0, // latitude
     @PrimaryKey(autoGenerate = true)

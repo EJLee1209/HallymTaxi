@@ -18,7 +18,7 @@ class KakaoRepositoryImpl(
             ) {
                 response.body()?.let { resultSearchKeyword->
                     result.invoke(
-                        UiState.Success(resultSearchKeyword)
+                        UiState.Success(filteredDocument(resultSearchKeyword))
                     )
                 } ?: kotlin.run {
                     result.invoke(
@@ -36,5 +36,15 @@ class KakaoRepositoryImpl(
 
         })
 
+    }
+
+    private fun filteredDocument(resultSearchKeyword: ResultSearchKeyword) : ResultSearchKeyword{
+        val placeList = resultSearchKeyword.documents
+        placeList.forEach {
+            if (it.road_address_name.isBlank()) it.road_address_name = it.address_name
+        }
+        resultSearchKeyword.documents = placeList
+
+        return resultSearchKeyword
     }
 }

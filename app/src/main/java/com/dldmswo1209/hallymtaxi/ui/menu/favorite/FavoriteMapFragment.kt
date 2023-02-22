@@ -11,6 +11,7 @@ import androidx.compose.material.BottomSheetState
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.dldmswo1209.hallymtaxi.common.clearFocusAndHideKeyboard
 import com.dldmswo1209.hallymtaxi.common.location.LocationService
 import com.dldmswo1209.hallymtaxi.common.toast
 import com.dldmswo1209.hallymtaxi.data.UiState
@@ -196,6 +197,7 @@ class FavoriteMapFragment : Fragment() {
             // 목적지 키워드로 주소를 검색
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 searchFromKeyword()
+                binding.etSearch.clearFocusAndHideKeyboard(requireActivity())
             }
             true
         }
