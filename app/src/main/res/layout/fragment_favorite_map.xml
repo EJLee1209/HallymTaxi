@@ -7,7 +7,7 @@
 
         <variable
             name="fragment"
-            type="com.dldmswo1209.hallymtaxi.ui.menu.FavoriteMapFragment" />
+            type="com.dldmswo1209.hallymtaxi.ui.menu.favorite.FavoriteMapFragment" />
 
         <variable
             name="currentPlace"
@@ -124,6 +124,7 @@
                     android:background="@null"
                     android:hint="장소 검색"
                     android:imeOptions="actionSearch"
+                    android:inputType="text"
                     android:maxLines="1"
                     android:paddingHorizontal="15dp"
                     android:paddingVertical="12dp"
@@ -142,14 +143,39 @@
                 android:id="@+id/rv_place_list"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginHorizontal="21dp"
                 android:clipToPadding="true"
                 android:paddingVertical="18dp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/input_layout" />
+                app:layout_constraintTop_toBottomOf="@id/input_layout"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_no_search_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_layout"
+                android:visibility="gone"
+                android:layout_marginTop="180dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/img_character"/>
+                <TextView
+                    style="@style/Text13.Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_search_list"
+                    android:layout_marginTop="3dp"/>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_add"
@@ -164,7 +190,8 @@
                 app:backgroundTint="@color/hallym_blue_3351b9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/input_layout" />
+                app:layout_constraintTop_toBottomOf="@id/input_layout"
+                android:onClick="@{()->fragment.onClickOk()}"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

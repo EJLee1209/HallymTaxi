@@ -11,7 +11,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.room.Room
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.MyApplication
-import com.dldmswo1209.hallymtaxi.data.database.AppDatabase
+import com.dldmswo1209.hallymtaxi.data.local.AppDatabase
 import com.dldmswo1209.hallymtaxi.data.model.Chat
 import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity

@@ -34,6 +34,7 @@ import net.daum.mf.map.api.MapView
 class MapFragment : Fragment() {
     private lateinit var binding: FragmentMapBinding
     private lateinit var locationService : LocationService
+    private lateinit var favoritesListAdapter: FavoritesListAdapter
     private val viewModel : MainViewModel by viewModels()
     private var isSearching = false
     private var isStartPointSearching = false
@@ -74,7 +75,6 @@ class MapFragment : Fragment() {
         init()
         setObservers()
         setEditorActionListener()
-        onShortCutButtonClickListener()
     }
     private fun init(){
         mapView = MapView(requireActivity())
@@ -82,6 +82,7 @@ class MapFragment : Fragment() {
 
         locationService = LocationService(requireActivity())
         moveCamera(hallym_lat, hallym_lng, 2f)
+
         myApplication = requireActivity().application as MyApplication
         user = myApplication.getUser() ?: kotlin.run {
             startActivity(Intent(requireActivity(), SplashActivity::class.java))
@@ -90,6 +91,13 @@ class MapFragment : Fragment() {
         }
 
         binding.fragment = this
+
+        favoritesListAdapter = FavoritesListAdapter { place ->
+            Log.d("testt", "즐겨찾기 클릭 : ${place.place_name}")
+            locationService.getCurrentAddress()
+            searchResultClickEvent(place, false)
+        }
+        binding.rvFavorites.adapter = favoritesListAdapter
     }
 
     private fun setObservers(){
@@ -176,8 +184,10 @@ class MapFragment : Fragment() {
                     }
                 }
             }
+        }
 
-
+        viewModel.favorites.observe(viewLifecycleOwner) { favorites ->
+            favoritesListAdapter.submitList(favorites)
         }
     }
 
@@ -205,35 +215,6 @@ class MapFragment : Fragment() {
         }
     }
 
-    private fun onShortCutButtonClickListener(){
-
-        binding.apply {
-            btnShortCutChuncheonStation.setOnClickListener {
-                locationService.getCurrentAddress()
-                searchResultClickEvent(place_chuncheon_station, false)
-            }
-
-            btnShortCutHallym.setOnClickListener {
-                locationService.getCurrentAddress()
-                searchResultClickEvent(place_hallym_univ, false)
-            }
-
-            btnShortCutMyeongDong.setOnClickListener {
-                locationService.getCurrentAddress()
-                searchResultClickEvent(place_myeoungdong, false)
-            }
-            btnShortCutBusTerminal.setOnClickListener {
-                locationService.getCurrentAddress()
-                searchResultClickEvent(place_terminal, false)
-            }
-
-            btnShortCutKangwonUniv.setOnClickListener {
-                locationService.getCurrentAddress()
-                searchResultClickEvent(place_kangwon_univ, false)
-            }
-        }
-
-    }
 
     private fun searchResultClickEvent(place: Place, isStartPoint: Boolean){
         val newMarker = MapPOIItem().apply {
@@ -275,12 +256,13 @@ class MapFragment : Fragment() {
         val constraintSet = ConstraintSet()
         constraintSet.clone(constraintLayout)
         constraintSet.connect(
-            binding.shortcutLayout.id,
+            binding.rvFavorites.id,
             ConstraintSet.TOP,
             binding.searchLayout.id,
             ConstraintSet.BOTTOM,
-            0
+            9
         )
+
         constraintSet.applyTo(constraintLayout)
 
         binding.initSearchLayout.visibility = View.GONE
@@ -387,6 +369,7 @@ class MapFragment : Fragment() {
         endPlace?.let {
             searchResultClickEvent(it, false)
         }
+        viewModel.getFavorites()
     }
 
     override fun onPause() {

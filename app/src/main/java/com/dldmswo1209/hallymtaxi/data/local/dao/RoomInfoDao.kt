@@ -1,4 +1,4 @@
-package com.dldmswo1209.hallymtaxi.data.database.dao
+package com.dldmswo1209.hallymtaxi.data.local.dao
 
 import androidx.room.*
 import com.dldmswo1209.hallymtaxi.data.model.RoomInfo

@@ -140,86 +140,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <HorizontalScrollView
-            android:id="@+id/shortcut_layout"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_favorites"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
             android:clipToPadding="false"
+            android:orientation="horizontal"
             android:paddingHorizontal="12dp"
-            android:scrollbarSize="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/init_search_layout">
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:padding="9dp">
-
-                <TextView
-                    android:id="@+id/btn_short_cut_chuncheon_station"
-                    style="@style/Text14.Black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/selector_toggle_button"
-                    android:elevation="8dp"
-                    android:paddingHorizontal="24dp"
-                    android:paddingVertical="6dp"
-                    android:text="춘천역" />
-
-                <TextView
-                    android:id="@+id/btn_short_cut_hallym"
-                    style="@style/Text14.Black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/selector_toggle_button"
-                    android:elevation="8dp"
-                    android:paddingHorizontal="24dp"
-                    android:paddingVertical="6dp"
-                    android:text="한림대" />
-
-                <TextView
-                    android:id="@+id/btn_short_cut_myeong_dong"
-                    style="@style/Text14.Black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/selector_toggle_button"
-                    android:elevation="8dp"
-                    android:paddingHorizontal="24dp"
-                    android:paddingVertical="6dp"
-                    android:text="명동입구" />
-
-                <TextView
-                    android:id="@+id/btn_short_cut_bus_terminal"
-                    style="@style/Text14.Black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/selector_toggle_button"
-                    android:elevation="8dp"
-                    android:paddingHorizontal="24dp"
-                    android:paddingVertical="6dp"
-                    android:text="버스터미널" />
-
-                <TextView
-                    android:id="@+id/btn_short_cut_kangwon_univ"
-                    style="@style/Text14.Black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/selector_toggle_button"
-                    android:elevation="8dp"
-                    android:paddingHorizontal="24dp"
-                    android:paddingVertical="6dp"
-                    android:text="강원대학교" />
-
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-        </HorizontalScrollView>
+            app:layout_constraintTop_toBottomOf="@id/init_search_layout"
+            tools:listitem="@layout/item_favorite" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/view_current_my_room"
@@ -314,11 +247,11 @@
             android:id="@+id/logo_kakao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginBottom="90dp"
             android:src="@drawable/kakao"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="21dp"
-            android:layout_marginBottom="90dp"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

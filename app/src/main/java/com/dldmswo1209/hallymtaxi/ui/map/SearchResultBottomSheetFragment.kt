@@ -27,10 +27,10 @@ class SearchResultBottomSheetFragment(
     ): View? {
         binding = FragmentSearchResultBottomSheetBinding.inflate(inflater, container, false)
         val filteredSearchList = mutableListOf<Place>()
-        val adapter = SearchResultListAdapter {
+        val adapter = SearchResultListAdapter(onClick = {
             onClickPlace(it)
             dialog?.dismiss()
-        }
+        })
 
         searchList.forEach {
             if (it.road_address_name.isNotBlank()) filteredSearchList.add(it)

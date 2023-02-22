@@ -4,53 +4,100 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="place"
             type="com.dldmswo1209.hallymtaxi.data.model.Place" />
+
+        <variable
+            name="isEditMode"
+            type="Boolean" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/hallym_white_ffffff"
+        android:clickable="true"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp">
 
-        <TextView
-            android:id="@+id/tv_place_name"
-            style="@style/TextSubTitle.Black.Bold"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="13dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="한림대학교"
-            android:text="@{place.place_name}"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tv_place_road_name"
-            style="@style/TextSubTitle.667080"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="3dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_place_name"
-            tools:text="강원 춘천시 한림대학길 1"
-            android:text="@{place.road_address_name}"/>
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btn_delete"
+                isEditMode="@{isEditMode}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:background="@null"
+                android:src="@drawable/ic_x_circle"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/hallym_grey_667080"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_place_road_name" />
+            <TextView
+                android:id="@+id/tv_place_name"
+                style="@style/TextSubTitle.Black.Bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="13dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{place.place_name}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_delete"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="한림대학교" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/tv_place_road_name"
+                style="@style/Text14.667080"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="7dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{place.road_address_name}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_delete"
+                app:layout_constraintTop_toBottomOf="@id/tv_place_name"
+                tools:text="강원 춘천시 한림대학길 1" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btn_right_arrow"
+                isEditMode="@{isEditMode}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="14dp"
+                android:background="@null"
+                android:src="@drawable/ic_right_arrow"
+                android:tint="@color/hallym_grey_667080"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="19dp"
+                android:background="@color/hallym_grey_D9D9D9"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_place_road_name" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
 </layout>

@@ -2,7 +2,7 @@ package com.dldmswo1209.hallymtaxi.di
 
 import android.content.Context
 import androidx.room.Room
-import com.dldmswo1209.hallymtaxi.data.database.AppDatabase
+import com.dldmswo1209.hallymtaxi.data.local.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

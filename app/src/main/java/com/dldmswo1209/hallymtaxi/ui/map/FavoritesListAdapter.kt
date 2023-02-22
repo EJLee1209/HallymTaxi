@@ -5,35 +5,28 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.dldmswo1209.hallymtaxi.databinding.ItemSearchResultBinding
 import com.dldmswo1209.hallymtaxi.data.model.Place
+import com.dldmswo1209.hallymtaxi.databinding.ItemFavoriteBinding
 
-class SearchResultListAdapter(
-    var isEditMode: Boolean = false,
-    val onClick: (Place)->Unit,
-    val onClickDelete: (Place)->Unit = {}
-): ListAdapter<Place, SearchResultListAdapter.ResultViewHolder>(diffUtil) {
+class FavoritesListAdapter(
+    val onClick: (Place) -> Unit
+) : ListAdapter<Place, FavoritesListAdapter.FavoriteViewHolder>(diffUtil) {
 
-    inner class ResultViewHolder(private val binding: ItemSearchResultBinding): RecyclerView.ViewHolder(binding.root){
-        fun bind(place: Place){
+    inner class FavoriteViewHolder(val binding: ItemFavoriteBinding) : RecyclerView.ViewHolder(binding.root){
+        fun bind(place: Place) {
             binding.place = place
-            binding.isEditMode = isEditMode
-
-            binding.root.setOnClickListener{
+            binding.cardLayout.setOnClickListener {
                 onClick(place)
-            }
-            binding.btnDelete.setOnClickListener {
-                onClickDelete(place)
             }
             binding.executePendingBindings()
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultViewHolder {
-        return ResultViewHolder(ItemSearchResultBinding.inflate(LayoutInflater.from(parent.context),parent,false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteViewHolder {
+        return FavoriteViewHolder(ItemFavoriteBinding.inflate(LayoutInflater.from(parent.context),parent,false))
     }
 
-    override fun onBindViewHolder(holder: ResultViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FavoriteViewHolder, position: Int) {
         holder.bind(currentList[position])
     }
 
@@ -49,5 +42,4 @@ class SearchResultListAdapter(
 
         }
     }
-
 }

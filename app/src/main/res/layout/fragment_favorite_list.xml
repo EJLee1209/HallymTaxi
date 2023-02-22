@@ -7,7 +7,7 @@
 
         <variable
             name="fragment"
-            type="com.dldmswo1209.hallymtaxi.ui.menu.FavoriteListFragment" />
+            type="com.dldmswo1209.hallymtaxi.ui.menu.favorite.FavoriteListFragment" />
 
     </data>
 
@@ -49,6 +49,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:id="@+id/tv_edit"
                 style="@style/Text13.White"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,10 +57,9 @@
                 android:layout_marginBottom="15dp"
                 android:padding="10dp"
                 android:text="@string/update"
-                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:visibility="visible" />
+                android:onClick="@{()->fragment.onClickUpdate()}"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -73,7 +73,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/top_bar" />
+            app:layout_constraintTop_toBottomOf="@id/top_bar"
+            tools:listitem="@layout/item_search_result"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_add_or_ok"

@@ -84,7 +84,7 @@
     </fragment>
     <fragment
         android:id="@+id/favoriteListFragment"
-        android:name="com.dldmswo1209.hallymtaxi.ui.menu.FavoriteListFragment"
+        android:name="com.dldmswo1209.hallymtaxi.ui.menu.favorite.FavoriteListFragment"
         android:label="FavoriteListFragment" >
         <action
             android:id="@+id/action_favoriteListFragment_to_favoriteMapFragment"
@@ -92,6 +92,12 @@
     </fragment>
     <fragment
         android:id="@+id/favoriteMapFragment"
-        android:name="com.dldmswo1209.hallymtaxi.ui.menu.FavoriteMapFragment"
-        android:label="FavoriteMapFragment" />
+        android:name="com.dldmswo1209.hallymtaxi.ui.menu.favorite.FavoriteMapFragment"
+        android:label="FavoriteMapFragment" >
+        <argument
+            android:name="place"
+            app:argType="com.dldmswo1209.hallymtaxi.data.model.Place"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
 </navigation>

@@ -9,7 +9,7 @@ import com.dldmswo1209.hallymtaxi.data.model.SEND_STATE_SUCCESS
 
 @BindingAdapter("isNewMessage")
 fun isNewMessage(view: View, isNewMessage: Boolean){
-    if(isNewMessage) view.visibility = View.VISIBLE else view.visibility = View.GONE
+    view.visibility = if(isNewMessage) View.VISIBLE else View.GONE
 }
 
 @BindingAdapter("progressVisibility")
@@ -30,4 +30,9 @@ fun cancelButtonVisibility(view: View, sendSuccess: String){
 @BindingAdapter("aloneGuideVisibility")
 fun aloneGuideVisibility(view: View, userCount: Int){
     view.visibility = if(userCount == 1) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("isEditMode")
+fun isEditMode(view: View, value: Boolean){
+    view.visibility = if(value) View.VISIBLE else View.GONE
 }
