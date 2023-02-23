@@ -58,3 +58,11 @@ val place_kangwon_univ = Place(
     x = 127.74403884881542,
     y = 37.86945254603451
 )
+
+val defaultFavorites = listOf(
+    place_chuncheon_station,
+    place_hallym_univ,
+    place_myeoungdong,
+    place_terminal,
+    place_kangwon_univ,
+)

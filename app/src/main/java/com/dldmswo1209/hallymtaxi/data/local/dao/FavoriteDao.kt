@@ -9,7 +9,6 @@ import com.dldmswo1209.hallymtaxi.data.model.Place
 
 @Dao
 interface FavoriteDao {
-
     @Query("SELECT * FROM favorite")
     fun getFavorites() : List<Place>
 

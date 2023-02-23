@@ -126,6 +126,8 @@ dependencies {
 
     // compose 용 webView
     implementation "com.google.accompanist:accompanist-webview:0.24.13-rc"
+
+
 }
 
 kapt {

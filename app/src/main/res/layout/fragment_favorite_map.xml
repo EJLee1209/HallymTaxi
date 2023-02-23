@@ -89,11 +89,10 @@
                 android:text="@{currentPlace.place_name}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-
                 tools:text="춘천역" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/btn_edit"
+                android:id="@+id/btn_edit_place_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -146,34 +145,35 @@
                 android:clipToPadding="true"
                 android:paddingVertical="18dp"
                 android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/input_layout"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                app:layout_constraintTop_toBottomOf="@id/input_layout" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/layout_no_search_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_marginTop="180dp"
                 android:gravity="center"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/input_layout"
+                android:orientation="vertical"
                 android:visibility="gone"
-                android:layout_marginTop="180dp">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_layout">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/img_character"/>
+                    android:src="@drawable/img_character" />
+
                 <TextView
                     style="@style/Text13.Black"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/no_search_list"
-                    android:layout_marginTop="3dp"/>
+                    android:layout_marginTop="3dp"
+                    android:text="@string/no_search_list" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -186,12 +186,12 @@
                 android:layout_marginBottom="47dp"
                 android:background="@drawable/background_blue_r100"
                 android:elevation="10dp"
+                android:onClick="@{()->fragment.onClickOk()}"
                 android:text="@string/ok"
                 app:backgroundTint="@color/hallym_blue_3351b9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/input_layout"
-                android:onClick="@{()->fragment.onClickOk()}"/>
+                app:layout_constraintTop_toBottomOf="@id/input_layout" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

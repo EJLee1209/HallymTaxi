@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import com.dldmswo1209.hallymtaxi.R
+import kotlinx.coroutines.*
 
 class LoadingDialog(context: Context): Dialog(context) {
 

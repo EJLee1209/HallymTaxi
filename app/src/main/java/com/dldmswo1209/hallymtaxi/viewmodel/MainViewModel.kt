@@ -112,6 +112,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun logout(uid: String) {
+        _logout.postValue(UiState.Loading)
         authRepository.logoutUser(uid){ _logout.postValue(it) }
     }
 

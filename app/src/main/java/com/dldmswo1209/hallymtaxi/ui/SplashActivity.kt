@@ -1,6 +1,7 @@
 package com.dldmswo1209.hallymtaxi.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -12,6 +13,7 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkD
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.data.model.defaultFavorites
 import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,7 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
-    private val checkNetwork by lazy{
+    private val checkNetwork by lazy {
         CheckNetwork(this)
     }
     private lateinit var myApplication: MyApplication
@@ -28,8 +30,24 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        checkFirst()
         init()
         setObserver()
+    }
+
+    private fun checkFirst() {
+        val sharedPreferences = getSharedPreferences("checkFirst", MODE_PRIVATE)
+        val isFirst = sharedPreferences.getBoolean("isFirst", true)
+
+        if (isFirst) {
+            sharedPreferences.edit()
+                .putBoolean("isFirst", false)
+                .apply()
+
+            defaultFavorites.forEach { place ->
+                viewModel.saveFavorite(place)
+            }
+        }
     }
 
     private fun init() {
@@ -41,8 +59,8 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    private fun setObserver(){
-        viewModel.updateToken.observe(this){ state->
+    private fun setObserver() {
+        viewModel.updateToken.observe(this) { state ->
             when (state) {
                 is UiState.Loading -> {}
                 is UiState.Failure -> {
@@ -59,7 +77,7 @@ class SplashActivity : AppCompatActivity() {
                 viewModel.updateFcmToken()
             }
         }
-        viewModel.user.observe(this){ state->
+        viewModel.user.observe(this) { state ->
             when (state) {
                 is UiState.Loading -> {}
                 is UiState.Failure -> {
