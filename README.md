@@ -23,6 +23,8 @@
 ## 🏗 아키텍쳐
 <img src="https://velog.velcdn.com/images%2Fdddooo9%2Fpost%2F02803dfe-c2e7-4cea-9cf7-74d757e60f2d%2Fimage.png"/>
 
+MVVM Pattern 적용
+
 <br>
 
 ## 🗂 폴더 구조
