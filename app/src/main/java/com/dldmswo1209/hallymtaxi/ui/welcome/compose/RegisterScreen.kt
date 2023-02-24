@@ -301,7 +301,7 @@ fun RegisterScreen(
                         .padding(horizontal = 13.dp, vertical = 8.dp)
                         .focusTarget(),
                     label = "비밀번호",
-                    subLabel = "(영문 대/소문자, 숫자, 특수문자 포함 8~16자)",
+                    subLabel = "(영문, 숫자, 특수 문자 포함 8~16자)",
                     isVisibleText = passwordState.valueVisible,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {

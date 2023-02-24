@@ -1,9 +1,11 @@
 package com.dldmswo1209.hallymtaxi.ui.welcome.compose
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,7 +58,7 @@ class RegisterViewModel
             is RegisterEvent.EnteredPassword -> {
                 _password.value = password.value.copy(
                     text = event.value,
-                    isValid = event.value.length >= 8
+                    isValid = isValidPassword(event.value)
                 )
                 _nextButtonVisible.value = password.value.isValid && nextCount.value == 0
             }
@@ -82,7 +84,7 @@ class RegisterViewModel
             is RegisterEvent.EnteredName -> {
                 _name.value = name.value.copy(
                     text = event.value,
-                    isValid = event.value.length >= 2,
+                    isValid = isValidName(event.value)
                 )
                 _nextButtonVisible.value = name.value.isValid && nextCount.value == 2
             }
@@ -114,41 +116,51 @@ class RegisterViewModel
             }
 
             is RegisterEvent.Next -> {
+                _nextCount.value = nextCount.value + 1
+
                 when (nextCount.value) {
-                    0 -> {
+                    1 -> {
                         _password.value = password.value.copy(
                             isOk = true
                         )
                         _guideText.value = "비밀번호를 확인해주세요"
                     }
-                    1 -> {
+                    2 -> {
                         _passwordConfirm.value = passwordConfirm.value.copy(
                             isOk = true
                         )
                         _guideText.value = "이름을 입력해주세요"
                     }
-                    2 -> {
+                    3 -> {
                         _name.value = name.value.copy(
                             isOk = true
                         )
                         _guideText.value = "성별을 선택해주세요\n(성별을 속이는 행위는 제재 대상 입니다)"
                     }
-                    3 -> {
+                    4 -> {
                         _gender.value = gender.value.copy(
                             isOk = true
                         )
                         _guideText.value = "개인정보처리방침에 동의해주세요"
                     }
-                    4 -> {
-                        _guideText.value = "안녕하세요 ${name}님\n회원가입 버튼을 눌러 회원가입을 완료하세요"
-                    }
                 }
-                _nextCount.value = nextCount.value + 1
                 _nextButtonVisible.value = false
             }
         }
         _registerButtonVisible.value =
             password.value.isValid && passwordConfirm.value.isValid && name.value.isValid && gender.value.gender.isNotBlank() && agreePrivacyPolicy.value
+        if(nextCount.value == 4 && agreePrivacyPolicy.value)
+            _guideText.value = "안녕하세요 ${name.value.text}님\n회원가입 버튼을 터치해 회원가입을 완료해주세요"
+    }
+
+    private fun isValidPassword(password: String) : Boolean {
+        val passwordPattern = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.])[A-Za-z[0-9]$@$!%*#?&.]{8,16}$"
+        return Pattern.matches(passwordPattern, password)
+    }
+
+    private fun isValidName(name: String) : Boolean {
+        val namePattern = "^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z]{2,16}$"
+        return Pattern.matches(namePattern, name)
     }
 
 }

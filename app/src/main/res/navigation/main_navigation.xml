@@ -73,7 +73,7 @@
         <action
             android:id="@+id/action_chatRoomFragment_to_navigation_map"
             app:destination="@id/navigation_map"
-            app:popUpTo="@id/navigation_map"
+            app:popUpTo="@id/chatRoomFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
