@@ -30,7 +30,6 @@
 - data : local DB, Model, Repository 등 비즈니스 로직 포함 <br>
 - di : 의존성 주입을 위한 Module <br>
 - ui : UI 로직 포함 <br>
-- viewmodel : State Holder 클래스 <br>
 
 <br>
 
