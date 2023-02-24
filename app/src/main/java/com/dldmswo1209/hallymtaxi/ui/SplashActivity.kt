@@ -3,17 +3,28 @@ package com.dldmswo1209.hallymtaxi.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
-import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.common.MyApplication
-import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.defaultFavorites
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkDialog
+import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
+import com.google.android.gms.tasks.Task
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.ActivityResult
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
@@ -23,15 +34,48 @@ class SplashActivity : AppCompatActivity() {
         CheckNetwork(this)
     }
     private lateinit var myApplication: MyApplication
+    private val UPDATE_REQUEST_CODE = 200
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        checkAppUpdate()
+    }
+
+    private fun checkAppUpdate() {
+        val appUpdateManager = AppUpdateManagerFactory.create(this)
+
+        val appUpdateInfoTask: Task<AppUpdateInfo> = appUpdateManager.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() === UpdateAvailability.UPDATE_AVAILABLE
+                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) { // 업데이트 있음
+                requestUpdate(appUpdateManager, appUpdateInfo)
+            } else {
+                splashStart()
+            }
+        }
+    }
+
+    private fun requestUpdate(
+        appUpdateManager: AppUpdateManager,
+        appUpdateInfo: AppUpdateInfo
+    ) {
+        appUpdateManager.startUpdateFlowForResult(
+            appUpdateInfo,
+            AppUpdateType.IMMEDIATE,
+            this,
+            UPDATE_REQUEST_CODE
+        )
+    }
+
+    private fun splashStart() {
         checkFirst()
         init()
         setObserver()
     }
+
 
     private fun checkFirst() {
         val sharedPreferences = getSharedPreferences("checkFirst", MODE_PRIVATE)
@@ -91,7 +135,6 @@ class SplashActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
 
     override fun onResume() {

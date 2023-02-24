@@ -48,7 +48,7 @@ class RegisterViewModel
     val nextButtonVisible: State<Boolean> = _nextButtonVisible
 
     private var _nextCount = mutableStateOf(0)
-    val nextCount: State<Int> = _nextCount
+    private val nextCount: State<Int> = _nextCount
 
     private var _registerButtonVisible = mutableStateOf(false)
     val registerButtonVisible: State<Boolean> = _registerButtonVisible

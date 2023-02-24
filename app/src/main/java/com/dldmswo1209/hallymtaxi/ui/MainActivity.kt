@@ -2,11 +2,8 @@ package com.dldmswo1209.hallymtaxi.ui
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Base64
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -21,8 +18,6 @@ import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 
 
 @AndroidEntryPoint
@@ -106,6 +101,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     override fun onResume() {
         super.onResume()
         checkNetwork.registerNetworkListener()
