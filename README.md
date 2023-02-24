@@ -15,7 +15,7 @@
 
 |채팅 기능|즐겨찾기 편집|즐겨찾기 위치 검색|
 |:-:|:-:|:-:|
-|<img src="https://user-images.githubusercontent.com/101651909/215319354-060bf1f8-cdd4-4cc3-b4a3-04177dad9d2c.jpeg" width=400>|<img src="https://user-images.githubusercontent.com/101651909/221205330-f36910eb-9e9e-4720-9dcf-0a3ed1ba4817.jpg"/>|<img src="https://user-images.githubusercontent.com/101651909/221205342-35285d79-9831-47d1-9504-f6910793e96f.jpg"/>|
+|<img src="https://user-images.githubusercontent.com/101651909/215319354-060bf1f8-cdd4-4cc3-b4a3-04177dad9d2c.jpeg">|<img src="https://user-images.githubusercontent.com/101651909/221205330-f36910eb-9e9e-4720-9dcf-0a3ed1ba4817.jpg"/>|<img src="https://user-images.githubusercontent.com/101651909/221205342-35285d79-9831-47d1-9504-f6910793e96f.jpg"/>|
 |목적지가 같은 학생들끼리 채팅할 수 있습니다.|자주 가는 곳을 즐겨찾기로 등록 해놓고,<br>터치 한번으로 편리하게 사용할 수 있습니다|즐겨찾기를 등록할 때<br>등록하고자 하는 장소를 지도로 확인 가능합니다|
 ![Screenshot_20230224-232305]()
 ![Screenshot_20230224-232322]()
