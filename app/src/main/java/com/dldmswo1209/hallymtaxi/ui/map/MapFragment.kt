@@ -23,7 +23,7 @@ import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.carpool.PoolListBottomSheetFragment
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.data.UiState
-import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
+import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import net.daum.mf.map.api.CameraPosition
 import net.daum.mf.map.api.CameraUpdateFactory

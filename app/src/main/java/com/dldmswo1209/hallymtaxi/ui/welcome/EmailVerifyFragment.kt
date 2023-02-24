@@ -16,7 +16,6 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.util.AuthResponse
 import com.dldmswo1209.hallymtaxi.data.UiState
-import com.dldmswo1209.hallymtaxi.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

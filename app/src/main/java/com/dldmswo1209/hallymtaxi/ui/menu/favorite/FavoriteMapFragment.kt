@@ -1,13 +1,11 @@
 package com.dldmswo1209.hallymtaxi.ui.menu.favorite
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import androidx.compose.material.BottomSheetState
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -18,11 +16,9 @@ import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.Place
 import com.dldmswo1209.hallymtaxi.data.model.place_hallym_univ
 import com.dldmswo1209.hallymtaxi.databinding.FragmentFavoriteMapBinding
-import com.dldmswo1209.hallymtaxi.ui.carpool.ChatRoomFragmentArgs
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
-import com.dldmswo1209.hallymtaxi.ui.map.FavoritesListAdapter
 import com.dldmswo1209.hallymtaxi.ui.map.SearchResultListAdapter
-import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
+import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import net.daum.mf.map.api.*

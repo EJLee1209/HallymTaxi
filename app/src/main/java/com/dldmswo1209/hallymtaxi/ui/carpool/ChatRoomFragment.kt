@@ -30,7 +30,7 @@ import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.data.UiState
-import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
+import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 

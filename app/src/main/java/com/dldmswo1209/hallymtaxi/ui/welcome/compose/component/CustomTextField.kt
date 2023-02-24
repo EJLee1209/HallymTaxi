@@ -17,7 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -35,6 +37,7 @@ import com.dldmswo1209.hallymtaxi.R
 fun CustomEditText(
     value: String,
     onValueChange: (String) -> Unit,
+    onFocusChange: (FocusState) -> Unit,
     modifier : Modifier = Modifier,
     hintVisibility: Boolean,
     hint: String = "",
@@ -88,6 +91,7 @@ fun CustomEditText(
         BasicTextField(
             modifier = Modifier
                 .focusRequester(focusRequester)
+                .onFocusChanged { onFocusChange(it) }
             ,
             value = value,
             onValueChange = { onValueChange(it) },

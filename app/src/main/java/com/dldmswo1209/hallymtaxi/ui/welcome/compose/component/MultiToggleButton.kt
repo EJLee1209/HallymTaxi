@@ -16,14 +16,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dldmswo1209.hallymtaxi.R
-
-
 @Composable
 fun MultiToggleButton(
-    toggleItems: List<String>,
-    toggleStates: List<Boolean>,
-    onClicks: List<()->Unit>,
-    alertText: String = "",
+    toggleItems: List<String> = listOf("남자", "여자", "선택 안함"),
+    toggleStates: GenderState,
+    onClick: (String) -> Unit,
+    alertText: String = "같은 성별 매칭에서 제외될 수 있어요",
     alertVisibility: Boolean = false
 ){
     Column(
@@ -42,8 +40,8 @@ fun MultiToggleButton(
                         .weight(1f)
                         .height(36.dp)
                         .clip(RoundedCornerShape(46.dp))
-                        .clickable { onClicks[index]() },
-                    backgroundColor = if(!toggleStates[index]) colorResource(id = R.color.hallym_white_ffffff) else colorResource(id = R.color.hallym_blue_3351b9),
+                        .clickable { onClick(item) },
+                    backgroundColor = if(item != toggleStates.gender) colorResource(id = R.color.hallym_white_ffffff) else colorResource(id = R.color.hallym_blue_3351b9),
                     shape = RoundedCornerShape(20.dp),
                     border = BorderStroke(1.dp, colorResource(id = R.color.hallym_blue_3351b9))
                 ) {
@@ -51,7 +49,7 @@ fun MultiToggleButton(
                         Text(
                             text = toggleItems[index],
                             fontSize = 16.sp,
-                            color = if(!toggleStates[index]) Color.Black else Color.White,
+                            color = if(item != toggleStates.gender) Color.Black else Color.White,
                             modifier = Modifier
                                 .align(Alignment.Center)
                         )

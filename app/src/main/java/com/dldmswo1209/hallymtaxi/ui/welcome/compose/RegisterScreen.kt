@@ -1,7 +1,6 @@
 package com.dldmswo1209.hallymtaxi.ui.welcome.compose
 
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -30,22 +29,50 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dldmswo1209.hallymtaxi.R
+import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_FEMALE
+import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_MALE
+import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_NONE
 import com.dldmswo1209.hallymtaxi.data.model.User
 
 @Composable
 fun RegisterScreen(
     email: String,
     isCreated: Boolean,
-    onClickRegister: (User, String)->(Unit),
-    onDismissRequest: () -> Unit
+    viewModel: RegisterViewModel = hiltViewModel(),
+    onClickRegister: (User, String) -> (Unit),
+    onDismissRequest: () -> Unit,
 ) {
-    val scrollState = rememberScrollState()
-    var dialogVisibility by remember { mutableStateOf(false) }
+    val passwordState = viewModel.password.value
+    val passwordConfirmState = viewModel.passwordConfirm.value
+    val nameState = viewModel.name.value
+    val genderState = viewModel.gender.value
+    val privacyPolicyState = viewModel.agreePrivacyPolicy.value
+    val guideText = viewModel.guideText.value
+    val nextButtonVisible = viewModel.nextButtonVisible.value
+    val registerButtonVisible = viewModel.registerButtonVisible.value
+    var dialogVisible by remember { mutableStateOf(false) }
 
-    if(dialogVisibility){
+    val passwordVisibilityIcon = if (passwordState.valueVisible) {
+        R.drawable.ic_visible_on
+    } else {
+        R.drawable.ic_visible_off
+    }
+
+    val passwordConfirmVisibilityIcon = if (passwordConfirmState.valueVisible) {
+        R.drawable.ic_visible_on
+    } else {
+        R.drawable.ic_visible_off
+    }
+
+    val scrollState = rememberScrollState()
+
+    val focusManager = LocalFocusManager.current
+
+    if (dialogVisible) {
         MyAlertDialog(
-            visible = dialogVisibility,
+            visible = dialogVisible,
             onDismissRequest = { onDismissRequest() },
             title = "회원가입",
             content = "회원가입이 완료되었습니다.",
@@ -54,145 +81,17 @@ fun RegisterScreen(
         )
     }
 
-    if(isCreated) {
-        Log.d("testt", "회원가입 성공")
-        dialogVisibility = true
-    }else{
-        Log.d("testt", "회원가입 실패")
+    if (isCreated) {
+        dialogVisible = true
     }
-
-    var password by remember { mutableStateOf("") }
-    var passwordConfirm by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("") }
-
-    var passwordHintVisibility by remember { mutableStateOf(true) }
-    var passwordConfirmHintVisibility by remember { mutableStateOf(true) }
-    var passwordConfirmErrorVisibility by remember { mutableStateOf(true) }
-    var nameHintVisibility by remember { mutableStateOf(true) }
-    var nameErrorVisibility by remember { mutableStateOf(true) }
-    var nextButtonVisibility by remember { mutableStateOf(false) }
-    var registerButtonVisibility by remember { mutableStateOf(false) }
-    var registerButtonEnabled by remember { mutableStateOf(false) }
-
-    passwordHintVisibility = password == ""
-    passwordConfirmHintVisibility = passwordConfirm == ""
-    nameHintVisibility = name == ""
-    passwordConfirmErrorVisibility = password != passwordConfirm
-    nameErrorVisibility = name.length < 2
-
-    var passwordOk by remember { mutableStateOf(false) }
-    var passwordConfirmOk by remember { mutableStateOf(false) }
-    var nameOk by remember { mutableStateOf(false) }
-    var genderOk by remember { mutableStateOf(false) }
-    var privacyPolicyAgreeOk by remember { mutableStateOf(false) }
-    var isPasswordShow by remember { mutableStateOf(false) }
-    var isPasswordConfirmShow by remember { mutableStateOf(false) }
-
-    val focusManager = LocalFocusManager.current
-
-    val passwordVisibilityIcon = if(isPasswordShow){
-        R.drawable.ic_visible_on
-    }else{
-        R.drawable.ic_visible_off
-    }
-
-    val passwordConfirmVisibilityIcon = if(isPasswordConfirmShow){
-        R.drawable.ic_visible_on
-    }else{
-        R.drawable.ic_visible_off
-    }
-
-    // 성별 토글 버튼 상태
-    var isMale by remember { mutableStateOf(false) }
-    var isFemale by remember { mutableStateOf(false) }
-    var isNoneBinary by remember { mutableStateOf(false) }
-    var genderAlertVisibility by remember { mutableStateOf(false) }
-
-    // 성별 선택 토글 버튼 클릭 이벤트
-    val clickMale : () -> Unit = {
-        if(!isMale){
-            isMale = true
-            isFemale = false
-            isNoneBinary = false
-            genderAlertVisibility = false
-            gender = "male"
-        }
-    }
-    val clickFeMale : () -> Unit = {
-        if(!isFemale){
-            isFemale = true
-            isMale = false
-            isNoneBinary = false
-            genderAlertVisibility = false
-            gender = "female"
-        }
-    }
-    val clickNoneBinary : () -> Unit = {
-        if(!isNoneBinary){
-            isNoneBinary = true
-            isMale = false
-            isFemale = false
-            genderAlertVisibility = true
-            gender = "none"
-        }
-    }
-
-    // 상단에 나오는 안내 문구
-    var guideText by remember { mutableStateOf("비밀번호를 입력해주세요.") }
-
-    // 다음 버튼을 누른 횟수
-    var nextCount by remember { mutableStateOf(0) }
-
-    if(password.length >= 8 && !passwordOk) {
-        nextButtonVisibility = true
-    }
-    if(password != "" && password == passwordConfirm && !passwordConfirmOk) {
-        nextButtonVisibility = true
-    }
-    if(name.length >= 2 && !nameOk) {
-        nextButtonVisibility = true
-    }
-    if(isMale || isFemale || isNoneBinary){ // 성별 선택완료
-        genderOk = true
-        guideText = "개인정보처리방침을 확인해주세요"
-    }
-    if(privacyPolicyAgreeOk){
-        registerButtonVisibility = true
-        guideText = "${name}님, 입력한 정보가 모두 확실한가요?"
-    }
-
-    // 다음 버튼 클릭 이벤트
-    val onNextClick : ()->Unit = {
-        when(nextCount){
-            0 -> {
-                passwordOk = true
-                guideText = "비밀번호를 확인해주세요"
-            }
-            1 -> {
-                passwordConfirmOk = true
-                guideText = "이름(실명)을 입력해주세요"
-            }
-            2 -> {
-                nameOk = true
-                guideText = "성별을 선택해주세요(잘못 기재시 제재 대상이 됩니다)"
-                focusManager.clearFocus()
-            }
-            3 -> {
-                genderOk = true
-            }
-        }
-        nextCount++
-        nextButtonVisibility = false
-    }
-
-    registerButtonEnabled = password.length >= 8 && password == passwordConfirm && name.length >= 2 && privacyPolicyAgreeOk
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
-                color = colorResource(id = R.color.white))
+            .background(
+                shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
+                color = colorResource(id = R.color.white)
+            )
             .addFocusCleaner(focusManager)
             .padding(top = 27.dp, start = 20.dp, end = 20.dp, bottom = 10.dp),
     ) {
@@ -220,7 +119,7 @@ fun RegisterScreen(
                 modifier = Modifier.verticalScroll(scrollState)
             ) {
                 AnimatedVisibility(
-                    visible = genderOk,
+                    visible = genderState.isOk,
                     enter = expandVertically(
                         expandFrom = Alignment.Top
                     ) + fadeIn(
@@ -232,23 +131,23 @@ fun RegisterScreen(
                         modifier = Modifier
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
-                    ){
-                        Row(){
+                    ) {
+                        Row {
                             Text(
-                                text="개인정보처리방침",
+                                text = "개인정보처리방침",
                                 color = colorResource(id = R.color.hallym_black_000000),
                                 fontSize = 14.sp,
                                 textDecoration = TextDecoration.Underline
                             )
                             Text(
-                                text="에 동의합니다",
+                                text = "에 동의합니다",
                                 color = colorResource(id = R.color.hallym_black_000000),
                                 fontSize = 14.sp,
                             )
                         }
                         Checkbox(
-                            checked = privacyPolicyAgreeOk,
-                            onCheckedChange = { privacyPolicyAgreeOk = it } ,
+                            checked = privacyPolicyState,
+                            onCheckedChange = { viewModel.onEvent(RegisterEvent.OnClickPrivacyPolicy) },
                             colors = CheckboxDefaults.colors(
                                 checkedColor = colorResource(id = R.color.hallym_blue_3351b9),
                                 uncheckedColor = colorResource(id = R.color.hallym_grey_f5f5f5)
@@ -260,7 +159,7 @@ fun RegisterScreen(
                 }
 
                 AnimatedVisibility(
-                    visible = nameOk,
+                    visible = nameState.isOk,
                     enter = expandVertically(
                         expandFrom = Alignment.Top
                     ) + fadeIn(
@@ -268,24 +167,26 @@ fun RegisterScreen(
                         animationSpec = spring(stiffness = Spring.StiffnessVeryLow)
                     ),
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(7.dp)){
+                    Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
                         Text(
                             text = "성별",
-                            style = TextStyle(fontSize = 14.sp, color = colorResource(id = R.color.hallym_black_000000), fontWeight = FontWeight.Bold)
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                color = colorResource(id = R.color.hallym_black_000000),
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                         MultiToggleButton(
-                            toggleItems = listOf("남자", "여자", "선택 안함"),
-                            toggleStates = listOf(isMale, isFemale, isNoneBinary),
-                            onClicks = listOf(clickMale, clickFeMale, clickNoneBinary),
-                            alertText = "같은 성별 매칭에서 제외될 수 있어요",
-                            alertVisibility = genderAlertVisibility
+                            toggleStates = genderState,
+                            onClick = { viewModel.onEvent(RegisterEvent.EnteredGender(it)) },
+                            alertVisibility = genderState.isGenderAlertVisible
                         )
                     }
 
                 }
 
                 AnimatedVisibility(
-                    visible = passwordConfirmOk,
+                    visible = passwordConfirmState.isOk,
                     enter = expandVertically(
                         expandFrom = Alignment.Top
                     ) + fadeIn(
@@ -294,10 +195,11 @@ fun RegisterScreen(
                     ),
                 ) {
                     CustomEditText(
-                        value = name,
-                        onValueChange = { name = it },
-                        hintVisibility = nameHintVisibility,
-                        hint = "실명기재",
+                        value = nameState.text,
+                        onValueChange = { viewModel.onEvent(RegisterEvent.EnteredName(it)) },
+                        onFocusChange = { viewModel.onEvent(RegisterEvent.ChangeNameFocus(it)) },
+                        hintVisibility = nameState.isHintVisible,
+                        hint = nameState.hint,
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
@@ -305,7 +207,7 @@ fun RegisterScreen(
                                 color = colorResource(id = R.color.hallym_grey_f5f5f5)
                             )
                             .run {
-                                if (nameErrorVisibility) {
+                                if (!nameState.isValid) {
                                     border(
                                         width = 1.dp,
                                         color = colorResource(id = R.color.hallym_red_E43429),
@@ -317,7 +219,7 @@ fun RegisterScreen(
                             }
                             .padding(horizontal = 13.dp, vertical = 8.dp),
                         label = "이름",
-                        errorVisibility = nameErrorVisibility,
+                        errorVisibility = !nameState.isValid,
                         errorText = "잘못된 이름 형식입니다.",
                         autoFocus = true,
                         trailingIcon = {}
@@ -325,7 +227,7 @@ fun RegisterScreen(
                 }
 
                 AnimatedVisibility(
-                    visible = passwordOk,
+                    visible = passwordState.isOk,
                     enter = expandVertically(
                         expandFrom = Alignment.Top
                     ) + fadeIn(
@@ -334,10 +236,17 @@ fun RegisterScreen(
                     ),
                 ) {
                     CustomEditText(
-                        value = passwordConfirm,
-                        onValueChange = { passwordConfirm = it },
-                        hintVisibility = passwordConfirmHintVisibility,
-                        hint = "비밀번호",
+                        value = passwordConfirmState.text,
+                        onValueChange = { viewModel.onEvent(RegisterEvent.EnteredPasswordConfirm(it)) },
+                        onFocusChange = {
+                            viewModel.onEvent(
+                                RegisterEvent.ChangePasswordConfirmFocus(
+                                    it
+                                )
+                            )
+                        },
+                        hintVisibility = passwordConfirmState.isHintVisible,
+                        hint = passwordConfirmState.hint,
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
@@ -345,7 +254,7 @@ fun RegisterScreen(
                                 color = colorResource(id = R.color.hallym_grey_f5f5f5)
                             )
                             .run {
-                                if (passwordConfirmErrorVisibility) {
+                                if (!passwordConfirmState.isValid) {
                                     border(
                                         width = 1.dp,
                                         color = colorResource(id = R.color.hallym_red_E43429),
@@ -357,7 +266,7 @@ fun RegisterScreen(
                             }
                             .padding(horizontal = 13.dp, vertical = 8.dp),
                         label = "비밀번호 확인",
-                        isVisibleText = isPasswordConfirmShow,
+                        isVisibleText = passwordConfirmState.valueVisible,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         trailingIcon = {
                             Icon(
@@ -366,31 +275,34 @@ fun RegisterScreen(
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .clickable {
-                                        isPasswordConfirmShow = !isPasswordConfirmShow
+                                        viewModel.onEvent(RegisterEvent.OnClickPasswordConfirmVisibleIcon)
                                     }
 
                             )
                         },
-                        errorVisibility = passwordConfirmErrorVisibility,
+                        errorVisibility = !passwordConfirmState.isValid,
                         errorText = "비밀번호가 일치하지 않습니다.",
                         autoFocus = true
                     )
                 }
 
                 CustomEditText(
-                    value = password,
-                    onValueChange = { password = it },
-                    hintVisibility = passwordHintVisibility,
-                    hint = "비밀번호",
+                    value = passwordState.text,
+                    onValueChange = { viewModel.onEvent(RegisterEvent.EnteredPassword(it)) },
+                    onFocusChange = { viewModel.onEvent(RegisterEvent.ChangePasswordFocus(it)) },
+                    hintVisibility = passwordState.isHintVisible,
+                    hint = passwordState.hint,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(shape = RoundedCornerShape(10.dp),
-                            color = colorResource(id = R.color.hallym_grey_f5f5f5))
+                        .background(
+                            shape = RoundedCornerShape(10.dp),
+                            color = colorResource(id = R.color.hallym_grey_f5f5f5)
+                        )
                         .padding(horizontal = 13.dp, vertical = 8.dp)
                         .focusTarget(),
                     label = "비밀번호",
                     subLabel = "(영문 대/소문자, 숫자, 특수문자 포함 8~16자)",
-                    isVisibleText = isPasswordShow,
+                    isVisibleText = passwordState.valueVisible,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         Icon(
@@ -399,7 +311,7 @@ fun RegisterScreen(
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .clickable {
-                                    isPasswordShow = !isPasswordShow
+                                    viewModel.onEvent(RegisterEvent.OnClickPasswordVisibleIcon)
                                 }
 
                         )
@@ -410,9 +322,11 @@ fun RegisterScreen(
             }
         }
 
-        if(nextButtonVisibility) {
+        if (nextButtonVisible) {
             Button(
-                onClick = { onNextClick() },
+                onClick = {
+                    viewModel.onEvent(RegisterEvent.Next)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
@@ -430,11 +344,25 @@ fun RegisterScreen(
                 )
             }
         }
-        if(registerButtonVisibility) {
+        if (registerButtonVisible) {
             Button(
                 onClick = {
-                    val user = User(email=email, name = name, gender = gender)
-                    onClickRegister(user, password)
+                    val user = User(
+                        email = email,
+                        name = nameState.text,
+                        gender = when(genderState.gender) {
+                            "남자" -> {
+                                GENDER_OPTION_MALE
+                            }
+                            "여자" -> {
+                                GENDER_OPTION_FEMALE
+                            }
+                            else -> {
+                                GENDER_OPTION_NONE
+                            }
+                        }
+                    )
+                    onClickRegister(user, passwordState.text)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -445,9 +373,8 @@ fun RegisterScreen(
                     backgroundColor = colorResource(id = R.color.hallym_blue_3351b9),
                     disabledBackgroundColor = colorResource(id = R.color.hallym_grey_f5f5f5)
                 ),
-                enabled = registerButtonEnabled
 
-            ) {
+                ) {
                 Text(
                     text = "회원가입",
                     fontSize = 15.sp,
@@ -460,7 +387,7 @@ fun RegisterScreen(
 }
 
 fun Modifier.addFocusCleaner(focusManager: FocusManager, doOnClear: () -> Unit = {}): Modifier {
-    return this.pointerInput(Unit){
+    return this.pointerInput(Unit) {
         detectTapGestures(onTap = {
             doOnClear()
             focusManager.clearFocus()

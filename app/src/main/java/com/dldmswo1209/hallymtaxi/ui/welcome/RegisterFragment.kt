@@ -18,7 +18,6 @@ import com.dldmswo1209.hallymtaxi.databinding.FragmentRegisterBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.ui.welcome.compose.RegisterScreen
-import com.dldmswo1209.hallymtaxi.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

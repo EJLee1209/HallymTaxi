@@ -2,8 +2,10 @@ package com.dldmswo1209.hallymtaxi.ui
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
@@ -16,11 +18,12 @@ import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.MyApplication
-import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
-import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
-import com.google.android.gms.common.api.GoogleApiClient
+import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -53,7 +56,6 @@ class MainActivity : AppCompatActivity() {
         getIntentExtraData()
         setObserver()
         bottomNavigationSetup()
-
     }
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기

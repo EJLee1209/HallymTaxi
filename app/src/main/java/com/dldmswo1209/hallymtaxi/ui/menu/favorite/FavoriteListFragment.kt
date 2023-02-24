@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.databinding.FragmentFavoriteListBinding
 import com.dldmswo1209.hallymtaxi.ui.map.SearchResultListAdapter
-import com.dldmswo1209.hallymtaxi.viewmodel.MainViewModel
+import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
