@@ -10,15 +10,13 @@
 # 📱 주요 기능 및 인터페이스
 |학생 인증|지도 api를 활용해 장소검색 제공|채팅방 생성 및 참여 가능|
 |:-:|:-:|:-:|
-|<img src="https://user-images.githubusercontent.com/101651909/215319350-d00babae-28f4-4d78-b122-fe8973402b6b.jpeg">|<img src="https://user-images.githubusercontent.com/101651909/215319345-8294a388-87a7-47e7-ace8-d3ad20c39d19.jpeg"/>|<img src="https://user-images.githubusercontent.com/101651909/215319351-e37e077c-ec7d-4309-abab-5477de8bfd64.jpeg">|
+|<img src="https://user-images.githubusercontent.com/101651909/215319350-d00babae-28f4-4d78-b122-fe8973402b6b.jpeg">|<img src="https://user-images.githubusercontent.com/101651909/215319345-8294a388-87a7-47e7-ace8-d3ad20c39d19.jpeg">|<img src="https://user-images.githubusercontent.com/101651909/215319351-e37e077c-ec7d-4309-abab-5477de8bfd64.jpeg">|
 |한림 웹메일 인증을 통해<br>회원가입을 합니다.|목적지를 검색하고, <br>해당 목적지의 정확한 위치를 확인할 수 있습니다.|채팅방을 생성하거나<br> 참여할 수 있습니다.|
 
 |채팅 기능|즐겨찾기 편집|즐겨찾기 위치 검색|
 |:-:|:-:|:-:|
-|<img src="https://user-images.githubusercontent.com/101651909/215319354-060bf1f8-cdd4-4cc3-b4a3-04177dad9d2c.jpeg">|<img src="https://user-images.githubusercontent.com/101651909/221205330-f36910eb-9e9e-4720-9dcf-0a3ed1ba4817.jpg"/>|<img src="https://user-images.githubusercontent.com/101651909/221205342-35285d79-9831-47d1-9504-f6910793e96f.jpg"/>|
+|<img src="https://user-images.githubusercontent.com/101651909/215319354-060bf1f8-cdd4-4cc3-b4a3-04177dad9d2c.jpeg">|<img src="https://user-images.githubusercontent.com/101651909/221205330-f36910eb-9e9e-4720-9dcf-0a3ed1ba4817.jpg">|<img src="https://user-images.githubusercontent.com/101651909/221205342-35285d79-9831-47d1-9504-f6910793e96f.jpg">|
 |목적지가 같은 학생들끼리 채팅할 수 있습니다.|자주 가는 곳을 즐겨찾기로 등록 해놓고,<br>터치 한번으로 편리하게 사용할 수 있습니다|즐겨찾기를 등록할 때<br>등록하고자 하는 장소를 지도로 확인 가능합니다|
-![Screenshot_20230224-232305]()
-![Screenshot_20230224-232322]()
 
 <br>
 
