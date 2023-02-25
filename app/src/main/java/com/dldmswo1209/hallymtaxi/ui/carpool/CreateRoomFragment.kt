@@ -7,24 +7,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.dldmswo1209.hallymtaxi.common.*
-import com.dldmswo1209.hallymtaxi.databinding.FragmentCreateRoomBinding
+import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.common.TimeService
+import com.dldmswo1209.hallymtaxi.common.registerBackPressedCallback
+import com.dldmswo1209.hallymtaxi.common.setMinutePicker
+import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_NONE
 import com.dldmswo1209.hallymtaxi.data.model.Place
 import com.dldmswo1209.hallymtaxi.data.model.User
+import com.dldmswo1209.hallymtaxi.databinding.FragmentCreateRoomBinding
+import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.ui.map.MapFragment.Companion.SEARCH_RESULT_BOTTOM_SHEET_TAG
 import com.dldmswo1209.hallymtaxi.ui.map.SearchResultBottomSheetFragment
-import com.dldmswo1209.hallymtaxi.data.UiState
-import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -57,6 +62,7 @@ class CreateRoomFragment: Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        registerBackPressedCallback()
         getArgsData()
         setUpUi()
         setObserver()
@@ -228,7 +234,7 @@ class CreateRoomFragment: Fragment() {
     }
 
     fun onClickBack(){
-        findNavController().popBackStack()
+        findNavController().navigateUp()
     }
 
     fun onClickCreate(){
@@ -284,4 +290,5 @@ class CreateRoomFragment: Fragment() {
 
         etTextUpdate()
     }
+
 }

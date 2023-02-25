@@ -4,14 +4,20 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.res.Resources
+import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.NumberPicker
 import android.widget.TimePicker
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph
+import androidx.navigation.fragment.findNavController
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -83,3 +89,39 @@ fun Fragment.toast(msg: String){
 
 val Int.dp: Int
     get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()
+
+fun NavController.navigateSafe(@IdRes resId: Int, args: Bundle? = null) {
+    val destinationId = currentDestination?.getAction(resId)?.destinationId.orEmpty()
+    currentDestination?.let { node ->
+        val currentNode = when (node) {
+            is NavGraph -> node
+            else -> node.parent
+        }
+        if (destinationId != 0) {
+            currentNode?.findNode(destinationId)?.let { navigate(resId, args) }
+        }
+    }
+}
+
+fun Int?.orEmpty(default: Int = 0): Int {
+    return this ?: default
+}
+
+fun Fragment.registerBackPressedCallback(){
+    val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            findNavController().navigateUp()
+        }
+    }
+    requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+}
+
+fun Fragment.registerBackPressedFinishActivityCallback(){
+    val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            requireActivity().finish()
+        }
+    }
+    requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+}
+

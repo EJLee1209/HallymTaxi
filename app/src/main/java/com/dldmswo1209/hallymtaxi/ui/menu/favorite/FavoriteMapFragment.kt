@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.common.clearFocusAndHideKeyboard
 import com.dldmswo1209.hallymtaxi.common.location.LocationService
+import com.dldmswo1209.hallymtaxi.common.registerBackPressedCallback
 import com.dldmswo1209.hallymtaxi.common.toast
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.Place
@@ -53,6 +54,7 @@ class FavoriteMapFragment : Fragment() {
 
         setObserver()
         init()
+        registerBackPressedCallback()
         setEditorActionListener()
     }
 
@@ -118,10 +120,15 @@ class FavoriteMapFragment : Fragment() {
                 }
                 is UiState.Success -> {
                     loadingDialog.dismiss()
-                    val place = state.data.documents.first() // 현재 위치
-                    binding.currentPlace = place
-                    this.place = place
-                    addMarker(place)
+                    val place = state.data.documents.firstOrNull() // 현재 위치
+                    place?.let {
+                        binding.currentPlace = it
+                        this.place = it
+                        addMarker(it)
+                    } ?: kotlin.run {
+                        binding.currentPlace = place_hallym_univ
+                        addMarker(place_hallym_univ)
+                    }
                 }
             }
         }
@@ -206,6 +213,6 @@ class FavoriteMapFragment : Fragment() {
     }
 
     fun onClickBack() {
-        findNavController().popBackStack()
+        findNavController().navigateUp()
     }
 }

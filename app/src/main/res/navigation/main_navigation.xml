@@ -57,11 +57,7 @@
             app:argType="com.dldmswo1209.hallymtaxi.data.model.Place" />
         <action
             android:id="@+id/action_navigation_create_room_to_chatRoomFragment"
-            app:destination="@id/chatRoomFragment"
-            app:enterAnim="@android:anim/slide_in_left"
-            app:exitAnim="@android:anim/slide_out_right"
-            app:popEnterAnim="@android:anim/slide_in_left"
-            app:popExitAnim="@android:anim/slide_out_right" />
+            app:destination="@id/chatRoomFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatRoomFragment"
@@ -73,8 +69,9 @@
         <action
             android:id="@+id/action_chatRoomFragment_to_navigation_map"
             app:destination="@id/navigation_map"
-            app:popUpTo="@id/chatRoomFragment"
-            app:popUpToInclusive="true" />
+            app:popUpTo="@id/navigation_map"
+            app:popUpToInclusive="true"
+            app:launchSingleTop="true" />
     </fragment>
     <fragment
         android:id="@+id/chatRoomHistoryFragment"

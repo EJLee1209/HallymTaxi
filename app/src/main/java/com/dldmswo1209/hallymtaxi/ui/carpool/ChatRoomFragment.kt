@@ -48,13 +48,13 @@ class ChatRoomFragment: Fragment() {
     private var tokenList = mutableListOf<String?>()
     private lateinit var chatListAdapter: ChatListAdapter
 
-    private lateinit var callback: OnBackPressedCallback
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
         ViewMarginDynamicChanger(requireActivity())
     }
     private val notificationManager : NotificationManagerCompat by lazy{
         NotificationManagerCompat.from(requireActivity().applicationContext)
     }
+
     private var isFirst = true
     private var mLastClickTime = 0L
 
@@ -79,7 +79,7 @@ class ChatRoomFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
-        backPressedSetCallback()
+        registerBackPressedCallback()
         setObserver()
         registerBroadcastReceiver()
     }
@@ -98,16 +98,6 @@ class ChatRoomFragment: Fragment() {
         KeyboardUtils.addKeyboardToggleListener(requireActivity(), keyboardStateListener)
         setRecyclerAdapter()
         editTextWatcher()
-
-
-    }
-    private fun backPressedSetCallback(){
-        callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                onClickBack()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
     private fun setRecyclerAdapter(){
         chatListAdapter = ChatListAdapter(currentUser){ chatId->
@@ -208,8 +198,6 @@ class ChatRoomFragment: Fragment() {
                 }
             }
         }
-
-
     }
     private fun registerBroadcastReceiver() {
         // 새로운 메세지가 온 경우 브로드 캐스트 리시버를 통해 알 수 있음
@@ -362,6 +350,5 @@ class ChatRoomFragment: Fragment() {
     override fun onDetach() {
         super.onDetach()
         KeyboardUtils.removeKeyboardToggleListener(keyboardStateListener)
-        Log.d("testt", "ChatRoomFragment onDetach: ")
     }
 }

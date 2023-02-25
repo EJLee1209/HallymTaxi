@@ -54,6 +54,7 @@ class MapFragment : Fragment() {
         LoadingDialog(requireActivity())
     }
     private lateinit var mapView: MapView
+    private var isClickToJoin = false
 
 
     companion object{
@@ -184,6 +185,8 @@ class MapFragment : Fragment() {
         }
 
         viewModel.joinRoom.observe(viewLifecycleOwner){state->
+            if(!isClickToJoin) return@observe
+
             when(state){
                 is UiState.Loading -> {
                     loadingDialog.show()
@@ -371,6 +374,7 @@ class MapFragment : Fragment() {
 
     fun onClickViewMyCurrentRoom(){
         joinedRoom?.let { room->
+            isClickToJoin = true
             viewModel.joinRoom(room, user)
         }
     }
@@ -402,5 +406,6 @@ class MapFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         searchResultBottomSheet?.dialog?.dismiss()
+        isClickToJoin = false
     }
 }

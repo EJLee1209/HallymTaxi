@@ -15,6 +15,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.TimeService
+import com.dldmswo1209.hallymtaxi.common.registerBackPressedFinishActivityCallback
 import com.dldmswo1209.hallymtaxi.databinding.FragmentHistoryBinding
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
@@ -46,6 +47,7 @@ class HistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         init()
+        registerBackPressedFinishActivityCallback()
         setObservers()
         registerBroadcastReceiver()
     }

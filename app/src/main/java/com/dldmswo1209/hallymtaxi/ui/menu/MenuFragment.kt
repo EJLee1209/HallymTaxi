@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.common.registerBackPressedFinishActivityCallback
 import com.dldmswo1209.hallymtaxi.databinding.FragmentMenuBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
@@ -41,6 +42,7 @@ class MenuFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         init()
         setObserver()
+        registerBackPressedFinishActivityCallback()
     }
     fun init(){
         myApplication = requireActivity().application as MyApplication

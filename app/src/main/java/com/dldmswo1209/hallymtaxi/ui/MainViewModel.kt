@@ -241,9 +241,5 @@ class MainViewModel @Inject constructor(
             .show()
         e.printStackTrace()
     }
-    override fun onCleared() {
-        super.onCleared()
-
-    }
 
 }
