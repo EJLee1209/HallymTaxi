@@ -108,8 +108,24 @@ class MapFragment : Fragment() {
                 binding.viewCurrentMyRoom.visibility = View.VISIBLE
                 binding.room = room
                 myApplication.setMyRoomId(room.roomId)
+
+                constraintDynamicChange(
+                    startId = binding.logoKakao.id,
+                    startSide = ConstraintSet.BOTTOM,
+                    endId = binding.viewCurrentMyRoom.id,
+                    ConstraintSet.TOP,
+                    2
+                )
             }else{
                 binding.viewCurrentMyRoom.visibility = View.GONE
+
+                constraintDynamicChange(
+                    startId = binding.logoKakao.id,
+                    startSide = ConstraintSet.BOTTOM,
+                    endId = binding.parentConstraintLayout.id,
+                    ConstraintSet.BOTTOM,
+                    132
+                )
             }
             joinedRoom = room
         }
@@ -253,22 +269,32 @@ class MapFragment : Fragment() {
             setCameraCenterAllPOIItems()
         }
 
-        val constraintLayout: ConstraintLayout = binding.parentConstraintLayout
-        val constraintSet = ConstraintSet()
-        constraintSet.clone(constraintLayout)
-        constraintSet.connect(
-            binding.rvFavorites.id,
-            ConstraintSet.TOP,
-            binding.searchLayout.id,
+        constraintDynamicChange(
+            startId = binding.rvFavorites.id,
+            startSide = ConstraintSet.TOP,
+            endId = binding.searchLayout.id,
             ConstraintSet.BOTTOM,
-            MetricsUtil.convertDpToPixel(9, requireActivity())
+            9
         )
-
-        constraintSet.applyTo(constraintLayout)
 
         binding.initSearchLayout.visibility = View.GONE
 
         binding.searchLayout.visibility = View.VISIBLE
+    }
+
+    private fun constraintDynamicChange(startId: Int, startSide: Int, endId: Int, endSide: Int, dp: Int) {
+        val constraintLayout: ConstraintLayout = binding.parentConstraintLayout
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(constraintLayout)
+        constraintSet.connect(
+            startId,
+            startSide,
+            endId,
+            endSide,
+            MetricsUtil.convertDpToPixel(dp, requireActivity()) // margin
+        )
+
+        constraintSet.applyTo(constraintLayout)
     }
 
     private fun moveCamera(lat: Double, lng: Double, zoomLevel: Float) {
