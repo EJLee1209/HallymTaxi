@@ -29,13 +29,8 @@ class LoginFragment: Fragment() {
     }
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
-            val tvLoginTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireActivity())
-            val tvLoginTitleSmallTopMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
-            val btnLoginOriginalBottomMarginValue = MetricsUtil.convertDpToPixel(47, requireActivity())
-            val btnLoginSmallBottomMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
-
-            viewMarginDynamicChanger.changeConstraintMarginTopBottom(binding.tvLoginTitle,0,0,tvLoginTitleOriginalTopMarginValue,tvLoginTitleSmallTopMarginValue, isVisible)
-            viewMarginDynamicChanger.changeConstraintMarginTopBottom(binding.btnLogin,btnLoginOriginalBottomMarginValue,btnLoginSmallBottomMarginValue,0,0,isVisible)
+            viewMarginDynamicChanger.changeConstraintMarginTopBottom(binding.tvLoginTitle,0,0,86.dp,5.dp, isVisible)
+            viewMarginDynamicChanger.changeConstraintMarginTopBottom(binding.btnLogin,47.dp,5.dp,0,0,isVisible)
         }
     }
 

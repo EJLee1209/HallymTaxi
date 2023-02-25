@@ -3,10 +3,7 @@ package com.dldmswo1209.hallymtaxi.ui
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -26,6 +23,7 @@ import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -38,12 +36,14 @@ class MainViewModel @Inject constructor(
     private val kakaoRepository: KakaoRepository,
     private val serverRepository: ServerRepository,
     private val fireStore: FirebaseFirestore,
-    private val auth: FirebaseAuth,
     application: Application
 ) : AndroidViewModel(application) {
 
-    private var userListener: ListenerRegistration? = null
-    private var myRoomListener: ListenerRegistration? = null
+    private var _subscribeUser = MutableLiveData<User>()
+    val subscribeUser : LiveData<User> = _subscribeUser
+
+    private var _subscribeMyRoom = MutableLiveData<CarPoolRoom>()
+    val subscribeMyRoom : LiveData<CarPoolRoom> = _subscribeMyRoom
 
     private var _user = MutableLiveData<UiState<User>>()
     val user : LiveData<UiState<User>> = _user
@@ -94,21 +94,10 @@ class MainViewModel @Inject constructor(
         authRepository.getUserInfo { _user.postValue(it) }
     }
 
-    fun subscribeUser() : LiveData<User>? {
-        val user = MutableLiveData<User>()
-
-        if (auth.currentUser == null) return null
-        userListener = fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
-            .addSnapshotListener { value, error->
-                if(error != null){
-                    return@addSnapshotListener
-                }
-                value?.let {snapshot->
-                    user.value = snapshot.toObject<User>()
-                }
-            }
-
-        return user
+    fun subscribeUser() = viewModelScope.launch {
+        fireStoreRepository.subscribeUser().collectLatest { user ->
+            _subscribeUser.value = user
+        }
     }
 
     fun logout(uid: String) {
@@ -169,26 +158,10 @@ class MainViewModel @Inject constructor(
         fireStoreRepository.joinRoom(room, user){ _joinRoom.postValue(it) }
     }
 
-    fun subscribeMyRoom(user: User) : LiveData<CarPoolRoom?> {
-        val room = MutableLiveData<CarPoolRoom?>()
-
-        myRoomListener = fireStore.collection(FireStoreTable.ROOM)
-            .whereArrayContains("participants", user)
-            .addSnapshotListener { value, error ->
-                if(error != null){
-                    return@addSnapshotListener
-                }
-                value?.let {querySnapshot ->
-                    if(!querySnapshot.isEmpty) {
-                        val snapshot = querySnapshot.first()
-                        room.postValue(snapshot.toObject(CarPoolRoom::class.java))
-                    }else{
-                        room.postValue(null) // 참여중인 방이 없음 null 반환
-                    }
-                }
-            }
-
-        return room
+    fun subscribeMyRoom(user: User) = viewModelScope.launch {
+        fireStoreRepository.subscribeMyRoom(user).collectLatest {
+            _subscribeMyRoom.value = it
+        }
     }
 
 
@@ -268,20 +241,9 @@ class MainViewModel @Inject constructor(
             .show()
         e.printStackTrace()
     }
-
-    private fun userListenerRemove(){
-        userListener?.remove()
-    }
-
-    private fun myRoomListenerRemove(){
-        myRoomListener?.remove()
-    }
-
     override fun onCleared() {
         super.onCleared()
-        Log.d("testt", "onCleared: ")
-        userListenerRemove()
-        myRoomListenerRemove()
+
     }
 
 }

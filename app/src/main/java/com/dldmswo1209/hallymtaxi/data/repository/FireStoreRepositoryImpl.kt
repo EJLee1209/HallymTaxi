@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
+import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
@@ -9,12 +10,63 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 class FireStoreRepositoryImpl(
     private val fireStore: FirebaseFirestore,
     private val auth: FirebaseAuth
 ): FireStoreRepository {
+    override fun subscribeUser(): Flow<User> {
+        return callbackFlow {
+            val listenerRegistration = fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
+                .addSnapshotListener { snapshot, error->
+                    if(error != null){
+                        cancel(
+                            message = "유저 정보를 가져오는데 에러가 발생했습니다",
+                            cause = error
+                        )
+                        return@addSnapshotListener
+                    }
+                    val user = snapshot?.toObject<User>()
+                    user?.let { trySend(it) }
+                }
+            awaitClose {
+                listenerRegistration.remove()
+            }
+        }
+    }
+
+    override fun subscribeMyRoom(user: User): Flow<CarPoolRoom> {
+        return callbackFlow {
+            val listenerRegistration = fireStore.collection(FireStoreTable.ROOM)
+                .whereArrayContains("participants", user)
+                .addSnapshotListener { value, error ->
+                    if(error != null){
+                        cancel(
+                            message = "방 정보를 가져오는데 에러가 발생했습니다",
+                            cause = error
+                        )
+                        return@addSnapshotListener
+                    }
+                    value?.let { querySnapshot ->
+                        if(!querySnapshot.isEmpty) {
+                            val data = querySnapshot.first().toObject<CarPoolRoom>()
+                            trySend(data)
+                        }
+                    }
+
+                }
+            awaitClose {
+                listenerRegistration.remove()
+            }
+        }
+    }
+
     override fun createRoom(room: CarPoolRoom, user: User, result: (UiState<CarPoolRoom>) -> Unit) {
         val ref = fireStore.collection(FireStoreTable.ROOM).document()
 

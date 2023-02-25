@@ -32,14 +32,9 @@ class EmailVerifyFragment: Fragment() {
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드가 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {
-                val tvRegisterTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireActivity())
-                val tvRegisterTitleSmallTopMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
-                val btnVerifyOriginalBottomMarginValue = MetricsUtil.convertDpToPixel(47, requireActivity())
-                val btnVerifySmallBottomMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
-
                 // 키보드 상태에따라 margin 동적 변경
-                changeConstraintMarginTopBottom(binding.btnVerify,btnVerifyOriginalBottomMarginValue,btnVerifySmallBottomMarginValue,0,0,isVisible)
-                changeConstraintMarginTopBottom(binding.tvRegisterTitle,0,0,tvRegisterTitleOriginalTopMarginValue,tvRegisterTitleSmallTopMarginValue, isVisible)
+                changeConstraintMarginTopBottom(binding.btnVerify,47.dp,5.dp,0,0,isVisible)
+                changeConstraintMarginTopBottom(binding.tvRegisterTitle,0,0,86.dp,5.dp, isVisible)
             }
         }
     }

@@ -34,10 +34,7 @@ class RegisterFragment: Fragment() {
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드가 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {
-                val tvRegisterTitleOriginalTopMarginValue = MetricsUtil.convertDpToPixel(86, requireActivity())
-                val tvRegisterTitleSmallTopMarginValue = MetricsUtil.convertDpToPixel(5, requireActivity())
-
-                changeConstraintMarginTopBottom(binding.tvRegisterTitle,0,0,tvRegisterTitleOriginalTopMarginValue,tvRegisterTitleSmallTopMarginValue, isVisible)
+                changeConstraintMarginTopBottom(binding.tvRegisterTitle,0,0,86.dp,5.dp, isVisible)
             }
         }
     }

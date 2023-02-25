@@ -61,10 +61,7 @@ class ChatRoomFragment: Fragment() {
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
             viewMarginDynamicChanger.apply {
-                val originalEditTextMarginBottom = MetricsUtil.convertDpToPixel(27, requireActivity())
-                val smallEditTextMarginBottom = MetricsUtil.convertDpToPixel(5, requireActivity())
-
-                changeConstraintMarginTopBottom(binding.inputLayout,originalEditTextMarginBottom,smallEditTextMarginBottom,0,0, isVisible)
+                changeConstraintMarginTopBottom(binding.inputLayout,27.dp,5.dp,0,0, isVisible)
                 scrollToLastItem()
             }
         }

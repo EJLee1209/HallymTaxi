@@ -13,8 +13,8 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.common.MetricsUtil
 import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.common.dp
 import com.dldmswo1209.hallymtaxi.common.location.LocationService
 import com.dldmswo1209.hallymtaxi.common.toast
 import com.dldmswo1209.hallymtaxi.data.model.*
@@ -114,7 +114,7 @@ class MapFragment : Fragment() {
                     startSide = ConstraintSet.BOTTOM,
                     endId = binding.viewCurrentMyRoom.id,
                     ConstraintSet.TOP,
-                    2
+                    2.dp
                 )
             }else{
                 binding.viewCurrentMyRoom.visibility = View.GONE
@@ -124,7 +124,7 @@ class MapFragment : Fragment() {
                     startSide = ConstraintSet.BOTTOM,
                     endId = binding.parentConstraintLayout.id,
                     ConstraintSet.BOTTOM,
-                    132
+                    92.dp
                 )
             }
             joinedRoom = room
@@ -274,7 +274,7 @@ class MapFragment : Fragment() {
             startSide = ConstraintSet.TOP,
             endId = binding.searchLayout.id,
             ConstraintSet.BOTTOM,
-            9
+            9.dp
         )
 
         binding.initSearchLayout.visibility = View.GONE
@@ -291,7 +291,7 @@ class MapFragment : Fragment() {
             startSide,
             endId,
             endSide,
-            MetricsUtil.convertDpToPixel(dp, requireActivity()) // margin
+            dp
         )
 
         constraintSet.applyTo(constraintLayout)

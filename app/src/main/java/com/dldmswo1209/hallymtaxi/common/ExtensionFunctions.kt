@@ -80,3 +80,6 @@ fun Date.dateToString(format: String = "yyyy-MM-dd HH:mm:ss", local : Locale = L
 fun Fragment.toast(msg: String){
     Toast.makeText(requireActivity(), msg, Toast.LENGTH_SHORT).show()
 }
+
+val Int.dp: Int
+    get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()

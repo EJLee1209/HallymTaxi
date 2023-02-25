@@ -29,17 +29,15 @@ class ServerRepositoryImpl(
                         }
                         STATUS_FAIL -> {
                             result.invoke(
-                                UiState.Failure("인증 메일 전송 실패, 웹메일을 다시 확인해주세요")
+                                UiState.Failure("인증 메일 전송 실패,\n웹메일을 다시 확인해주세요")
                             )
                         }
                     }
                 } ?: kotlin.run {
                     result.invoke(
-                        UiState.Failure("서버 오류 입니다 빠른 시일 내에 고치겠습니다 죄송합니다")
+                        UiState.Failure("서버 오류 입니다\n빠른 시일 내에 고치겠습니다 죄송합니다")
                     )
                 }
-
-
             }
 
             override fun onFailure(call: Call<VerifyInfo>, t: Throwable) {

@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -68,18 +69,17 @@ class MainActivity : AppCompatActivity() {
             isNetworkActivate = it
         }
 
-        viewModel.subscribeUser()?.observe(this){
+        viewModel.subscribeUser.observe(this){
             myApplication.setUser(it)
-        } ?: kotlin.run {
-            startActivity(Intent(this, SplashActivity::class.java))
+        }
+        viewModel.subscribeMyRoom.observe(this){room->
+            myApplication.setMyRoom(room)
         }
 
+        viewModel.subscribeUser()
         user?.let {
-            viewModel.subscribeMyRoom(it).observe(this){room->
-                myApplication.setMyRoom(room)
-            }
+            viewModel.subscribeMyRoom(it)
         }
-
     }
 
     private fun bottomNavigationSetup() {
