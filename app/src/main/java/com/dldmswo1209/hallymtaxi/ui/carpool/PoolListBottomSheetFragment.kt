@@ -160,17 +160,19 @@ class PoolListBottomSheetFragment(
         joinedRoom?.let {
             if (it.roomId.isNotBlank()) {
                 // 이미 참여중인 채팅방이 존재함
-                val dialog = CustomDialog(
-                    title = "채팅방 입장",
-                    content = "이미 참여 중인\n채팅방이 존재합니다"
-                ) {}
-                dialog.show(parentFragmentManager, dialog.tag)
-                return
+                if(it == room) {
+                    viewModel.joinRoom(room, user)
+                }else{
+                    val dialog = CustomDialog(
+                        title = "채팅방 입장",
+                        content = "이미 참여 중인\n채팅방이 존재합니다"
+                    ) {}
+                    dialog.show(parentFragmentManager, dialog.tag)
+                    return
+                }
             }
         }
-
         viewModel.joinRoom(room, user)
-        loadingDialog.show()
     }
 
     fun onClickCreateRoom() {

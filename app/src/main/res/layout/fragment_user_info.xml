@@ -72,7 +72,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/name"
                 android:text="@{user.name}"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:enabled="false"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
