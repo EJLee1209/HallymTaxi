@@ -79,7 +79,7 @@ class ChatRoomFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
-        registerBackPressedCallback()
+        registerBackPressedCallback(R.id.action_chatRoomFragment_to_navigation_map)
         setObserver()
         registerBroadcastReceiver()
     }

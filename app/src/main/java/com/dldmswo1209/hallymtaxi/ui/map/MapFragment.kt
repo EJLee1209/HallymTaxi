@@ -103,8 +103,11 @@ class MapFragment : Fragment() {
     }
 
     private fun setObservers(){
+        myApplication.userLiveData.observe(viewLifecycleOwner) { user ->
+            this.user = user
+        }
+
         myApplication.myRoom.observe(viewLifecycleOwner){ room->
-            Log.d("testt", "subscribeMyRoom: ${room}")
             if(room != null){
                 binding.viewCurrentMyRoom.visibility = View.VISIBLE
                 binding.room = room
@@ -375,6 +378,7 @@ class MapFragment : Fragment() {
     fun onClickViewMyCurrentRoom(){
         joinedRoom?.let { room->
             isClickToJoin = true
+            Log.d("testt", "onClickViewMyCurrentRoom: ${user.fcmToken}")
             viewModel.joinRoom(room, user)
         }
     }

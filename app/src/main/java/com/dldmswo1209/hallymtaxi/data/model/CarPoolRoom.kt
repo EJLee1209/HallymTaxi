@@ -14,7 +14,7 @@ data class CarPoolRoom(
     var created: String = "", // 방 생성 시간
     var genderOption: String = "", // 탑승 옵션(남자/여자/상관없음)
     var closed: Boolean = false // 방 마감 여부
-): Parcelable
+): Parcelable, java.io.Serializable
 
 const val GENDER_OPTION_MALE = "male"
 const val GENDER_OPTION_FEMALE = "female"

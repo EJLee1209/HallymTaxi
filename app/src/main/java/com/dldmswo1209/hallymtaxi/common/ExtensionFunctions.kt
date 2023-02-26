@@ -107,10 +107,14 @@ fun Int?.orEmpty(default: Int = 0): Int {
     return this ?: default
 }
 
-fun Fragment.registerBackPressedCallback(){
+fun Fragment.registerBackPressedCallback(destination: Int? = null){
     val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            findNavController().navigateUp()
+            destination?.let {
+                findNavController().navigate(it)
+            }  ?: kotlin.run {
+                findNavController().navigateUp()
+            }
         }
     }
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)

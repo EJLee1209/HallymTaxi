@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -16,8 +17,14 @@ import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
+import com.dldmswo1209.hallymtaxi.util.FireStoreTable
+import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -33,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     var isNetworkActivate = false
     private var user: User? = null
     private lateinit var myApplication: MyApplication
+    private var room: CarPoolRoom? = null
 
     //권한 가져오기
     companion object{
@@ -52,6 +60,8 @@ class MainActivity : AppCompatActivity() {
         getIntentExtraData()
         setObserver()
         bottomNavigationSetup()
+
+
     }
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기
@@ -69,17 +79,23 @@ class MainActivity : AppCompatActivity() {
             isNetworkActivate = it
         }
 
-        viewModel.subscribeUser.observe(this){
-            myApplication.setUser(it)
-        }
         viewModel.subscribeMyRoom.observe(this){room->
             myApplication.setMyRoom(room)
+            this.room = room
         }
 
-        viewModel.subscribeUser()
+        viewModel.subscribeUser.observe(this){ user ->
+            myApplication.setUser(user)
+            room?.let { pool ->
+                // 유저 정보 업데이트 시 현재 참여 중인 방의 내 정보 동기화
+                viewModel.updateRoomParticipantsInfo(pool.roomId, pool.participants, user)
+            }
+        }
+
         user?.let {
             viewModel.subscribeMyRoom(it)
         }
+        viewModel.subscribeUser()
     }
 
     private fun bottomNavigationSetup() {

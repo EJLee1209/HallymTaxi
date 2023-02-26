@@ -67,6 +67,46 @@ class FireStoreRepositoryImpl(
         }
     }
 
+    override fun getMyRoom(user: User, result: (UiState<CarPoolRoom>) -> Unit) {
+        fireStore.collection(FireStoreTable.ROOM)
+            .whereArrayContains("participants", user)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                querySnapshot?.let {
+                    val snapshot = it.documents.firstOrNull()
+                    snapshot?.toObject<CarPoolRoom>()?.let { room ->
+                        result.invoke(UiState.Success(room))
+                    } ?: kotlin.run {
+                        val copyUser = user
+                        copyUser.fcmToken = ""
+                        fireStore.collection(FireStoreTable.ROOM)
+                            .whereArrayContains("participants", copyUser)
+                            .get()
+                            .addOnSuccessListener { querySnapshot ->
+                                querySnapshot?.let { querySnapshot2->
+                                    val snapshot2 = querySnapshot2.documents.firstOrNull()
+                                    snapshot2?.toObject<CarPoolRoom>()?.let { room ->
+                                        result.invoke(UiState.Success(room))
+                                    } ?: kotlin.run {
+                                        result.invoke(UiState.Failure("참여 중인 방이 없습니다"))
+                                    }
+                                } ?: kotlin.run {
+                                    result.invoke(UiState.Failure("빈 쿼리입니다"))
+                                }
+                            }
+                            .addOnFailureListener {
+                                result.invoke(UiState.Failure("방 정보를 가져오지 못했습니다"))
+                            }
+                    }
+                } ?: kotlin.run {
+                    result.invoke(UiState.Failure("빈 쿼리입니다"))
+                }
+            }
+            .addOnFailureListener {
+                result.invoke(UiState.Failure("방 정보를 가져오지 못했습니다"))
+            }
+    }
+
     override fun createRoom(room: CarPoolRoom, user: User, result: (UiState<CarPoolRoom>) -> Unit) {
         val ref = fireStore.collection(FireStoreTable.ROOM).document()
 
@@ -195,5 +235,17 @@ class FireStoreRepositoryImpl(
                     UiState.Failure("기기의 토큰 값을 가져오지 못했습니다")
                 )
             }
+    }
+
+    override fun updateRoomParticipantsInfo(roomId: String, participants: List<User>, currentUser: User) {
+        participants.forEach { participant->
+            if(participant.uid == currentUser.uid){
+                participant.name = currentUser.name
+                participant.fcmToken = currentUser.fcmToken
+                return@forEach
+            }
+        }
+        fireStore.collection(FireStoreTable.ROOM).document(roomId)
+            .update("participants", participants)
     }
 }

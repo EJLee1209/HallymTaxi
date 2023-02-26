@@ -12,8 +12,14 @@ class MyApplication: Application() {
     private var isViewChatRoom: Boolean = false // 유저가 채팅창을 보고 있음?
     private var _myRoom = MutableLiveData<CarPoolRoom?>() // 현재 참여중인 채팅방
     val myRoom : LiveData<CarPoolRoom?> = _myRoom
+
+    private var _userLiveData = MutableLiveData<User>() // 현재 참여중인 채팅방
+    val userLiveData : LiveData<User> = _userLiveData
+
     private var myRoomId: String? = null
     private var user : User? = null
+
+
 
     fun getIsViewChatRoom() : Boolean = isViewChatRoom
     fun setIsViewChatRoom(value: Boolean){ isViewChatRoom = value }
@@ -21,6 +27,9 @@ class MyApplication: Application() {
     fun getMyRoomId() = myRoomId
     fun setMyRoomId(roomId: String) { myRoomId = roomId }
     fun getUser() : User? = user
-    fun setUser(user: User) { this.user = user }
+    fun setUser(user: User) {
+        this.user = user
+        _userLiveData.postValue(user)
+    }
 
 }

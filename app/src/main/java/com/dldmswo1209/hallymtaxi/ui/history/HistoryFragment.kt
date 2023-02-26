@@ -72,7 +72,6 @@ class HistoryFragment : Fragment() {
 
     private fun setObservers() {
         myApplication.myRoom.observe(viewLifecycleOwner){
-            Log.d("testt", "myRoom: ${it}")
             if(it == null) {
                 if(history.isEmpty()) binding.layoutNoPoolRoom.visibility = View.VISIBLE
                 binding.layoutCurrentJoinedRoom.visibility = View.GONE
@@ -89,7 +88,6 @@ class HistoryFragment : Fragment() {
             binding.roomInfo = it
         }
         viewModel.roomHistory.observe(viewLifecycleOwner){
-            Log.d("testt", "room history: ${it}")
             if(it.isEmpty()){
                 if(joinedRoom == null) binding.layoutNoPoolRoom.visibility = View.VISIBLE
                 return@observe

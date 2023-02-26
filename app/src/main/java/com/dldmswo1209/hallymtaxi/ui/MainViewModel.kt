@@ -45,6 +45,9 @@ class MainViewModel @Inject constructor(
     private var _subscribeMyRoom = MutableLiveData<CarPoolRoom>()
     val subscribeMyRoom : LiveData<CarPoolRoom> = _subscribeMyRoom
 
+    private var _myRoom = MutableLiveData<UiState<CarPoolRoom>>()
+    val myRoom : LiveData<UiState<CarPoolRoom>> = _myRoom
+
     private var _user = MutableLiveData<UiState<User>>()
     val user : LiveData<UiState<User>> = _user
 
@@ -164,6 +167,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun getMyRoom(user: User) {
+        fireStoreRepository.getMyRoom(user) {
+            _myRoom.postValue(it)
+        }
+    }
+
 
     fun exitRoom(user: User, room: CarPoolRoom) {
         _exitRoom.postValue(UiState.Loading)
@@ -173,6 +182,10 @@ class MainViewModel @Inject constructor(
     fun deactivateRoom(roomId: String) {
         _deactivateRoom.postValue(UiState.Loading)
         fireStoreRepository.deactivateRoom(roomId){ _deactivateRoom.postValue(it) }
+    }
+
+    fun updateRoomParticipantsInfo(roomId: String, participants: List<User>, currentUser: User) {
+        fireStoreRepository.updateRoomParticipantsInfo(roomId, participants, currentUser)
     }
 
     fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {

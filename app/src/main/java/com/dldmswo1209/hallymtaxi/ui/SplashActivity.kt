@@ -9,10 +9,12 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.data.model.defaultFavorites
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkDialog
 import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
@@ -35,6 +37,7 @@ class SplashActivity : AppCompatActivity() {
     }
     private lateinit var myApplication: MyApplication
     private val UPDATE_REQUEST_CODE = 200
+    private lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,15 +129,33 @@ class SplashActivity : AppCompatActivity() {
                     startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
                 }
                 is UiState.Success -> {
+                    user = state.data
+                    viewModel.getMyRoom(state.data)
                     myApplication.setUser(state.data)
-                    val intent = Intent(this@SplashActivity, MainActivity::class.java).apply {
-                        putExtra("userInfo", state.data)
-                    }
-                    startActivity(intent)
-                    finish()
                 }
             }
         }
+        viewModel.myRoom.observe(this) { state ->
+            when (state) {
+                is UiState.Loading -> {}
+                is UiState.Failure -> {
+                    startMainActivity()
+                }
+                is UiState.Success -> {
+                    val room = state.data
+                    viewModel.updateRoomParticipantsInfo(room.roomId, room.participants, user)
+                    startMainActivity()
+                }
+            }
+        }
+    }
+
+    private fun startMainActivity() {
+        val intent = Intent(this@SplashActivity, MainActivity::class.java).apply {
+            putExtra("userInfo", user)
+        }
+        startActivity(intent)
+        finish()
     }
 
     override fun onResume() {
