@@ -31,6 +31,7 @@ import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.ui.MainViewModel
+import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
@@ -53,6 +54,9 @@ class ChatRoomFragment: Fragment() {
     }
     private val notificationManager : NotificationManagerCompat by lazy{
         NotificationManagerCompat.from(requireActivity().applicationContext)
+    }
+    private val loadingDialog by lazy{
+        LoadingDialog(requireActivity())
     }
 
     private var isFirst = true
@@ -128,7 +132,7 @@ class ChatRoomFragment: Fragment() {
     private fun setObserver(){
         viewModel.detachChatList(room.roomId)
         myApplication.myRoom.observe(viewLifecycleOwner){ room->
-            if(room == null) {
+            if(room.roomId.isBlank()) {
                 val deletedRoomDialog = CustomDialog(
                     title = "채팅방 입장 오류",
                     content = "참여할 수 없는 채팅방입니다.",
@@ -138,13 +142,14 @@ class ChatRoomFragment: Fragment() {
                 return@observe
             }
 
+
             val isBefore = TimeService.isBefore(room.departureTime, "T")
             if(!isBefore && isFirst){
                 // 출발시간이 지남
                 val finishedRoom = CustomDialog(
                     title = "출발시간 초과",
                     content = "출발시간이 지난 채팅방 입니다.\n더 이상 카풀 목록에 표시되지 않습니다.",
-                    positiveCallback = { exitRoom() },
+                    positiveCallback = { viewModel.exitRoom(currentUser, room) },
                     positiveButton = "나가기",
                     negativeButtonVisible = true,
                     negativeButton = "취소",
@@ -198,6 +203,77 @@ class ChatRoomFragment: Fragment() {
                 }
             }
         }
+
+        viewModel.deactivateRoom.observe(viewLifecycleOwner) { state ->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                    val chat = Chat(
+                        roomId = room.roomId,
+                        userId = currentUser.uid,
+                        msg = "카풀이 마감됐습니다",
+                        messageType = CHAT_ETC
+                    )
+                    viewModel.sendMessage(chat, currentUser.name, tokenList)
+                }
+                is UiState.Failure ->{
+                    loadingDialog.dismiss()
+                    toast(state.error ?: "알 수 없는 오류 입니다")
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    viewModel.detachChatList(room.roomId)
+                }
+            }
+        }
+
+        viewModel.exitRoom.observe(viewLifecycleOwner) { state ->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                    messages.forEachIndexed { idx, chat ->
+                        if (chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid) {
+                            // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
+                            roomInfo?.let { roomInfo ->
+                                roomInfo.isActivate = false
+                                roomInfo.startPlaceName = room.startPlace.place_name
+                                roomInfo.endPlaceName = room.endPlace.place_name
+                                roomInfo.lastMsg = messages.last().msg
+                                roomInfo.lastReceiveMsgDateTime = messages.last().dateTime
+                                viewModel.insertRoomInfo(roomInfo)
+                            }
+                            return@forEachIndexed
+                        }
+                    }
+                }
+                is UiState.Failure ->{ }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+
+                    viewModel.sendMessage(
+                        Chat(
+                            roomId = room.roomId,
+                            userId = currentUser.uid,
+                            msg = "${currentUser.name}님이 나갔습니다",
+                            messageType = CHAT_EXIT
+                        ), currentUser.name, tokenList
+                    )
+                    if(room.participants.first() == currentUser && room.userCount >= 2){
+                        // 방장이 나감
+                        viewModel.sendMessage(
+                            Chat(
+                                roomId = room.roomId,
+                                userId = currentUser.uid,
+                                msg = "${room.participants[1].name}님은 이제 방장 입니다",
+                                messageType = CHAT_ETC
+                            ), currentUser.name, tokenList
+                        )
+                    }
+                    onClickBack()
+                }
+            }
+
+        }
     }
     private fun registerBroadcastReceiver() {
         // 새로운 메세지가 온 경우 브로드 캐스트 리시버를 통해 알 수 있음
@@ -236,7 +312,7 @@ class ChatRoomFragment: Fragment() {
                         content = "나가기를 하면 대화내용이\n모두 히스토리에 저장됩니다.\n정말 나가시겠습니까?",
                         negativeButtonVisible = true,
                         positiveButton = "나가기",
-                        positiveCallback = { exitRoom() }
+                        positiveCallback = { viewModel.exitRoom(currentUser, room) }
                     )
                     exitDialog.show(parentFragmentManager, exitDialog.tag)
 
@@ -264,62 +340,11 @@ class ChatRoomFragment: Fragment() {
             return
         }
         if (room.closed) return
-        val chat = Chat(
-            roomId = room.roomId,
-            userId = currentUser.uid,
-            msg = "카풀이 마감됐습니다",
-            messageType = CHAT_ETC
-        )
+
         viewModel.deactivateRoom(room.roomId)
-        CoroutineScope(Dispatchers.IO).launch {
-            async {
-                viewModel.sendMessage(chat, currentUser.name, tokenList)
-            }.await()
-            viewModel.detachChatList(room.roomId)
-        }
     }
 
-    private fun exitRoom() {
-        CoroutineScope(Dispatchers.IO).launch {
-            viewModel.sendMessage(
-                Chat(
-                    roomId = room.roomId,
-                    userId = currentUser.uid,
-                    msg = "${currentUser.name}님이 나갔습니다",
-                    messageType = CHAT_EXIT
-                ), currentUser.name, tokenList
-            )
-            if(room.participants.first() == currentUser && room.userCount >= 2){
-                // 방장이 나감
-                viewModel.sendMessage(
-                    Chat(
-                        roomId = room.roomId,
-                        userId = currentUser.uid,
-                        msg = "${room.participants[1].name}님은 이제 방장 입니다",
-                        messageType = CHAT_ETC
-                    ), currentUser.name, tokenList
-                )
-            }
-        }
-        messages.forEachIndexed { idx, chat ->
-            if (chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid) {
-                // 유저가 해당 채팅방에서 채팅을 보낸적 있으면 히스토리에 저장함
-                roomInfo?.let { roomInfo ->
-                    roomInfo.isActivate = false
-                    roomInfo.startPlaceName = room.startPlace.place_name
-                    roomInfo.endPlaceName = room.endPlace.place_name
-                    roomInfo.lastMsg = messages.last().msg
-                    roomInfo.lastReceiveMsgDateTime = messages.last().dateTime
-                    viewModel.insertRoomInfo(roomInfo)
-                }
-                return@forEachIndexed
-            }
-        }
 
-        viewModel.exitRoom(currentUser, room)
-        onClickBack()
-        myApplication.setMyRoom(null)
-    }
 
     fun onClickSend(){
         if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){

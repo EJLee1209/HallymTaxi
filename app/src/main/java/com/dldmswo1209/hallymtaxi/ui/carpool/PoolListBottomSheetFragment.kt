@@ -158,7 +158,7 @@ class PoolListBottomSheetFragment(
         // 채팅방 입장
         this.room = room
         joinedRoom?.let {
-            if (it.roomId != room.roomId) {
+            if (it.roomId.isNotBlank()) {
                 // 이미 참여중인 채팅방이 존재함
                 val dialog = CustomDialog(
                     title = "채팅방 입장",
@@ -176,13 +176,15 @@ class PoolListBottomSheetFragment(
     fun onClickCreateRoom() {
         joinedRoom?.let {
             // 현재 참여하고 있는 방이 있음
-            val dialog = CustomDialog(
-                title = "방 만들기",
-                content = "다른 채팅방을 생성하려면,\n참여하고 있는 방을 나가주세요"
-            ) {}
-            dialog.show(parentFragmentManager, dialog.tag)
+            if(it.roomId.isNotBlank()) {
+                val dialog = CustomDialog(
+                    title = "방 만들기",
+                    content = "다른 채팅방을 생성하려면,\n참여하고 있는 방을 나가주세요"
+                ) {}
+                dialog.show(parentFragmentManager, dialog.tag)
 
-            return
+                return
+            }
         }
 
         onCreateRoomBtnClick()

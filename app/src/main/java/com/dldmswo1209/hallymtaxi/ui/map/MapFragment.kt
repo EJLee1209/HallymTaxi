@@ -25,6 +25,7 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
 import net.daum.mf.map.api.CameraPosition
 import net.daum.mf.map.api.CameraUpdateFactory
 import net.daum.mf.map.api.MapPOIItem
@@ -108,10 +109,11 @@ class MapFragment : Fragment() {
         }
 
         myApplication.myRoom.observe(viewLifecycleOwner){ room->
-            if(room != null){
-                binding.viewCurrentMyRoom.visibility = View.VISIBLE
+
+            if(room != null && room.roomId.isNotBlank()){
                 binding.room = room
                 myApplication.setMyRoomId(room.roomId)
+                binding.viewCurrentMyRoom.visibility = View.VISIBLE
 
                 constraintDynamicChange(
                     startId = binding.logoKakao.id,

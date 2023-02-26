@@ -57,6 +57,8 @@ class FireStoreRepositoryImpl(
                         if(!querySnapshot.isEmpty) {
                             val data = querySnapshot.first().toObject<CarPoolRoom>()
                             trySend(data)
+                        }else{
+                            this.trySend(CarPoolRoom())
                         }
                     }
 

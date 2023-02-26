@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             myApplication.setUser(user)
             room?.let { pool ->
                 // 유저 정보 업데이트 시 현재 참여 중인 방의 내 정보 동기화
-                viewModel.updateRoomParticipantsInfo(pool.roomId, pool.participants, user)
+                if(pool.roomId.isNotBlank()) viewModel.updateRoomParticipantsInfo(pool.roomId, pool.participants, user)
             }
         }
 
