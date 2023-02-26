@@ -65,7 +65,6 @@ class FireStoreRepositoryImpl(
                 }
             awaitClose {
                 listenerRegistration.remove()
-                Log.d("testt", "subscribeMyRoom listener remove")
             }
         }
     }

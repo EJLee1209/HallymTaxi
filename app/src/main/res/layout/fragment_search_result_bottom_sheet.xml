@@ -30,10 +30,11 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/resultRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginHorizontal="12dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/background_grey_top_r15"
+                android:paddingBottom="300dp"
+                android:clipToPadding="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_search_result" />
 

@@ -37,30 +37,44 @@ class MapFragment : Fragment() {
     private lateinit var binding: FragmentMapBinding
     private lateinit var locationService : LocationService
     private lateinit var favoritesListAdapter: FavoritesListAdapter
-    private val viewModel : MainViewModel by viewModels()
+    private lateinit var user : User
+    private lateinit var myApplication: MyApplication
+    private lateinit var mapView: MapView
+
     private var isSearching = false
     private var isStartPointSearching = false
     private var startPlaceMarker = MapPOIItem()
     private var endPlaceMarker = MapPOIItem()
     private var startPlace : Place? = null
     private var endPlace: Place? = null
-    private val hallym_lat : Double = 37.88728582472663
-    private val hallym_lng : Double = 127.73812631862366
     private var searchResultBottomSheet : SearchResultBottomSheetFragment? = null
     private var poolListBottomSheet : PoolListBottomSheetFragment? = null
     private var joinedRoom: CarPoolRoom? = null
-    private lateinit var user : User
-    private lateinit var myApplication: MyApplication
     private val loadingDialog by lazy{
         LoadingDialog(requireActivity())
     }
-    private lateinit var mapView: MapView
-    private var isClickToJoin = false
-
+    private val viewModel : MainViewModel by viewModels()
 
     companion object{
         const val SEARCH_RESULT_BOTTOM_SHEET_TAG = "SearchResultBottomSheetFragment"
         const val POOL_LIST_BOTTOM_SHEET_TAG = "PoolListBottomSheetFragment"
+    }
+
+    private val onClickCreateRoom: () -> Unit = {
+        // 채팅방 생성 버튼 클릭 콜백
+        val action =
+            MapFragmentDirections.actionNavigationMapToNavigationCreateRoom(
+                startPlace!!,
+                endPlace!!
+            )
+        findNavController().navigate(action)
+    }
+    private val joinCallback: (CarPoolRoom) -> Unit = { room ->
+        // 채팅방 입장 콜백
+        val action =
+            MapFragmentDirections.actionNavigationMapToChatRoomFragment(room)
+        findNavController().navigate(action)
+        poolListBottomSheet?.dialog?.dismiss()
     }
 
     override fun onCreateView(
@@ -80,11 +94,13 @@ class MapFragment : Fragment() {
         setEditorActionListener()
     }
     private fun init(){
+        binding.fragment = this
+
         mapView = MapView(requireActivity())
         binding.mapview.addView(mapView)
 
         locationService = LocationService(requireActivity())
-        moveCamera(hallym_lat, hallym_lng, 2f)
+        moveCamera(place_hallym_univ.y, place_hallym_univ.x, 2f)
 
         myApplication = requireActivity().application as MyApplication
         user = myApplication.getUser() ?: kotlin.run {
@@ -93,10 +109,7 @@ class MapFragment : Fragment() {
             return
         }
 
-        binding.fragment = this
-
         favoritesListAdapter = FavoritesListAdapter { place ->
-            Log.d("testt", "즐겨찾기 클릭 : ${place.place_name}")
             locationService.getCurrentAddress()
             searchResultClickEvent(place, false)
         }
@@ -149,7 +162,7 @@ class MapFragment : Fragment() {
                     loadingDialog.dismiss()
                     val placeList = state.data.documents
                     if(isStartPointSearching){ // 출발지를 검색한 경우
-                        showBottomSheetDialog(placeList, isStartPoint = true, isSearchResult = true, tag = SEARCH_RESULT_BOTTOM_SHEET_TAG)
+                        showSearchResultBottomSheet(placeList, true)
                     }else{ // 그냥 현재 위치를 가져온 경우
                         if(placeList.isNotEmpty()){
                             searchResultClickEvent(placeList.first(), true) // 검색결과 첫번째 장소를 전달
@@ -177,7 +190,7 @@ class MapFragment : Fragment() {
                     loadingDialog.dismiss()
                     val placeList = state.data.documents
                     if(isSearching){
-                        showBottomSheetDialog(placeList, isStartPoint = false, isSearchResult = true, tag = SEARCH_RESULT_BOTTOM_SHEET_TAG)
+                        showSearchResultBottomSheet(placeList, false)
                     }
                     isSearching = false
                 }
@@ -190,8 +203,6 @@ class MapFragment : Fragment() {
         }
 
         viewModel.joinRoom.observe(viewLifecycleOwner){state->
-            if(!isClickToJoin) return@observe
-
             when(state){
                 is UiState.Loading -> {
                     loadingDialog.show()
@@ -271,7 +282,7 @@ class MapFragment : Fragment() {
             if(startPlace != null && endPlace != null){
                 mapView.selectPOIItem(endPlaceMarker, true)
                 setCameraCenterAllPOIItems()
-                showBottomSheetDialog(isSearchResult = false, tag = POOL_LIST_BOTTOM_SHEET_TAG) // 카풀방 리스트 보여주기
+                showCarPoolListBottomSheet()
             }
         }else{
             setCameraCenterAllPOIItems()
@@ -286,7 +297,6 @@ class MapFragment : Fragment() {
         )
 
         binding.initSearchLayout.visibility = View.GONE
-
         binding.searchLayout.visibility = View.VISIBLE
     }
 
@@ -318,36 +328,22 @@ class MapFragment : Fragment() {
     }
 
     // 장소 검색결과 또는 카풀방 리스트 보여주기
-    private fun showBottomSheetDialog(documents: List<Place> = listOf(), isStartPoint: Boolean = false, isSearchResult: Boolean, tag: String){
-        if(!isOpenBottomSheetFragment(tag)){
-            if(isSearchResult) {
-                searchResultBottomSheet = SearchResultBottomSheetFragment(documents) { place ->
-                    // 장소 클릭 이벤트 처리
-                    searchResultClickEvent(place, isStartPoint)
-                }
-                searchResultBottomSheet?.show(parentFragmentManager, SEARCH_RESULT_BOTTOM_SHEET_TAG)
+    private fun showSearchResultBottomSheet(searchResults: List<Place>, isStartPoint: Boolean) {
+        if(!isOpenBottomSheetFragment(SEARCH_RESULT_BOTTOM_SHEET_TAG)) {
+            searchResultBottomSheet = SearchResultBottomSheetFragment(searchResults) { place ->
+                // 장소 클릭 이벤트 처리
+                searchResultClickEvent(place, isStartPoint)
             }
-            else{
-                if(startPlace != null && endPlace != null) {
-                    val onClickCreateRoom: () -> Unit = {
-                        val action =
-                            MapFragmentDirections.actionNavigationMapToNavigationCreateRoom(
-                                startPlace!!,
-                                endPlace!!
-                            )
-                        findNavController().navigate(action)
-                    }
-                    val joinCallback: (CarPoolRoom) -> Unit = { room ->
-                        // 채팅방 입장
-                        val action =
-                            MapFragmentDirections.actionNavigationMapToChatRoomFragment(room)
-                        findNavController().navigate(action)
-                        poolListBottomSheet?.dialog?.dismiss()
-                    }
-                    poolListBottomSheet =
-                        PoolListBottomSheetFragment(onClickCreateRoom, joinCallback, endPlace!!)
-                    poolListBottomSheet?.show(parentFragmentManager, POOL_LIST_BOTTOM_SHEET_TAG)
-                }
+            searchResultBottomSheet?.show(parentFragmentManager, SEARCH_RESULT_BOTTOM_SHEET_TAG)
+        }
+    }
+
+    private fun showCarPoolListBottomSheet() {
+        if(!isOpenBottomSheetFragment(POOL_LIST_BOTTOM_SHEET_TAG)) {
+            if(startPlace != null && endPlace != null) {
+                poolListBottomSheet =
+                    PoolListBottomSheetFragment(onClickCreateRoom, joinCallback, endPlace!!)
+                poolListBottomSheet?.show(parentFragmentManager, POOL_LIST_BOTTOM_SHEET_TAG)
             }
         }
     }
@@ -379,8 +375,6 @@ class MapFragment : Fragment() {
 
     fun onClickViewMyCurrentRoom(){
         joinedRoom?.let { room->
-            isClickToJoin = true
-            Log.d("testt", "onClickViewMyCurrentRoom: ${user.fcmToken}")
             viewModel.joinRoom(room, user)
         }
     }
@@ -412,6 +406,5 @@ class MapFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         searchResultBottomSheet?.dialog?.dismiss()
-        isClickToJoin = false
     }
 }
