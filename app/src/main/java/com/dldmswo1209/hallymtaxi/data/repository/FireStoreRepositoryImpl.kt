@@ -63,6 +63,7 @@ class FireStoreRepositoryImpl(
                 }
             awaitClose {
                 listenerRegistration.remove()
+                Log.d("testt", "subscribeMyRoom listener remove")
             }
         }
     }
@@ -77,7 +78,7 @@ class FireStoreRepositoryImpl(
                     snapshot?.toObject<CarPoolRoom>()?.let { room ->
                         result.invoke(UiState.Success(room))
                     } ?: kotlin.run {
-                        val copyUser = user
+                        val copyUser = user.copy()
                         copyUser.fcmToken = ""
                         fireStore.collection(FireStoreTable.ROOM)
                             .whereArrayContains("participants", copyUser)

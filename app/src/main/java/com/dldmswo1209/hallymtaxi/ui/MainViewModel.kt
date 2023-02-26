@@ -22,6 +22,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -98,7 +99,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun subscribeUser() = viewModelScope.launch {
-        fireStoreRepository.subscribeUser().collectLatest { user ->
+        fireStoreRepository.subscribeUser().collect { user ->
             _subscribeUser.value = user
         }
     }
@@ -162,7 +163,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun subscribeMyRoom(user: User) = viewModelScope.launch {
-        fireStoreRepository.subscribeMyRoom(user).collectLatest {
+        fireStoreRepository.subscribeMyRoom(user).collect {
             _subscribeMyRoom.value = it
         }
     }
