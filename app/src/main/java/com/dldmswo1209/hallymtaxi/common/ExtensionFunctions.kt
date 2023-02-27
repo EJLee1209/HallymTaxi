@@ -1,6 +1,7 @@
 package com.dldmswo1209.hallymtaxi.common
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.res.Resources
@@ -19,6 +20,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -113,3 +117,15 @@ fun Fragment.registerBackPressedFinishActivityCallback(){
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 }
 
+fun Activity.requestUpdate(
+    appUpdateInfo: AppUpdateInfo
+) {
+    val appUpdateManager = AppUpdateManagerFactory.create(this)
+
+    appUpdateManager.startUpdateFlowForResult(
+        appUpdateInfo,
+        AppUpdateType.IMMEDIATE,
+        this,
+        200
+    )
+}

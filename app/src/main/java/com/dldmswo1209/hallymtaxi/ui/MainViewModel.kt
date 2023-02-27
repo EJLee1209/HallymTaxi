@@ -15,6 +15,7 @@ import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.remote.FirestorePagingSource
 import com.dldmswo1209.hallymtaxi.data.remote.PAGE_SIZE
+import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -36,6 +37,7 @@ class MainViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val kakaoRepository: KakaoRepository,
     private val serverRepository: ServerRepository,
+    private val inAppUpdateRepository: InAppUpdateRepository,
     private val fireStore: FirebaseFirestore,
     application: Application
 ) : AndroidViewModel(application) {
@@ -93,6 +95,9 @@ class MainViewModel @Inject constructor(
 
     private var _updateUserName = MutableLiveData<UiState<String>>()
     val updateUserName : LiveData<UiState<String>> = _updateUserName
+
+    private var _inAppUpdate = MutableLiveData<UiState<AppUpdateInfo>>()
+    val inAppUpdate : LiveData<UiState<AppUpdateInfo>> = _inAppUpdate
 
     fun getUserInfo(){
         authRepository.getUserInfo { _user.postValue(it) }
@@ -248,6 +253,11 @@ class MainViewModel @Inject constructor(
 
     fun deleteFavorite(place: Place) = viewModelScope.launch(Dispatchers.IO) {
         databaseRepository.deleteFavorite(place)
+    }
+
+    fun checkAppUpdate() {
+        _inAppUpdate.postValue(UiState.Loading)
+        inAppUpdateRepository.checkAppUpdate { _inAppUpdate.postValue(it) }
     }
 
     private fun networkErrorMessage(e: Exception){

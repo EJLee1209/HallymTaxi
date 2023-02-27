@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.common.requestUpdate
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.data.model.defaultFavorites
@@ -36,42 +37,30 @@ class SplashActivity : AppCompatActivity() {
         CheckNetwork(this)
     }
     private lateinit var myApplication: MyApplication
-    private val UPDATE_REQUEST_CODE = 200
     private lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        checkAppUpdate()
+        start()
     }
 
-    private fun checkAppUpdate() {
-        val appUpdateManager = AppUpdateManagerFactory.create(this)
-
-        val appUpdateInfoTask: Task<AppUpdateInfo> = appUpdateManager.appUpdateInfo
-        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo.updateAvailability() === UpdateAvailability.UPDATE_AVAILABLE
-                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
-            ) { // 업데이트 있음
-                requestUpdate(appUpdateManager, appUpdateInfo)
-            } else {
-                splashStart()
+    private fun start() {
+        viewModel.inAppUpdate.observe(this) { state ->
+            when (state) {
+                is UiState.Loading -> {}
+                is UiState.Failure -> {
+                    splashStart()
+                }
+                is UiState.Success -> {
+                    requestUpdate(state.data)
+                }
             }
         }
+        viewModel.checkAppUpdate()
     }
 
-    private fun requestUpdate(
-        appUpdateManager: AppUpdateManager,
-        appUpdateInfo: AppUpdateInfo
-    ) {
-        appUpdateManager.startUpdateFlowForResult(
-            appUpdateInfo,
-            AppUpdateType.IMMEDIATE,
-            this,
-            UPDATE_REQUEST_CODE
-        )
-    }
 
     private fun splashStart() {
         checkFirst()

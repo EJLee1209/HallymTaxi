@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.registerBackPressedFinishActivityCallback
+import com.dldmswo1209.hallymtaxi.common.requestUpdate
 import com.dldmswo1209.hallymtaxi.databinding.FragmentMenuBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
@@ -76,6 +77,33 @@ class MenuFragment: Fragment() {
                 }
             }
         }
+
+        viewModel.inAppUpdate.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                    when(state.error) {
+                        "업데이트 없음" -> {
+                            binding.tvVersion.text = "최신 버전 입니다."
+                        }
+                        else -> {
+                            val failToCheckUpdate = CustomDialog(
+                                title = state.error ?: "알 수 없는 오류",
+                                content = "네트워크 상태를 확인해주세요",
+                            )
+                            failToCheckUpdate.show(parentFragmentManager, failToCheckUpdate.tag)
+                        }
+                    }
+                }
+                is UiState.Success -> {
+                    loadingDialog.dismiss()
+                    requireActivity().requestUpdate(state.data)
+                }
+            }
+        }
     }
 
 
@@ -91,5 +119,9 @@ class MenuFragment: Fragment() {
 
     fun onClickUserInfo(){
         findNavController().navigate(R.id.action_navigation_menu_to_userInfoFragment)
+    }
+
+    fun onClickUpdateInfo() {
+        viewModel.checkAppUpdate()
     }
 }

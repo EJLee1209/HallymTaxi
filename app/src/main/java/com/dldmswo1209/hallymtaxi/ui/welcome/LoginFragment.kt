@@ -67,7 +67,6 @@ class LoginFragment: Fragment() {
                 is UiState.Success ->{
                     loadingDialog.dismiss()
                     // 로그인 가능
-                    // 로그인 시도
                     viewModel.login(email, password)
                 }
             }

@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.di
 
+import android.content.Context
 import com.dldmswo1209.hallymtaxi.data.local.dao.ChatDao
 import com.dldmswo1209.hallymtaxi.data.local.dao.FavoriteDao
 import com.dldmswo1209.hallymtaxi.data.local.dao.RoomInfoDao
@@ -11,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -51,5 +53,11 @@ object RepositoryModule {
     fun provideKakaoRepository(
         client: KakaoApi
     ) : KakaoRepository = KakaoRepositoryImpl(client)
+
+    @Provides
+    @Singleton
+    fun provideInAppUpdateRepository(
+        @ApplicationContext context: Context
+    ) : InAppUpdateRepository = InAppUpdateRepositoryImpl(context)
 
 }
