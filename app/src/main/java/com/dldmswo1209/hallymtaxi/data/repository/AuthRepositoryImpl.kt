@@ -1,12 +1,15 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
+import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.util.AuthResponse.EMAIL_EXIST
 import com.dldmswo1209.hallymtaxi.util.AuthResponse.EMAIL_VALID
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.data.model.SignedIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 
 class AuthRepositoryImpl(
     private val auth: FirebaseAuth,
@@ -44,6 +47,39 @@ class AuthRepositoryImpl(
         }
     }
 
+    override fun checkLogged(email: String, result: (UiState<String>) -> Unit) {
+        fireStore.collection("SignedIn").whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener {
+                it?.let { snapshot ->
+                    snapshot.documents.firstOrNull()?.let { document ->
+                        val signedIn = document.toObject<SignedIn>()
+
+                        if(signedIn != null) {
+                            if(signedIn.signedIn) {
+                                result.invoke(
+                                    UiState.Failure("다른 기기에서 이미 로그인 했습니다")
+                                )
+                            }
+                            else {
+                                result.invoke(
+                                    UiState.Success("로그인 가능")
+                                )
+                            }
+                        } else {
+                            result.invoke(
+                                UiState.Success("로그인 가능")
+                            )
+                        }
+                    }
+                } ?: kotlin.run {
+                    result.invoke(
+                        UiState.Success("로그인 가능")
+                    )
+                }
+            }
+    }
+
     override fun loginUser(email: String, password: String, result: (UiState<String>) -> Unit) {
         if(email.isEmpty() || password.isEmpty()){
             result.invoke(
@@ -54,6 +90,12 @@ class AuthRepositoryImpl(
             result.invoke(
                 UiState.Success("로그인 성공")
             )
+            fireStore.collection("SignedIn").document(auth.currentUser!!.uid)
+                .set(SignedIn(
+                    uid = auth.currentUser!!.uid,
+                    email = email,
+                    signedIn = true
+                ))
         }.addOnFailureListener {
             result.invoke(
                 UiState.Failure("로그인 실패, 이메일 또는 비밀번호를 확인해주세요")
@@ -71,6 +113,8 @@ class AuthRepositoryImpl(
                 result.invoke(
                     UiState.Success("로그아웃 성공")
                 )
+                fireStore.collection("SignedIn").document(auth.currentUser!!.uid)
+                    .update(mapOf("signedIn" to false))
                 auth.signOut()
             }
             .addOnFailureListener {

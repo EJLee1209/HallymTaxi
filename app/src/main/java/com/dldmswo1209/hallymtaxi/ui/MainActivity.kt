@@ -61,7 +61,6 @@ class MainActivity : AppCompatActivity() {
         setObserver()
         bottomNavigationSetup()
 
-
     }
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기

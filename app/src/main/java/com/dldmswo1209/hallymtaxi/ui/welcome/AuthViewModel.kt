@@ -37,6 +37,10 @@ class AuthViewModel @Inject constructor(
     private var _login = MutableLiveData<UiState<String>>()
     val login : LiveData<UiState<String>> = _login
 
+    private var _checkLogged = MutableLiveData<UiState<String>>()
+    val checkLogged : LiveData<UiState<String>> = _checkLogged
+
+
     var codeEffectiveTime = 300
 
     fun continueTimer(){
@@ -76,6 +80,13 @@ class AuthViewModel @Inject constructor(
         _login.postValue(UiState.Loading)
         authRepository.loginUser(email, password){
             _login.postValue(it)
+        }
+    }
+
+    fun checkLogged(email: String) {
+        _checkLogged.postValue(UiState.Loading)
+        authRepository.checkLogged(email) {
+            _checkLogged.postValue(it)
         }
     }
 

@@ -1,16 +1,12 @@
 package com.dldmswo1209.hallymtaxi.ui.menu
 
-import android.app.Application
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
-import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.MyApplication
-import com.dldmswo1209.hallymtaxi.common.navigateSafe
 import com.dldmswo1209.hallymtaxi.common.registerBackPressedCallback
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.databinding.FragmentUserInfoBinding

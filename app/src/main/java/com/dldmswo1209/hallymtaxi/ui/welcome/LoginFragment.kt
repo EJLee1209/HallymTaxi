@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.common.*
@@ -20,6 +21,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class LoginFragment: Fragment() {
     private lateinit var binding: FragmentLoginBinding
+    private var email : String = ""
+    private var password : String = ""
     private val viewModel : AuthViewModel by viewModels()
     private val loadingDialog by lazy{
         LoadingDialog(requireActivity())
@@ -50,6 +53,26 @@ class LoginFragment: Fragment() {
         KeyboardUtils.addKeyboardToggleListener((activity as WelcomeActivity), keyboardStateListener)
         binding.etEmail.setFocusAndShowKeyboard(requireContext())
 
+        viewModel.checkLogged.observe(viewLifecycleOwner) { state ->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    // 로그인 불가능 (이미 로그인 되어 있는 기기가 있음)
+                    loadingDialog.dismiss()
+                    binding.tvErrorMessage.text = state.error
+                    binding.tvErrorMessage.visibility = View.VISIBLE
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    // 로그인 가능
+                    // 로그인 시도
+                    viewModel.login(email, password)
+                }
+            }
+        }
+
         viewModel.login.observe(viewLifecycleOwner){state->
             when(state){
                 is UiState.Loading -> {
@@ -58,6 +81,7 @@ class LoginFragment: Fragment() {
                 is UiState.Failure -> {
                     // 로그인 실패
                     loadingDialog.dismiss()
+                    binding.tvErrorMessage.text = state.error
                     binding.tvErrorMessage.visibility = View.VISIBLE
                 }
                 is UiState.Success ->{
@@ -78,9 +102,10 @@ class LoginFragment: Fragment() {
             checkNetworkDialog(parentFragmentManager)
             return
         }
-        val email = binding.etEmail.text.toString()
-        val password = binding.etPassword.text.toString()
-        viewModel.login(email, password)
+        email = binding.etEmail.text.toString()
+        password = binding.etPassword.text.toString()
+
+        viewModel.checkLogged(email)
     }
 
     fun clickBackBtn(){
