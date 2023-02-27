@@ -53,6 +53,6 @@ MVVM Pattern 적용
  
 <br>
 
-## 🏃🏻 프로젝트의 험난한 진행 여정 기록
+## 🏃🏻 프로젝트의 험난한 여정 기록
 [확인하기](https://opposite-mandevilla-887.notion.site/Android-761fa109e0d74f47a997afc6a85f6bf2)
 
