@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -128,4 +129,9 @@ fun Activity.requestUpdate(
         this,
         200
     )
+}
+
+@SuppressLint("HardwareIds")
+fun Activity.getDeviceId(): String {
+    return Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 }

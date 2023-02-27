@@ -1,11 +1,12 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
-import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.data.model.SignedIn
+import com.dldmswo1209.hallymtaxi.util.FireStoreTable.SIGNEDIN
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -249,5 +250,26 @@ class FireStoreRepositoryImpl(
         }
         fireStore.collection(FireStoreTable.ROOM).document(roomId)
             .update("participants", participants)
+    }
+
+    override fun monitoringLoggedIn(): Flow<SignedIn> {
+        return callbackFlow {
+            val listenerRegistration = fireStore.collection(SIGNEDIN).document(auth.currentUser!!.uid)
+                .addSnapshotListener { snapshot, error->
+                    if(error != null){
+                        cancel(
+                            message = "모니터링 에러가 발생했습니다",
+                            cause = error
+                        )
+                        return@addSnapshotListener
+                    }
+                    val signedIn = snapshot?.toObject<SignedIn>()
+                    signedIn?.let { trySend(it) }
+                }
+
+            awaitClose {
+                listenerRegistration.remove()
+            }
+        }
     }
 }

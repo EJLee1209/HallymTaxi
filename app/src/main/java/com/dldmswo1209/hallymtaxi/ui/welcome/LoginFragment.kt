@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.ui.welcome
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog.Companion.checkNetworkD
 import com.dldmswo1209.hallymtaxi.databinding.FragmentLoginBinding
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,13 +63,24 @@ class LoginFragment: Fragment() {
                 is UiState.Failure -> {
                     // 로그인 불가능 (이미 로그인 되어 있는 기기가 있음)
                     loadingDialog.dismiss()
+                    if(state.error == "다른 기기에서 이미 로그인 했습니다") {
+                        val forceLoginDailog = CustomDialog(
+                            "로그인",
+                            content = "다른 기기에서 이미 로그인 상태 입니다\n강제로 로그인 하시겠습니까?",
+                            negativeButtonVisible = true,
+                            positiveCallback = {
+                                viewModel.login(email, password, requireActivity().getDeviceId())
+                            }
+                        )
+                        forceLoginDailog.show(parentFragmentManager, forceLoginDailog.tag)
+                    }
                     binding.tvErrorMessage.text = state.error
                     binding.tvErrorMessage.visibility = View.VISIBLE
                 }
                 is UiState.Success ->{
                     loadingDialog.dismiss()
                     // 로그인 가능
-                    viewModel.login(email, password)
+                    viewModel.login(email, password, requireActivity().getDeviceId())
                 }
             }
         }
@@ -86,11 +99,23 @@ class LoginFragment: Fragment() {
                 is UiState.Success ->{
                     loadingDialog.dismiss()
                     // 로그인 성공
-                    startActivity(Intent(requireActivity(), SplashActivity::class.java))
+                    savePreferencesLoggedInfo()
+                    val intent = Intent(requireActivity(), SplashActivity::class.java)
+                    intent.putExtra("fromLoginFragment", true)
+                    startActivity(intent)
                     requireActivity().finish()
                 }
             }
         }
+    }
+
+    private fun savePreferencesLoggedInfo() {
+        val sharedPreferences =
+            requireActivity().getSharedPreferences("loggedInfo", Context.MODE_PRIVATE)
+        sharedPreferences.edit()
+            .putString("email", email)
+            .putString("password", password)
+            .apply()
     }
 
     fun clickLoginBtn(){
@@ -104,7 +129,7 @@ class LoginFragment: Fragment() {
         email = binding.etEmail.text.toString()
         password = binding.etPassword.text.toString()
 
-        viewModel.checkLogged(email)
+        viewModel.checkLogged(email, requireActivity().getDeviceId())
     }
 
     fun clickBackBtn(){

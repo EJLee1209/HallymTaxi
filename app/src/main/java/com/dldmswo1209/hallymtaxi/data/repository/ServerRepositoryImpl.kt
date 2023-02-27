@@ -116,6 +116,12 @@ class ServerRepositoryImpl(
         id: String,
         result: (UiState<String>) -> Unit
     ) {
+        if(token.isEmpty()) {
+            result.invoke(
+                UiState.Failure(id)
+            )
+        }
+
         client.sendPushMessage(token, id, roomId, userId, userName, message, messageType)
             .enqueue(object : Callback<Boolean> {
                 override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
@@ -143,7 +149,6 @@ class ServerRepositoryImpl(
                         UiState.Failure(id)
                     )
                 }
-
             })
     }
 }

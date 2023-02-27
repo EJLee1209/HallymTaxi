@@ -1,31 +1,26 @@
 package com.dldmswo1209.hallymtaxi.ui
 
 import android.Manifest
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.common.getDeviceId
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
-import com.dldmswo1209.hallymtaxi.util.FireStoreTable
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.ktx.Firebase
+import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
 
 
 @AndroidEntryPoint
@@ -60,7 +55,6 @@ class MainActivity : AppCompatActivity() {
         getIntentExtraData()
         setObserver()
         bottomNavigationSetup()
-
     }
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기
@@ -91,6 +85,26 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.monitoring.observe(this) {
+            if(it.deviceId != getDeviceId()) {
+                // 다른 기기로 강제 로그인 시도함
+                val forcedLoggedInDialog = CustomDialog(
+                    title = "시스템 메세지",
+                    content = "다른 기기에서 로그인을 했습니다\n잠시 후 앱이 종료됩니다",
+                    positiveCallback = { finish() },
+                )
+                CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.Default) {
+                        forcedLoggedInDialog.show(supportFragmentManager, forcedLoggedInDialog.tag)
+                        delay(3000)
+                    }
+                    finish()
+                }
+
+            }
+        }
+        viewModel.monitoringLoggedIn()
+
         user?.let {
             viewModel.subscribeMyRoom(it)
         }
@@ -116,6 +130,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     override fun onResume() {
         super.onResume()

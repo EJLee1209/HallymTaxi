@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.ui.menu
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -109,7 +110,13 @@ class MenuFragment: Fragment() {
 
     fun onClickLogout(){
         user?.let {
-            viewModel.logout(it.uid)
+            viewModel.logout()
+        }
+        val sharedPreferences = requireActivity().getSharedPreferences("loggedInfo", Context.MODE_PRIVATE)
+        sharedPreferences.edit().apply {
+            putString("email", null)
+            putString("password", null)
+            apply()
         }
     }
 

@@ -14,4 +14,5 @@ interface FireStoreRepository {
     fun deactivateRoom(roomId: String, result: (UiState<String>)->Unit)
     fun updateFcmToken(result: (UiState<String>)->Unit)
     fun updateRoomParticipantsInfo(roomId: String, participants: List<User>, currentUser: User)
+    fun monitoringLoggedIn() : Flow<SignedIn>
 }

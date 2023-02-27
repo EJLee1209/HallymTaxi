@@ -25,6 +25,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -47,6 +48,9 @@ class MainViewModel @Inject constructor(
 
     private var _subscribeMyRoom = MutableLiveData<CarPoolRoom>()
     val subscribeMyRoom : LiveData<CarPoolRoom> = _subscribeMyRoom
+
+    private var _monitoring = MutableLiveData<SignedIn>()
+    val monitoring : LiveData<SignedIn> = _monitoring
 
     private var _myRoom = MutableLiveData<UiState<CarPoolRoom>>()
     val myRoom : LiveData<UiState<CarPoolRoom>> = _myRoom
@@ -108,10 +112,15 @@ class MainViewModel @Inject constructor(
             _subscribeUser.value = user
         }
     }
+    fun monitoringLoggedIn() = viewModelScope.launch {
+        fireStoreRepository.monitoringLoggedIn().collect{
+            _monitoring.postValue(it)
+        }
+    }
 
-    fun logout(uid: String) {
+    fun logout() {
         _logout.postValue(UiState.Loading)
-        authRepository.logoutUser(uid){ _logout.postValue(it) }
+        authRepository.logoutUser{ _logout.postValue(it) }
     }
 
     fun updateUserName(newName: String) {
