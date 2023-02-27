@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
+import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
@@ -241,6 +242,8 @@ class FireStoreRepositoryImpl(
     }
 
     override fun updateRoomParticipantsInfo(roomId: String, participants: List<User>, currentUser: User) {
+        Log.d("testt", "currentUser: ${currentUser.email}")
+
         participants.forEach { participant->
             if(participant.uid == currentUser.uid){
                 participant.name = currentUser.name

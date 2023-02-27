@@ -56,7 +56,7 @@ class AuthRepositoryImpl(
                     snapshot.documents.firstOrNull()?.let { document ->
                         val signedIn = document.toObject<SignedIn>()
 
-                        if(signedIn != null && signedIn.deviceId.isNotBlank()) {
+                        if(signedIn != null) {
                             if(signedIn.deviceId == deviceId) {
                                 result.invoke(
                                     UiState.Success("로그인 가능")
@@ -114,8 +114,7 @@ class AuthRepositoryImpl(
                 result.invoke(
                     UiState.Success("로그아웃 성공")
                 )
-                fireStore.collection(SIGNEDIN).document(auth.currentUser!!.uid)
-                    .update(mapOf("deviceId" to ""))
+
                 auth.signOut()
             }
             .addOnFailureListener {
