@@ -242,8 +242,6 @@ class FireStoreRepositoryImpl(
     }
 
     override fun updateRoomParticipantsInfo(roomId: String, participants: List<User>, currentUser: User) {
-        Log.d("testt", "currentUser: ${currentUser.email}")
-
         participants.forEach { participant->
             if(participant.uid == currentUser.uid){
                 participant.name = currentUser.name

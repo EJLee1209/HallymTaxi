@@ -86,6 +86,7 @@ class AuthRepositoryImpl(
             result.invoke(
                 UiState.Failure("모든 정보를 입력해주세요")
             )
+            return
         }
         auth.signInWithEmailAndPassword("$email@hallym.ac.kr", password).addOnSuccessListener {
             result.invoke(

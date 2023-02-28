@@ -118,8 +118,9 @@ class ServerRepositoryImpl(
     ) {
         if(token.isEmpty()) {
             result.invoke(
-                UiState.Failure(id)
+                UiState.Success(id)
             )
+            return
         }
 
         client.sendPushMessage(token, id, roomId, userId, userName, message, messageType)

@@ -66,7 +66,8 @@ class LoginFragment: Fragment() {
                     if(state.error == "다른 기기에서 이미 로그인 했습니다") {
                         val forceLoginDailog = CustomDialog(
                             "로그인",
-                            content = "다른 기기에서 이미 로그인 상태 입니다\n강제로 로그인 하시겠습니까?",
+                            content = "다른 기기에서 로그인 하셨군요!\n접송 중인 모든 기기의 연결을 끊고\n로그인 하시겠습니까?",
+                            positiveButton = "로그인",
                             negativeButtonVisible = true,
                             positiveCallback = {
                                 viewModel.login(email, password, requireActivity().getDeviceId())

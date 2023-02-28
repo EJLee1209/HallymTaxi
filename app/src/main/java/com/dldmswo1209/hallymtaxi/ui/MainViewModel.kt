@@ -209,7 +209,7 @@ class MainViewModel @Inject constructor(
         saveChat(chat)
 
         receiveTokens.forEachIndexed { index, token->
-            if(!token.isNullOrEmpty()){
+            if(token != null){
                 serverRepository.sendPushMessage(token, chat.roomId, chat.userId, userName, chat.msg, chat.messageType, chat.id){
                     if(receiveTokens.last() == token) _sendPush.postValue(it)
                 }
