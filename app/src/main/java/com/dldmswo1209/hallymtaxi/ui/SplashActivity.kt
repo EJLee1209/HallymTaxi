@@ -39,9 +39,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
-    private val checkNetwork by lazy {
-        CheckNetwork(this)
-    }
     private lateinit var myApplication: MyApplication
     private lateinit var user: User
     private var email: String? = ""
@@ -168,6 +165,7 @@ class SplashActivity : AppCompatActivity() {
                 }
                 is UiState.Success -> {
                     Log.d("testt", "update token success: ")
+                    myApplication.setFcmToken(state.data)
                     viewModel.getUserInfo()
                 }
             }
@@ -183,24 +181,12 @@ class SplashActivity : AppCompatActivity() {
                 is UiState.Success -> {
                     Log.d("testt", "get user info success : ${state.data}")
                     user = state.data
-                    viewModel.getMyRoom(state.data)
                     myApplication.setUser(state.data)
-                }
-            }
-        }
-        viewModel.myRoom.observe(this) { state ->
-            when (state) {
-                is UiState.Loading -> {}
-                is UiState.Failure -> {
-                    startMainActivity()
-                }
-                is UiState.Success -> {
-                    val room = state.data
-                    viewModel.updateRoomParticipantsInfo(room.roomId, room.participants, user)
                     startMainActivity()
                 }
             }
         }
+
     }
 
     private fun startMainActivity() {

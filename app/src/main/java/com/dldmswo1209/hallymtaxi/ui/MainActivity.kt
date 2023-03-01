@@ -3,6 +3,7 @@ package com.dldmswo1209.hallymtaxi.ui
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -79,10 +80,6 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.subscribeUser.observe(this){ user ->
             myApplication.setUser(user)
-            room?.let { pool ->
-                // 유저 정보 업데이트 시 현재 참여 중인 방의 내 정보 동기화
-                if(pool.roomId.isNotBlank()) viewModel.updateRoomParticipantsInfo(pool.roomId, pool.participants, user)
-            }
         }
 
         viewModel.monitoring.observe(this) {
@@ -105,9 +102,7 @@ class MainActivity : AppCompatActivity() {
         }
         viewModel.monitoringLoggedIn()
 
-        user?.let {
-            viewModel.subscribeMyRoom(it)
-        }
+        viewModel.subscribeMyRoom()
         viewModel.subscribeUser()
     }
 

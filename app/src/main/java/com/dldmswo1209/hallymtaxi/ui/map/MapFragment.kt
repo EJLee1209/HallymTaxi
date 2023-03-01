@@ -375,7 +375,7 @@ class MapFragment : Fragment() {
 
     fun onClickViewMyCurrentRoom(){
         joinedRoom?.let { room->
-            viewModel.joinRoom(room, user)
+            viewModel.joinRoom(room)
         }
     }
 

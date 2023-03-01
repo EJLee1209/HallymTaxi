@@ -32,6 +32,7 @@ const val CHAT_NORMAL = "NORMAL"
 const val CHAT_JOIN = "JOIN"
 const val CHAT_EXIT = "EXIT"
 const val CHAT_ETC = "ETC"
+const val CHAT_RECEIVE_HOST = "HOST"
 
 const val SEND_STATE_FAIL = "FAIL"
 const val SEND_STATE_SUCCESS = "SUCCESS"

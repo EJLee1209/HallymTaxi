@@ -2,6 +2,7 @@ package com.dldmswo1209.hallymtaxi.ui.welcome
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -137,6 +138,19 @@ class LoginFragment: Fragment() {
         findNavController().popBackStack()
         binding.etEmail.clearFocusAndHideKeyboard(requireActivity())
         binding.etPassword.clearFocusAndHideKeyboard(requireActivity())
+    }
+
+    fun onClickForgotPassword() {
+        val forgotPasswordDialog = CustomDialog(
+            title = "안내 메세지",
+            content = "아직 개발 중인 기능 입니다\n연락 주시면 도와드리겠습니다",
+            positiveButton = "연락 하기",
+            positiveCallback = {
+                var intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/s2SRy56e"))
+                startActivity(intent)
+            }
+        )
+        forgotPasswordDialog.show(parentFragmentManager, forgotPasswordDialog.tag)
     }
 
     private fun getNetworkAvailable() : Boolean = (activity as WelcomeActivity).isNetworkActivate

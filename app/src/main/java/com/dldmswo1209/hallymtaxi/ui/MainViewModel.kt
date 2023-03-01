@@ -49,6 +49,13 @@ class MainViewModel @Inject constructor(
     private var _subscribeMyRoom = MutableLiveData<CarPoolRoom>()
     val subscribeMyRoom : LiveData<CarPoolRoom> = _subscribeMyRoom
 
+    private var _subscribeParticipantsTokens = MutableLiveData<List<String>>()
+    val subscribeParticipantsTokens : LiveData<List<String>> = _subscribeParticipantsTokens
+
+    private var _getParticipantsTokens = MutableLiveData<UiState<List<String>>>()
+    val getParticipantsTokens : LiveData<UiState<List<String>>> = _getParticipantsTokens
+
+
     private var _monitoring = MutableLiveData<SignedIn>()
     val monitoring : LiveData<SignedIn> = _monitoring
 
@@ -103,6 +110,8 @@ class MainViewModel @Inject constructor(
     private var _inAppUpdate = MutableLiveData<UiState<AppUpdateInfo>>()
     val inAppUpdate : LiveData<UiState<AppUpdateInfo>> = _inAppUpdate
 
+
+
     fun getUserInfo(){
         authRepository.getUserInfo { _user.postValue(it) }
     }
@@ -112,6 +121,20 @@ class MainViewModel @Inject constructor(
             _subscribeUser.value = user
         }
     }
+
+    fun subscribeParticipantsTokens(roomId: String) = viewModelScope.launch {
+        fireStoreRepository.subscribeParticipantsTokens(roomId).collect { tokens ->
+            _subscribeParticipantsTokens.postValue( tokens)
+        }
+    }
+
+    fun getParticipantsTokens(roomId: String) = viewModelScope.launch {
+        _getParticipantsTokens.postValue(UiState.Loading)
+        fireStoreRepository.getParticipantsTokens(roomId) {
+            _getParticipantsTokens.postValue(it)
+        }
+    }
+
     fun monitoringLoggedIn() = viewModelScope.launch {
         fireStoreRepository.monitoringLoggedIn().collect{
             _monitoring.postValue(it)
@@ -166,41 +189,37 @@ class MainViewModel @Inject constructor(
         }.flow.cachedIn(viewModelScope)
     }
 
-    fun createRoom(room: CarPoolRoom, user: User) {
+    fun createRoom(room: CarPoolRoom) {
         _createRoom.postValue(UiState.Loading)
-        fireStoreRepository.createRoom(room, user){ _createRoom.postValue(it) }
+        fireStoreRepository.createRoom(room){ _createRoom.postValue(it) }
     }
 
-    fun joinRoom(room: CarPoolRoom, user: User) {
+    fun joinRoom(room: CarPoolRoom) {
         _joinRoom.postValue(UiState.Loading)
-        fireStoreRepository.joinRoom(room, user){ _joinRoom.postValue(it) }
+        fireStoreRepository.joinRoom(room){ _joinRoom.postValue(it) }
     }
 
-    fun subscribeMyRoom(user: User) = viewModelScope.launch {
-        fireStoreRepository.subscribeMyRoom(user).collect {
+    fun subscribeMyRoom() = viewModelScope.launch {
+        fireStoreRepository.subscribeMyRoom().collect {
             _subscribeMyRoom.value = it
         }
     }
 
-    fun getMyRoom(user: User) {
-        fireStoreRepository.getMyRoom(user) {
+    fun getMyRoom() {
+        fireStoreRepository.getMyRoom {
             _myRoom.postValue(it)
         }
     }
 
 
-    fun exitRoom(user: User, room: CarPoolRoom) {
+    fun exitRoom(room: CarPoolRoom) {
         _exitRoom.postValue(UiState.Loading)
-        fireStoreRepository.exitRoom(user, room){ _exitRoom.postValue(it) }
+        fireStoreRepository.exitRoom(room){ _exitRoom.postValue(it) }
     }
 
     fun deactivateRoom(roomId: String) {
         _deactivateRoom.postValue(UiState.Loading)
         fireStoreRepository.deactivateRoom(roomId){ _deactivateRoom.postValue(it) }
-    }
-
-    fun updateRoomParticipantsInfo(roomId: String, participants: List<User>, currentUser: User) {
-        fireStoreRepository.updateRoomParticipantsInfo(roomId, participants, currentUser)
     }
 
     fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {
@@ -218,6 +237,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun saveChat(chat: Chat) = viewModelScope.launch(Dispatchers.IO) {
+        if(chat.messageType == CHAT_RECEIVE_HOST) return@launch
+
         databaseRepository.saveChat(chat)
         if(chat.messageType != CHAT_EXIT) {
             databaseRepository.insertRoomInfo(RoomInfo(chat.roomId, chat.msg, chat.dateTime, false, isActivate = true))

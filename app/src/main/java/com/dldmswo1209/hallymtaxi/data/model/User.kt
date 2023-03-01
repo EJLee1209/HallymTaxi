@@ -5,5 +5,4 @@ data class User(
     val email: String = "",
     var name: String = "",
     val gender: String = "",
-    var fcmToken: String = "",
 ): java.io.Serializable

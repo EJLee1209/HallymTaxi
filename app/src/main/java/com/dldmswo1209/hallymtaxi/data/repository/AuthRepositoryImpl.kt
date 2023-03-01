@@ -7,7 +7,7 @@ import com.dldmswo1209.hallymtaxi.util.AuthResponse.EMAIL_VALID
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.SignedIn
-import com.dldmswo1209.hallymtaxi.util.FireStoreTable.SIGNEDIN
+import com.dldmswo1209.hallymtaxi.data.model.TokenInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
@@ -36,7 +36,9 @@ class AuthRepositoryImpl(
             if(it.isSuccessful){
                 auth.currentUser?.let {firebaseUser ->
                     user.uid = firebaseUser.uid
+
                     fireStore.collection(FireStoreTable.USER).document(user.uid).set(user)
+                    fireStore.collection(FireStoreTable.FCMTOKENS).document(user.uid).set(TokenInfo())
                     result.invoke(true)
                 } ?: kotlin.run {
                     result.invoke(false)
@@ -49,7 +51,7 @@ class AuthRepositoryImpl(
     }
 
     override fun checkLogged(email: String, deviceId: String, result: (UiState<String>) -> Unit) {
-        fireStore.collection(SIGNEDIN).whereEqualTo("email", email)
+        fireStore.collection(FireStoreTable.SIGNEDIN).whereEqualTo("email", email)
             .get()
             .addOnSuccessListener {
                 it?.let { snapshot ->
@@ -92,7 +94,7 @@ class AuthRepositoryImpl(
             result.invoke(
                 UiState.Success("로그인 성공")
             )
-            fireStore.collection(SIGNEDIN).document(auth.currentUser!!.uid)
+            fireStore.collection(FireStoreTable.SIGNEDIN).document(auth.currentUser!!.uid)
                 .set(SignedIn(
                     uid = auth.currentUser!!.uid,
                     email = email,
@@ -106,11 +108,8 @@ class AuthRepositoryImpl(
     }
 
     override fun logoutUser(result: (UiState<String>) -> Unit) {
-        val userInfo = mapOf<String, Any>(
-            "fcmToken" to ""
-        )
-        fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
-            .update(userInfo)
+        fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
+            .update(mapOf("token" to ""))
             .addOnSuccessListener {
                 result.invoke(
                     UiState.Success("로그아웃 성공")

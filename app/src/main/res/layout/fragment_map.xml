@@ -250,6 +250,7 @@
             android:layout_marginStart="21dp"
             android:layout_marginBottom="92dp"
             android:src="@drawable/kakao_logo"
+            android:tint="#3A1D1D"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

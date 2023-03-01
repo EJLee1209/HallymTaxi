@@ -12,6 +12,8 @@ import androidx.room.Room
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.data.local.AppDatabase
+import com.dldmswo1209.hallymtaxi.data.model.CHAT_ETC
+import com.dldmswo1209.hallymtaxi.data.model.CHAT_RECEIVE_HOST
 import com.dldmswo1209.hallymtaxi.data.model.Chat
 import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
@@ -67,30 +69,37 @@ class FcmService : FirebaseMessagingService() {
             messageType = messageType
         )
 
-        roomDB?.chatDao()?.saveChat(chat) // 채팅 저장
+        if(messageType != CHAT_RECEIVE_HOST && messageType != CHAT_ETC) {
+            roomDB?.chatDao()?.saveChat(chat) // 채팅 저장
+            val pendingIntent = createPendingIntent(roomId)
 
-        val pendingIntent = createPendingIntent(roomId)
+            val builder: NotificationCompat.Builder =
+                NotificationCompat.Builder(applicationContext, CHANNEL_ID).apply {
+                    setSmallIcon(R.mipmap.ic_launcher)
+                    setContentTitle(userName)
+                    setContentText(message)
+                    setAutoCancel(true)
+                    setContentIntent(pendingIntent)
+                    setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority =
+                        NotificationCompat.PRIORITY_MAX
+                }
 
-        val builder: NotificationCompat.Builder =
-            NotificationCompat.Builder(applicationContext, CHANNEL_ID).apply {
-                setSmallIcon(R.mipmap.ic_launcher)
-                setContentTitle(userName)
-                setContentText(message)
-                setAutoCancel(true)
-                setContentIntent(pendingIntent)
-                setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority =
-                    NotificationCompat.PRIORITY_MAX
+            if (!myApplication.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
+                notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
+                roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, true, isActivate = true))
+            } else {
+                roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, false, isActivate = true))
             }
 
-        if (!myApplication.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
-            notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
-            roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, true, isActivate = true))
-        } else {
-            roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, false, isActivate = true))
+            val notificationMessage = Intent("newMessage")
+            broadcaster?.sendBroadcast(notificationMessage) // 브로드 캐스트 리시버를 통해 노티가 온 경우 알려준다.
+        }else {
+            if(messageType == CHAT_RECEIVE_HOST) {
+                val notificationMessage = Intent("receiveHost")
+                notificationMessage.putExtra("hostUid", message)
+                broadcaster?.sendBroadcast(notificationMessage) // 브로드 캐스트 리시버를 통해 방장 권한을 받았음을 알려준다
+            }
         }
-
-        val notificationMessage = Intent("newMessage")
-        broadcaster?.sendBroadcast(notificationMessage) // 브로드 캐스트 리시버를 통해 노티가 온 경우 알려준다.
     }
 
     private fun createPendingIntent(

@@ -3,6 +3,7 @@ package com.dldmswo1209.hallymtaxi.ui.carpool
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +38,7 @@ class PoolListBottomSheetFragment(
     private var room: CarPoolRoom? = null // 참여하려는 방
     private lateinit var user: User
     private lateinit var myApplication: MyApplication
+    private var myToken : String = ""
 
     private val loadingDialog by lazy {
         LoadingDialog(requireActivity())
@@ -73,6 +75,8 @@ class PoolListBottomSheetFragment(
             requireActivity().finish()
             return
         }
+        myToken = myApplication.getFcmToken()
+
         poolListAdapter = PoolListAdapter(
             requireActivity(),
             this@PoolListBottomSheetFragment,
@@ -92,6 +96,35 @@ class PoolListBottomSheetFragment(
                 poolListAdapter.submitData(it) // submitData는 무효화 또는 새로고침 전까지 반환되지 않는 정지 함수
                 // 여기부터 실행이 중단됨.
                 loadingDialog.dismiss() // 새로고침이 완료 되면, 로딩 다이얼로그 숨김
+            }
+        }
+
+        viewModel.getParticipantsTokens.observe(viewLifecycleOwner) { state ->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                }
+                is UiState.Success ->{
+                    val tokens = state.data.toMutableList()
+                    tokens.remove(myToken)
+
+                    room?.let { room ->
+                        val chat = Chat(
+                            roomId = room.roomId,
+                            userId = user.uid,
+                            userName = user.name,
+                            msg = "${user.name}님이 입장하셨습니다",
+                            messageType = CHAT_JOIN
+                        )
+                        Log.d("testt", "입장 메세지 전송 : ${tokens}")
+                        viewModel.sendMessage(chat = chat, userName = user.name, receiveTokens = tokens)
+                        joinRoomCallback(room)
+                    }
+
+                }
             }
         }
 
@@ -116,29 +149,9 @@ class PoolListBottomSheetFragment(
                     loadingDialog.dismiss()
 
                     room?.let { room ->
-                        CoroutineScope(Dispatchers.Main).launch{
-                            withContext(Dispatchers.Default) {
-                                if (state.data == JOIN_ROOM_SUCCESS) {
-                                    val receiveTokens = mutableListOf<String>()
-                                    val chat = Chat(
-                                        roomId = room.roomId,
-                                        userId = user.uid,
-                                        userName = user.name,
-                                        msg = "${user.name}님이 입장하셨습니다",
-                                        messageType = CHAT_JOIN
-                                    )
-                                    room.participants.forEach {
-                                        if (it.fcmToken != user.fcmToken) receiveTokens.add(
-                                            it.fcmToken
-                                        )
-                                    }
-                                    viewModel.sendMessage(chat = chat, user.name, receiveTokens)
-                                }
-                                delay(200)
-                            }
-                            joinRoomCallback(room)
+                        if(state.data == JOIN_ROOM_SUCCESS) {
+                            viewModel.getParticipantsTokens(room.roomId)
                         }
-
                     }
                 }
             }
@@ -161,7 +174,7 @@ class PoolListBottomSheetFragment(
             if (it.roomId.isNotBlank()) {
                 // 이미 참여중인 채팅방이 존재함
                 if(it == room) {
-                    viewModel.joinRoom(room, user)
+                    viewModel.joinRoom(room)
                 }else{
                     val dialog = CustomDialog(
                         title = "채팅방 입장",
@@ -172,7 +185,7 @@ class PoolListBottomSheetFragment(
                 }
             }
         }
-        viewModel.joinRoom(room, user)
+        viewModel.joinRoom(room)
     }
 
     fun onClickCreateRoom() {

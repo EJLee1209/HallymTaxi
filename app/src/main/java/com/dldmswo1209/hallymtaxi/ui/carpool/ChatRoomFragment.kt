@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -25,19 +24,18 @@ import androidx.navigation.fragment.navArgs
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
+import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentChatRoomBinding
+import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
-import com.dldmswo1209.hallymtaxi.data.UiState
-import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
 @AndroidEntryPoint
 class ChatRoomFragment: Fragment() {
-
     private lateinit var binding: FragmentChatRoomBinding
     private val viewModel: MainViewModel by viewModels()
     private lateinit var myApplication: MyApplication
@@ -46,6 +44,7 @@ class ChatRoomFragment: Fragment() {
     private var roomInfo: RoomInfo? = null
     private var messages: MutableList<Chat> = mutableListOf()
     private lateinit var currentUser: User
+    private var myToken = ""
     private var tokenList = mutableListOf<String?>()
     private lateinit var chatListAdapter: ChatListAdapter
 
@@ -99,6 +98,8 @@ class ChatRoomFragment: Fragment() {
             requireActivity().finish()
             return
         }
+        myToken = myApplication.getFcmToken()
+
         KeyboardUtils.addKeyboardToggleListener(requireActivity(), keyboardStateListener)
         setRecyclerAdapter()
         editTextWatcher()
@@ -130,7 +131,6 @@ class ChatRoomFragment: Fragment() {
     }
     @SuppressLint("NotifyDataSetChanged")
     private fun setObserver(){
-        viewModel.detachChatList(room.roomId)
         myApplication.myRoom.observe(viewLifecycleOwner){ room->
             if(room.roomId.isBlank()) {
                 val deletedRoomDialog = CustomDialog(
@@ -149,7 +149,7 @@ class ChatRoomFragment: Fragment() {
                 val finishedRoom = CustomDialog(
                     title = "출발시간 초과",
                     content = "출발시간이 지난 채팅방 입니다.\n더 이상 카풀 목록에 표시되지 않습니다.",
-                    positiveCallback = { viewModel.exitRoom(currentUser, room) },
+                    positiveCallback = { viewModel.exitRoom(room) },
                     positiveButton = "나가기",
                     negativeButtonVisible = true,
                     negativeButton = "취소",
@@ -159,10 +159,12 @@ class ChatRoomFragment: Fragment() {
 
             binding.room = room
             this.room = room
-            tokenList = mutableListOf()
 
-            room.participants.forEach { if(it.fcmToken != currentUser.fcmToken) tokenList.add(it.fcmToken) }
             isFirst = false
+        }
+        viewModel.subscribeParticipantsTokens.observe(viewLifecycleOwner) { tokens ->
+            tokenList = tokens.toMutableList()
+            tokenList.remove(myToken)
         }
 
         viewModel.chatList.observe(viewLifecycleOwner){
@@ -185,19 +187,19 @@ class ChatRoomFragment: Fragment() {
                 is UiState.Loading ->{}
                 is UiState.Failure ->{
                     CoroutineScope(Dispatchers.Main).launch {
-                        async {
+                        withContext(Dispatchers.Default) {
                             viewModel.updateChatById(state.error!!, SEND_STATE_FAIL)
                             delay(200)
-                        }.await()
+                        }
                         viewModel.detachChatList(room.roomId)
                     }
                 }
                 is UiState.Success ->{
                     CoroutineScope(Dispatchers.Main).launch {
-                        async {
+                        withContext(Dispatchers.Default) {
                             viewModel.updateChatById(state.data, SEND_STATE_SUCCESS)
                             delay(200)
-                        }.await()
+                        }
                         viewModel.detachChatList(room.roomId)
                     }
                 }
@@ -208,13 +210,6 @@ class ChatRoomFragment: Fragment() {
             when(state){
                 is UiState.Loading -> {
                     loadingDialog.show()
-                    val chat = Chat(
-                        roomId = room.roomId,
-                        userId = currentUser.uid,
-                        msg = "카풀이 마감됐습니다",
-                        messageType = CHAT_ETC
-                    )
-                    viewModel.sendMessage(chat, currentUser.name, tokenList)
                 }
                 is UiState.Failure ->{
                     loadingDialog.dismiss()
@@ -222,7 +217,19 @@ class ChatRoomFragment: Fragment() {
                 }
                 is UiState.Success ->{
                     loadingDialog.dismiss()
-                    viewModel.detachChatList(room.roomId)
+                    val chat = Chat(
+                        roomId = room.roomId,
+                        userId = currentUser.uid,
+                        msg = "카풀이 마감됐습니다",
+                        messageType = CHAT_ETC
+                    )
+                    CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.Default) {
+                            viewModel.sendMessage(chat, currentUser.name, tokenList)
+                            delay(200)
+                        }
+                        viewModel.detachChatList(room.roomId)
+                    }
                 }
             }
         }
@@ -256,24 +263,30 @@ class ChatRoomFragment: Fragment() {
                             userId = currentUser.uid,
                             msg = "${currentUser.name}님이 나갔습니다",
                             messageType = CHAT_EXIT
-                        ), currentUser.name, tokenList
+                        ),
+                        currentUser.name,
+                        tokenList
                     )
-                    if(room.participants.first() == currentUser && room.userCount >= 2){
+                    if(room.participants.first() == currentUser.uid && room.userCount >= 2){
                         // 방장이 나감
                         viewModel.sendMessage(
                             Chat(
                                 roomId = room.roomId,
                                 userId = currentUser.uid,
-                                msg = "${room.participants[1].name}님은 이제 방장 입니다",
-                                messageType = CHAT_ETC
-                            ), currentUser.name, tokenList
+                                msg = room.participants[1],
+                                messageType = CHAT_RECEIVE_HOST
+                            ),
+                            currentUser.name,
+                            tokenList
                         )
                     }
                     onClickBack()
                 }
             }
-
         }
+
+        viewModel.detachChatList(room.roomId)
+        viewModel.subscribeParticipantsTokens(room.roomId)
     }
     private fun registerBroadcastReceiver() {
         // 새로운 메세지가 온 경우 브로드 캐스트 리시버를 통해 알 수 있음
@@ -284,13 +297,34 @@ class ChatRoomFragment: Fragment() {
                 }
 
             }, IntentFilter("newMessage"))
+
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    intent.getStringExtra("hostUid")?.let { uid ->
+                        if(uid == currentUser.uid){
+                            viewModel.sendMessage(
+                                Chat(
+                                    roomId = room.roomId,
+                                    userId = currentUser.uid,
+                                    msg = "${currentUser.name}님이 방장 입니다",
+                                    messageType = CHAT_ETC
+                                ),
+                                currentUser.name,
+                                tokenList
+                            )
+                        }
+                    }
+                }
+
+            }, IntentFilter("receiveHost"))
     }
 
     private fun scrollToLastItem(){
         CoroutineScope(Dispatchers.Main).launch {
-            async {
+            withContext(Dispatchers.Default) {
                 delay(300)
-            }.await()
+            }
             if(messages.isNotEmpty()) binding.rvMessage.scrollToPosition(messages.size-1)
         }
     }
@@ -312,7 +346,7 @@ class ChatRoomFragment: Fragment() {
                         content = "나가기를 하면 대화내용이\n모두 히스토리에 저장됩니다.\n정말 나가시겠습니까?",
                         negativeButtonVisible = true,
                         positiveButton = "나가기",
-                        positiveCallback = { viewModel.exitRoom(currentUser, room) }
+                        positiveCallback = { viewModel.exitRoom(room) }
                     )
                     exitDialog.show(parentFragmentManager, exitDialog.tag)
 
@@ -335,7 +369,7 @@ class ChatRoomFragment: Fragment() {
     }
 
     private fun deactivateRoomPositiveCallback() {
-        if (room.participants.first() != currentUser) {
+        if (room.participants.first() != currentUser.uid) {
             Toast.makeText(requireContext(), "방장 권한입니다.", Toast.LENGTH_SHORT).show()
             return
         }
@@ -343,8 +377,6 @@ class ChatRoomFragment: Fragment() {
 
         viewModel.deactivateRoom(room.roomId)
     }
-
-
 
     fun onClickSend(){
         if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
@@ -355,8 +387,8 @@ class ChatRoomFragment: Fragment() {
         val msg = binding.etMsg.text.toString()
         if(msg.isBlank()) return
 
-        val chat = Chat(roomId = room.roomId, userId = currentUser.uid, msg= msg, messageType = CHAT_NORMAL)
-        viewModel.sendMessage(chat, currentUser.name, tokenList.toList())
+        val chat = Chat(roomId = room.roomId, userId = currentUser.uid, userName = currentUser.name ,msg= msg, messageType = CHAT_NORMAL)
+        viewModel.sendMessage(chat, currentUser.name, tokenList)
         binding.etMsg.text.clear()
     }
 

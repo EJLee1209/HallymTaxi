@@ -35,7 +35,7 @@ class ServerRepositoryImpl(
                     }
                 } ?: kotlin.run {
                     result.invoke(
-                        UiState.Failure("서버 오류 입니다\n빠른 시일 내에 고치겠습니다 죄송합니다")
+                        UiState.Failure("서버 점검 중 입니다\n이용에 불편을 드려 죄송합니다")
                     )
                 }
             }

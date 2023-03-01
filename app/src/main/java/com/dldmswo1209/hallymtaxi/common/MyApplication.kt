@@ -10,6 +10,7 @@ import dagger.hilt.android.HiltAndroidApp
 @HiltAndroidApp
 class MyApplication: Application() {
     private var isViewChatRoom: Boolean = false // 유저가 채팅창을 보고 있음?
+
     private var _myRoom = MutableLiveData<CarPoolRoom>() // 현재 참여중인 채팅방
     val myRoom : LiveData<CarPoolRoom> = _myRoom
 
@@ -18,7 +19,7 @@ class MyApplication: Application() {
 
     private var myRoomId: String? = null
     private var user : User? = null
-
+    private var fcmToken: String = ""
 
 
     fun getIsViewChatRoom() : Boolean = isViewChatRoom
@@ -30,6 +31,10 @@ class MyApplication: Application() {
     fun setUser(user: User) {
         this.user = user
         _userLiveData.postValue(user)
+    }
+    fun getFcmToken() : String = fcmToken
+    fun setFcmToken(token: String) {
+        this.fcmToken = token
     }
 
 }

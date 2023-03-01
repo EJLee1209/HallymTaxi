@@ -263,7 +263,7 @@ class CreateRoomFragment: Fragment() {
         }
 
         val room = CarPoolRoom(
-            participants = mutableListOf(currentUser),
+            participants = mutableListOf(currentUser.uid),
             userMaxCount = maxCount,
             departureTime = departureDateTime,
             startPlace = startPlace,
@@ -272,7 +272,7 @@ class CreateRoomFragment: Fragment() {
             genderOption = genderOption
         )
 
-        viewModel.createRoom(room, currentUser)
+        viewModel.createRoom(room)
         isClicked = true
 
         loadingDialog.show()

@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class CarPoolRoom(
     var roomId: String = "",
-    val participants: MutableList<User> = mutableListOf(),
+    val participants: MutableList<String> = mutableListOf(),
     var userMaxCount : Int = 4, // 제한 인원
     var userCount: Int = 1, // 현재 참여 유저 수
     val startPlace: Place = Place(),
