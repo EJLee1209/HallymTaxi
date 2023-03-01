@@ -250,16 +250,12 @@ class MainViewModel @Inject constructor(
             chat.roomId,
             chat.msg,
             chat.dateTime,
-            false
+            false,
+            isActivate = true
         )
          if(chat.messageType != CHAT_EXIT) {
-             roomInfo.isActivate = true
              databaseRepository.insertRoomInfo(roomInfo)
          }
-        else{
-            roomInfo.isActivate = false
-            databaseRepository.insertRoomInfo(roomInfo)
-        }
     }
 
     fun updateChatById(id: String, sendSuccess: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -271,7 +267,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun insertRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
-        Log.d("testt", "insertRoomInfo: ${roomInfo}")
         databaseRepository.insertRoomInfo(roomInfo)
     }
 
