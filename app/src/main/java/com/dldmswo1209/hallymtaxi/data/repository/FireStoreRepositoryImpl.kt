@@ -107,6 +107,21 @@ class FireStoreRepositoryImpl(
         }
     }
 
+    override fun findUserName(uid: String, result: (UiState<String>) -> Unit) {
+        fireStore.collection(FireStoreTable.USER).document(uid)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                documentSnapshot.getString("name")?.let { name ->
+                    result.invoke(UiState.Success(name))
+                } ?: kotlin.run {
+                    result.invoke(UiState.Failure("이름 없음"))
+                }
+            }
+            .addOnFailureListener {
+                result.invoke(UiState.Failure("이름 가져 오기 실패"))
+            }
+    }
+
     override fun getParticipantsTokens(roomId: String, result: (UiState<List<String>>) -> Unit) {
         fireStore.collection(FireStoreTable.FCMTOKENS)
             .whereEqualTo("roomId", roomId)

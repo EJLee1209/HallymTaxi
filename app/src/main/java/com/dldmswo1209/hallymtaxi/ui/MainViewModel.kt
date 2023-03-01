@@ -52,9 +52,11 @@ class MainViewModel @Inject constructor(
     private var _subscribeParticipantsTokens = MutableLiveData<List<String>>()
     val subscribeParticipantsTokens : LiveData<List<String>> = _subscribeParticipantsTokens
 
+    private var _findUserName = MutableLiveData<UiState<String>>()
+    val findUserName: LiveData<UiState<String>> = _findUserName
+
     private var _getParticipantsTokens = MutableLiveData<UiState<List<String>>>()
     val getParticipantsTokens : LiveData<UiState<List<String>>> = _getParticipantsTokens
-
 
     private var _monitoring = MutableLiveData<SignedIn>()
     val monitoring : LiveData<SignedIn> = _monitoring
@@ -125,6 +127,12 @@ class MainViewModel @Inject constructor(
     fun subscribeParticipantsTokens(roomId: String) = viewModelScope.launch {
         fireStoreRepository.subscribeParticipantsTokens(roomId).collect { tokens ->
             _subscribeParticipantsTokens.postValue( tokens)
+        }
+    }
+
+    fun findUserName(uid: String) = viewModelScope.launch {
+        fireStoreRepository.findUserName(uid) {
+            _findUserName.postValue(it)
         }
     }
 
@@ -237,8 +245,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun saveChat(chat: Chat) = viewModelScope.launch(Dispatchers.IO) {
-        if(chat.messageType == CHAT_RECEIVE_HOST) return@launch
-
         databaseRepository.saveChat(chat)
         if(chat.messageType != CHAT_EXIT) {
             databaseRepository.insertRoomInfo(RoomInfo(chat.roomId, chat.msg, chat.dateTime, false, isActivate = true))

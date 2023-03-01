@@ -269,17 +269,31 @@ class ChatRoomFragment: Fragment() {
                     )
                     if(room.participants.first() == currentUser.uid && room.userCount >= 2){
                         // 방장이 나감
-                        viewModel.sendMessage(
-                            Chat(
-                                roomId = room.roomId,
-                                userId = currentUser.uid,
-                                msg = room.participants[1],
-                                messageType = CHAT_RECEIVE_HOST
-                            ),
-                            currentUser.name,
-                            tokenList
-                        )
+                        viewModel.findUserName(room.participants[1]) // 방장을 위임받을 사람의 이름을 가져옴
+                    }else {
+                        onClickBack()
                     }
+                }
+            }
+        }
+
+        viewModel.findUserName.observe(viewLifecycleOwner) { state ->
+            when(state) {
+                is UiState.Loading -> {}
+                is UiState.Failure -> {}
+                is UiState.Success -> {
+                    val name = state.data
+                    val chat = Chat(
+                        roomId = room.roomId,
+                        userId = currentUser.uid,
+                        msg = "$name 님이 방장 입니다",
+                        messageType = CHAT_ETC
+                    )
+                    viewModel.sendMessage(
+                        chat = chat,
+                        userName = currentUser.name,
+                        receiveTokens = tokenList
+                    )
                     onClickBack()
                 }
             }
@@ -297,27 +311,6 @@ class ChatRoomFragment: Fragment() {
                 }
 
             }, IntentFilter("newMessage"))
-
-        LocalBroadcastManager.getInstance(requireContext())
-            .registerReceiver(object : BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    intent.getStringExtra("hostUid")?.let { uid ->
-                        if(uid == currentUser.uid){
-                            viewModel.sendMessage(
-                                Chat(
-                                    roomId = room.roomId,
-                                    userId = currentUser.uid,
-                                    msg = "${currentUser.name}님이 방장 입니다",
-                                    messageType = CHAT_ETC
-                                ),
-                                currentUser.name,
-                                tokenList
-                            )
-                        }
-                    }
-                }
-
-            }, IntentFilter("receiveHost"))
     }
 
     private fun scrollToLastItem(){
