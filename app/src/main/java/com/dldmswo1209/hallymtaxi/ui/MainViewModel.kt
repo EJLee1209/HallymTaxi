@@ -244,10 +244,21 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun saveChat(chat: Chat) = viewModelScope.launch(Dispatchers.IO) {
+    private fun saveChat(chat: Chat) = viewModelScope.launch(Dispatchers.IO) {
         databaseRepository.saveChat(chat)
-        if(chat.messageType != CHAT_EXIT) {
-            databaseRepository.insertRoomInfo(RoomInfo(chat.roomId, chat.msg, chat.dateTime, false, isActivate = true))
+        val roomInfo = RoomInfo(
+            chat.roomId,
+            chat.msg,
+            chat.dateTime,
+            false
+        )
+         if(chat.messageType != CHAT_EXIT) {
+             roomInfo.isActivate = true
+             databaseRepository.insertRoomInfo(roomInfo)
+         }
+        else{
+            roomInfo.isActivate = false
+            databaseRepository.insertRoomInfo(roomInfo)
         }
     }
 
@@ -260,6 +271,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun insertRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
+        Log.d("testt", "insertRoomInfo: ${roomInfo}")
         databaseRepository.insertRoomInfo(roomInfo)
     }
 

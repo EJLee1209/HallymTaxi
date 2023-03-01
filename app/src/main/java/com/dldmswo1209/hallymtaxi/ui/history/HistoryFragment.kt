@@ -95,6 +95,7 @@ class HistoryFragment : Fragment() {
             binding.layoutNoPoolRoom.visibility = View.GONE
             history = sortedWithDate(it)
             historyListAdapter.submitList(history)
+            Log.d("testt", "History : ${it}")
         }
         
     }

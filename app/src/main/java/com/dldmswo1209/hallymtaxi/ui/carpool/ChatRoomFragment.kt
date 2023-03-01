@@ -248,8 +248,8 @@ class ChatRoomFragment: Fragment() {
                                 roomInfo.lastMsg = messages.last().msg
                                 roomInfo.lastReceiveMsgDateTime = messages.last().dateTime
                                 viewModel.insertRoomInfo(roomInfo)
+                                return@forEachIndexed
                             }
-                            return@forEachIndexed
                         }
                     }
                 }
