@@ -41,6 +41,7 @@ fun RegisterScreen(
     email: String,
     isCreated: Boolean,
     viewModel: RegisterViewModel = hiltViewModel(),
+    onClickPrivacyPolicyViewContent: () -> Unit,
     onClickRegister: (User, String) -> (Unit),
     onDismissRequest: () -> Unit,
 ) {
@@ -137,7 +138,10 @@ fun RegisterScreen(
                                 text = "개인정보처리방침",
                                 color = colorResource(id = R.color.hallym_black_000000),
                                 fontSize = 14.sp,
-                                textDecoration = TextDecoration.Underline
+                                textDecoration = TextDecoration.Underline,
+                                modifier = Modifier.clickable {
+                                    onClickPrivacyPolicyViewContent()
+                                }
                             )
                             Text(
                                 text = "에 동의합니다",

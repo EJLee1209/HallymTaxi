@@ -2,6 +2,7 @@ package com.dldmswo1209.hallymtaxi.ui.menu
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,7 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.ui.MainViewModel
+import com.dldmswo1209.hallymtaxi.util.PRIVACY_POLICY_URL
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -130,5 +132,10 @@ class MenuFragment: Fragment() {
 
     fun onClickUpdateInfo() {
         viewModel.checkAppUpdate()
+    }
+
+    fun onClickPrivacyPolicy() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))
+        startActivity(intent)
     }
 }

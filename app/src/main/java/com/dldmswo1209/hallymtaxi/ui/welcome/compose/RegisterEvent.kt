@@ -24,6 +24,5 @@ sealed class RegisterEvent {
     object OnClickPrivacyPolicy : RegisterEvent()
     object OnClickPasswordVisibleIcon: RegisterEvent()
     object OnClickPasswordConfirmVisibleIcon: RegisterEvent()
-
 }
 

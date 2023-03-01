@@ -1,5 +1,7 @@
 package com.dldmswo1209.hallymtaxi.ui.welcome
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +20,7 @@ import com.dldmswo1209.hallymtaxi.databinding.FragmentRegisterBinding
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.ui.welcome.compose.RegisterScreen
+import com.dldmswo1209.hallymtaxi.util.PRIVACY_POLICY_URL
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -97,12 +100,17 @@ class RegisterFragment: Fragment() {
                 }
             }
 
-            RegisterScreen(email = email, isCreated = isCreated.value, onClickRegister = registerButtonClickCallback) {
+            RegisterScreen(email = email, isCreated = isCreated.value, onClickRegister = registerButtonClickCallback, onClickPrivacyPolicyViewContent = onClickPrivacyPolicyViewContent) {
                 // 회원가입 완료시 초기 화면으로 이동
                 clickBackBtn()
             }
         }
     }
+    private val onClickPrivacyPolicyViewContent:() -> Unit = {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))
+        startActivity(intent)
+    }
+
 
     fun clickBackBtn(){
         // 백버튼 클릭시 초기 화면으로 돌아감

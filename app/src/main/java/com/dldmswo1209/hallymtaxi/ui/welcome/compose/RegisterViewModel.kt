@@ -146,6 +146,7 @@ class RegisterViewModel
                 }
                 _nextButtonVisible.value = false
             }
+
         }
         _registerButtonVisible.value =
             password.value.isValid && passwordConfirm.value.isValid && name.value.isValid && gender.value.gender.isNotBlank() && agreePrivacyPolicy.value
