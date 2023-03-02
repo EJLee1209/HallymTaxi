@@ -20,6 +20,7 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.util.FireStoreResponse.JOIN_ROOM_SUCCESS
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.ui.MainViewModel
+import com.dldmswo1209.hallymtaxi.util.FireStoreResponse.JOIN_ROOM_ALREADY_JOINED
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -149,8 +150,14 @@ class PoolListBottomSheetFragment(
                     loadingDialog.dismiss()
 
                     room?.let { room ->
-                        if(state.data == JOIN_ROOM_SUCCESS) {
-                            viewModel.getParticipantsTokens(room.roomId)
+                        when(state.data) {
+                            JOIN_ROOM_SUCCESS -> {
+                                viewModel.getParticipantsTokens(room.roomId)
+                            }
+                            JOIN_ROOM_ALREADY_JOINED -> {
+                                joinRoomCallback(room)
+                            }
+                            else -> {}
                         }
                     }
                 }
@@ -174,6 +181,7 @@ class PoolListBottomSheetFragment(
             if (it.roomId.isNotBlank()) {
                 // 이미 참여중인 채팅방이 존재함
                 if(it == room) {
+                    Log.d("testt", "recyclerItemClickEvent: ")
                     viewModel.joinRoom(room)
                 }else{
                     val dialog = CustomDialog(

@@ -25,7 +25,6 @@ class FireStoreRepositoryImpl(
     private val auth: FirebaseAuth
 ): FireStoreRepository {
     override fun subscribeUser(): Flow<User> {
-        Log.d("testt", "registration subscribeUser")
         return callbackFlow {
             val listenerRegistration = fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
                 .addSnapshotListener { snapshot, error->
@@ -41,7 +40,6 @@ class FireStoreRepositoryImpl(
                 }
             awaitClose {
                 listenerRegistration.remove()
-                Log.d("testt", "remove subscribeUser")
             }
         }
     }
@@ -314,7 +312,6 @@ class FireStoreRepositoryImpl(
     }
 
     override fun monitoringLoggedIn(): Flow<SignedIn> {
-        Log.d("testt", "registration monitoringLoggedIn")
         return callbackFlow {
             val listenerRegistration = fireStore.collection(SIGNEDIN).document(auth.currentUser!!.uid)
                 .addSnapshotListener { snapshot, error->
@@ -331,7 +328,6 @@ class FireStoreRepositoryImpl(
 
             awaitClose {
                 listenerRegistration.remove()
-                Log.d("testt", "remove monitoringLoggedIn")
             }
         }
     }

@@ -188,6 +188,8 @@
                 android:elevation="10dp"
                 android:onClick="@{()->fragment.onClickOk()}"
                 android:text="@string/ok"
+                android:textColor="@color/hallym_white_ffffff"
+                android:textSize="15sp"
                 app:backgroundTint="@color/hallym_blue_3351b9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

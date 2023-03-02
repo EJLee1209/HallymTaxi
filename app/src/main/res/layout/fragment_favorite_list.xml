@@ -82,11 +82,11 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:visibility="gone"
             tools:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -112,6 +112,8 @@
             android:background="@drawable/background_blue_r100"
             android:onClick="@{()->fragment.onClickAdd()}"
             android:text="@string/add"
+            android:textColor="@color/hallym_white_ffffff"
+            android:textSize="15sp"
             app:backgroundTint="@color/hallym_blue_3351b9"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             app:strokeColor="@color/hallym_blue_3351b9"
+            app:cardBackgroundColor="@color/hallym_white_ffffff"
             app:strokeWidth="1dp"
             app:cardCornerRadius="50dp"
             app:layout_constraintStart_toStartOf="parent"

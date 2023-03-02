@@ -20,7 +20,8 @@
         android:background="@null"
         android:clickable="true"
         app:cardCornerRadius="0dp"
-        app:cardElevation="0dp">
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/hallym_white_ffffff">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
