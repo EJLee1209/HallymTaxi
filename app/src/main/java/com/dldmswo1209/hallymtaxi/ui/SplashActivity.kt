@@ -108,7 +108,6 @@ class SplashActivity : AppCompatActivity() {
             // 로그인 가능 여부 체크
             authViewModel.checkLogged(email!!, getDeviceId())
         }else{
-            Log.d("testt", "checkLoggedInfo: welcomeActivity 실행 지점")
             startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
         }
     }
@@ -146,7 +145,6 @@ class SplashActivity : AppCompatActivity() {
                 is UiState.Loading -> {}
                 is UiState.Failure -> {
                     // 로그인 실패
-                    Log.d("testt", "login : welcomeActivity 실행 지점")
                     startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
                 }
                 is UiState.Success -> {
@@ -160,11 +158,9 @@ class SplashActivity : AppCompatActivity() {
             when (state) {
                 is UiState.Loading -> {}
                 is UiState.Failure -> {
-                    Log.d("testt", "update token failed : ${state.error}")
                     startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
                 }
                 is UiState.Success -> {
-                    Log.d("testt", "update token success: ")
                     myApplication.setFcmToken(state.data)
                     viewModel.getUserInfo()
                 }
@@ -175,11 +171,9 @@ class SplashActivity : AppCompatActivity() {
             when (state) {
                 is UiState.Loading -> {}
                 is UiState.Failure -> {
-                    Log.d("testt", "get user info failed : ${state.error}")
                     startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
                 }
                 is UiState.Success -> {
-                    Log.d("testt", "get user info success : ${state.data}")
                     user = state.data
                     myApplication.setUser(state.data)
                     startMainActivity()

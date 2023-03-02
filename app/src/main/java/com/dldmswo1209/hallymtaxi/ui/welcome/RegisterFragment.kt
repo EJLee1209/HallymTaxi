@@ -111,7 +111,6 @@ class RegisterFragment: Fragment() {
         startActivity(intent)
     }
 
-
     fun clickBackBtn(){
         // 백버튼 클릭시 초기 화면으로 돌아감
         findNavController().navigate(R.id.action_navigation_register_to_navigation_welcome)

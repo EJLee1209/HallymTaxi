@@ -102,7 +102,6 @@
             android:id="@+id/user_info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/hallym_white_ffffff"
             android:clickable="true"
             android:onClick="@{()->fragment.onClickUserInfo()}"
             app:cardCornerRadius="0dp"
@@ -151,7 +150,6 @@
             android:id="@+id/shortcut_modify_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/hallym_white_ffffff"
             android:clickable="true"
             android:onClick="@{()->fragment.onClickFavorite()}"
             app:cardCornerRadius="0dp"
@@ -203,7 +201,6 @@
             android:id="@+id/update_info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/hallym_white_ffffff"
             android:clickable="true"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
@@ -253,7 +250,6 @@
             android:id="@+id/privacy_policy_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/hallym_white_ffffff"
             android:clickable="true"
             app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
@@ -286,7 +282,6 @@
             android:id="@+id/btn_logout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/hallym_white_ffffff"
             android:clickable="true"
             android:onClick="@{()->fragment.onClickLogout()}"
             app:cardCornerRadius="0dp"
@@ -306,7 +301,8 @@
                     android:text="@string/logout"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:layout_width="wrap_content"
