@@ -75,6 +75,12 @@ class MenuFragment: Fragment() {
                 }
                 is UiState.Success -> {
                     loadingDialog.dismiss()
+                    val sharedPreferences = requireActivity().getSharedPreferences("loggedInfo", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().apply {
+                        putString("email", null)
+                        putString("password", null)
+                        apply()
+                    }
                     startActivity(Intent(requireActivity(), SplashActivity::class.java))
                     requireActivity().finish()
                 }
@@ -113,12 +119,6 @@ class MenuFragment: Fragment() {
     fun onClickLogout(){
         user?.let {
             viewModel.logout()
-        }
-        val sharedPreferences = requireActivity().getSharedPreferences("loggedInfo", Context.MODE_PRIVATE)
-        sharedPreferences.edit().apply {
-            putString("email", null)
-            putString("password", null)
-            apply()
         }
     }
 

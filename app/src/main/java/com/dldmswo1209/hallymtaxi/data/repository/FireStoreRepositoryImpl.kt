@@ -7,8 +7,6 @@ import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.SignedIn
-import com.dldmswo1209.hallymtaxi.data.model.TokenInfo
-import com.dldmswo1209.hallymtaxi.util.FireStoreTable.SIGNEDIN
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -30,7 +28,7 @@ class FireStoreRepositoryImpl(
                 .addSnapshotListener { snapshot, error->
                     if(error != null){
                         cancel(
-                            message = "유저 정보를 가져오는데 에러가 발생했습니다",
+                            message = FireStoreResponse.SUBSCRIBE_USER_ERROR,
                             cause = error
                         )
                         return@addSnapshotListener
@@ -48,11 +46,11 @@ class FireStoreRepositoryImpl(
         return callbackFlow {
             auth.currentUser?.let { user ->
                 val listenerRegistration = fireStore.collection(FireStoreTable.ROOM)
-                    .whereArrayContains("participants", user.uid)
+                    .whereArrayContains(FireStoreTable.FIELD_PARTICIPANTS , user.uid)
                     .addSnapshotListener { value, error ->
                         if(error != null){
                             cancel(
-                                message = "방 정보를 가져오는데 에러가 발생했습니다",
+                                message = FireStoreResponse.SUBSCRIBE_ROOM_ERROR,
                                 cause = error
                             )
                             return@addSnapshotListener
@@ -79,11 +77,11 @@ class FireStoreRepositoryImpl(
     override fun subscribeParticipantsTokens(roomId: String): Flow<List<String>> {
         return callbackFlow {
             val listenerRegistration = fireStore.collection(FireStoreTable.FCMTOKENS)
-                .whereEqualTo("roomId", roomId)
+                .whereEqualTo(FireStoreTable.FIELD_ROOM_ID, roomId)
                 .addSnapshotListener { value, error ->
                     if(error != null){
                         cancel(
-                            message = "참여자 토큰 정보를 가져오는데 에러가 발생했습니다",
+                            message = FireStoreResponse.SUBSCRIBE_TOKENS,
                             cause = error
                         )
                         return@addSnapshotListener
@@ -91,7 +89,7 @@ class FireStoreRepositoryImpl(
                     value?.let { querySnapshot ->
                         val tokens = mutableListOf<String>()
                         querySnapshot.documents.forEach { document ->
-                            document.getString("token")?.let {
+                            document.getString(FireStoreTable.FIELD_TOKEN)?.let {
                                 tokens.add(it)
                             }
                         }
@@ -109,65 +107,38 @@ class FireStoreRepositoryImpl(
         fireStore.collection(FireStoreTable.USER).document(uid)
             .get()
             .addOnSuccessListener { documentSnapshot ->
-                documentSnapshot.getString("name")?.let { name ->
+                documentSnapshot.getString(FireStoreTable.FIELD_NAME)?.let { name ->
                     result.invoke(UiState.Success(name))
                 } ?: kotlin.run {
-                    result.invoke(UiState.Failure("이름 없음"))
+                    result.invoke(UiState.Failure(FireStoreResponse.FIND_NAME_EMPTY))
                 }
             }
             .addOnFailureListener {
-                result.invoke(UiState.Failure("이름 가져 오기 실패"))
+                result.invoke(UiState.Failure(FireStoreResponse.FIND_NAME_FAILED))
             }
     }
 
     override fun getParticipantsTokens(roomId: String, result: (UiState<List<String>>) -> Unit) {
         fireStore.collection(FireStoreTable.FCMTOKENS)
-            .whereEqualTo("roomId", roomId)
+            .whereEqualTo(FireStoreTable.FIELD_ROOM_ID, roomId)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 querySnapshot?.let {
                     val tokens = mutableListOf<String>()
                     it.documents.forEach { document ->
-                        document.getString("token")?.let { token ->
+                        document.getString(FireStoreTable.FIELD_TOKEN)?.let { token ->
                             tokens.add(token)
                         }
                     }
                     result.invoke(UiState.Success(tokens))
                 } ?: kotlin.run {
-                    result.invoke(UiState.Failure("빈 쿼리입니다"))
+                    result.invoke(UiState.Failure(FireStoreResponse.GET_TOKENS_EMPTY))
                 }
             }
             .addOnFailureListener {
-                result.invoke(UiState.Failure("쿼리 실패"))
+                result.invoke(UiState.Failure(FireStoreResponse.GET_TOKENS_FAILED))
             }
     }
-
-    override fun getMyRoom(result: (UiState<CarPoolRoom>) -> Unit) {
-        if(auth.currentUser == null) {
-            result.invoke(UiState.Failure("현재 유저 정보를 불러올 수 없습니다"))
-            return
-        }
-
-        fireStore.collection(FireStoreTable.ROOM)
-            .whereArrayContains("participants", auth.currentUser!!.uid)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                querySnapshot?.let {
-                    val snapshot = it.documents.firstOrNull()
-                    snapshot?.toObject<CarPoolRoom>()?.let { room ->
-                        result.invoke(UiState.Success(room))
-                    } ?: kotlin.run {
-                        result.invoke(UiState.Failure("현재 참여 중인 채팅방이 없습니다"))
-                    }
-                } ?: kotlin.run {
-                    result.invoke(UiState.Failure("빈 쿼리입니다"))
-                }
-            }
-            .addOnFailureListener {
-                result.invoke(UiState.Failure("방 정보를 가져오지 못했습니다"))
-            }
-    }
-
     override fun createRoom(room: CarPoolRoom, result: (UiState<CarPoolRoom>) -> Unit) {
         val ref = fireStore.collection(FireStoreTable.ROOM).document()
 
@@ -175,17 +146,17 @@ class FireStoreRepositoryImpl(
         ref.set(room)
             .addOnSuccessListener {
                 fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
-                    .update(mapOf("roomId" to room.roomId))
+                    .update(mapOf(FireStoreTable.FIELD_ROOM_ID to room.roomId))
                 result.invoke(UiState.Success(room))
             }
             .addOnFailureListener {
-                result.invoke(UiState.Failure("채팅방 생성 실패"))
+                result.invoke(UiState.Failure(FireStoreResponse.CREATE_ROOM_FAILED))
             }
     }
 
     override fun joinRoom(room: CarPoolRoom, result: (UiState<String>) -> Unit) {
         if(auth.currentUser == null) {
-            result.invoke(UiState.Failure("현재 유저 정보를 불러올 수 없습니다"))
+            result.invoke(UiState.Failure(FireStoreResponse.SUBSCRIBE_USER_ERROR))
             return
         }
 
@@ -194,7 +165,7 @@ class FireStoreRepositoryImpl(
             result.invoke(UiState.Success(FireStoreResponse.JOIN_ROOM_ALREADY_JOINED))
             return
         }else{
-            val docRef = fireStore.collection("Room").document(room.roomId)
+            val docRef = fireStore.collection(FireStoreTable.ROOM).document(room.roomId)
             docRef.get().addOnSuccessListener { documentSnapshot->
                 if(documentSnapshot.data == null){
                     result.invoke(
@@ -207,12 +178,12 @@ class FireStoreRepositoryImpl(
                     // 먼저 입장이 완료된 유저만 성공시키고, 나머지 유저는 실패 처리
                     fireStore.runTransaction {transaction->
                         val snapshot = transaction.get(docRef)
-                        val newCount = snapshot.getLong("userCount")?.plus(1) ?: return@runTransaction
-                        val closed = snapshot.getBoolean("closed") ?: return@runTransaction
+                        val newCount = snapshot.getLong(FireStoreTable.FIELD_USER_COUNT)?.plus(1) ?: return@runTransaction
+                        val closed = snapshot.getBoolean(FireStoreTable.FIELD_CLOSED) ?: return@runTransaction
 
                         if(newCount <= room.userMaxCount && !closed){
-                            transaction.update(docRef, "userCount", FieldValue.increment(1))
-                            transaction.update(docRef, "participants", FieldValue.arrayUnion(auth.currentUser!!.uid))
+                            transaction.update(docRef, FireStoreTable.FIELD_USER_COUNT, FieldValue.increment(1))
+                            transaction.update(docRef, FireStoreTable.FIELD_PARTICIPANTS, FieldValue.arrayUnion(auth.currentUser!!.uid))
                         }else{
                             throw FirebaseFirestoreException("userCount limit over or closed room", FirebaseFirestoreException.Code.ABORTED)
                         }
@@ -220,7 +191,7 @@ class FireStoreRepositoryImpl(
                         .addOnSuccessListener {
                             // 입장 성공
                             fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
-                                .update(mapOf("roomId" to room.roomId))
+                                .update(mapOf(FireStoreTable.FIELD_ROOM_ID to room.roomId))
 
                             result.invoke(UiState.Success(FireStoreResponse.JOIN_ROOM_SUCCESS))
                         }
@@ -237,40 +208,40 @@ class FireStoreRepositoryImpl(
 
     override fun exitRoom(room: CarPoolRoom, result: (UiState<String>) -> Unit) {
         if(auth.currentUser == null) {
-            result.invoke(UiState.Failure("현재 유저 정보를 불러올 수 없습니다"))
+            result.invoke(UiState.Failure(FireStoreResponse.SUBSCRIBE_USER_ERROR))
             return
         }
 
-        val docRef = fireStore.collection("Room").document(room.roomId)
+        val docRef = fireStore.collection(FireStoreTable.ROOM).document(room.roomId)
         fireStore.runTransaction{transaction->
             val snapshot = transaction.get(docRef)
-            val userCount = snapshot.getLong("userCount")?.minus(1) ?: return@runTransaction
+            val userCount = snapshot.getLong(FireStoreTable.FIELD_USER_COUNT)?.minus(1) ?: return@runTransaction
 
             if(userCount > 0){
-                transaction.update(docRef,"userCount",userCount)
-                transaction.update(docRef, "participants", FieldValue.arrayRemove(auth.currentUser!!.uid))
+                transaction.update(docRef,FireStoreTable.FIELD_USER_COUNT,userCount)
+                transaction.update(docRef, FireStoreTable.FIELD_PARTICIPANTS, FieldValue.arrayRemove(auth.currentUser!!.uid))
             }else{
-                fireStore.collection("Room").document(room.roomId).delete()
+                fireStore.collection(FireStoreTable.ROOM).document(room.roomId).delete()
             }
-            result.invoke(UiState.Success("채팅방 퇴장"))
+            result.invoke(UiState.Success(FireStoreResponse.EXIT_ROOM_SUCCESS))
         }
             .addOnSuccessListener {
-                fireStore.collection("FcmTokens").document(auth.currentUser!!.uid)
-                    .update(mapOf("roomId" to ""))
+                fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
+                    .update(mapOf(FireStoreTable.FIELD_ROOM_ID to ""))
             }
     }
 
     override fun deactivateRoom(roomId: String, result: (UiState<String>) -> Unit) {
-        fireStore.collection("Room").document(roomId)
-            .update("closed", true)
+        fireStore.collection(FireStoreTable.ROOM).document(roomId)
+            .update(FireStoreTable.FIELD_CLOSED, true)
             .addOnSuccessListener {
                 result.invoke(
-                    UiState.Success("채팅방이 마감 되었습니다")
+                    UiState.Success(FireStoreResponse.DEACTIVATE_ROOM_SUCCESS)
                 )
             }
             .addOnFailureListener {
                 result.invoke(
-                    UiState.Failure("채팅방을 마감할 수 없습니다")
+                    UiState.Failure(FireStoreResponse.DEACTIVATE_ROOM_FAILED)
                 )
             }
     }
@@ -279,19 +250,19 @@ class FireStoreRepositoryImpl(
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 result.invoke(
-                    UiState.Failure(task.result)
+                    UiState.Failure(FireStoreResponse.UPDATE_TOKEN_TASK_FAILED)
                 )
                 return@addOnCompleteListener
             }
             if(auth.currentUser == null){
                 result.invoke(
-                    UiState.Failure("로그인 필요")
+                    UiState.Failure(FireStoreResponse.SUBSCRIBE_USER_ERROR)
                 )
                 return@addOnCompleteListener
             }
 
-            fireStore.collection("FcmTokens").document(auth.currentUser!!.uid)
-                .update(mapOf("token" to task.result))
+            fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
+                .update(mapOf(FireStoreTable.FIELD_TOKEN to task.result))
                 .addOnSuccessListener {
                     result.invoke(
                         UiState.Success(task.result)
@@ -306,18 +277,18 @@ class FireStoreRepositoryImpl(
         }
             .addOnFailureListener {
                 result.invoke(
-                    UiState.Failure("기기의 토큰 값을 가져오지 못했습니다")
+                    UiState.Failure(FireStoreResponse.UPDATE_TOKEN_TASK_FAILED)
                 )
             }
     }
 
     override fun monitoringLoggedIn(): Flow<SignedIn> {
         return callbackFlow {
-            val listenerRegistration = fireStore.collection(SIGNEDIN).document(auth.currentUser!!.uid)
+            val listenerRegistration = fireStore.collection(FireStoreTable.SIGNEDIN).document(auth.currentUser!!.uid)
                 .addSnapshotListener { snapshot, error->
                     if(error != null){
                         cancel(
-                            message = "모니터링 에러가 발생했습니다",
+                            message = FireStoreResponse.MONITORING_ERROR,
                             cause = error
                         )
                         return@addSnapshotListener

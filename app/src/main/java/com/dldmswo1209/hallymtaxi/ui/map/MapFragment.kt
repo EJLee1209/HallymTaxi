@@ -147,7 +147,7 @@ class MapFragment : Fragment() {
                 }
                 is UiState.Failure -> {
                     loadingDialog.dismiss()
-                    toast("현재 주소를 찾지 못했습니다")
+                    toast(state.error ?: "출발지 검색 실패")
                 }
                 is UiState.Success ->{
                     loadingDialog.dismiss()
@@ -175,7 +175,7 @@ class MapFragment : Fragment() {
                 }
                 is UiState.Failure -> {
                     loadingDialog.dismiss()
-                    toast("현재 주소를 찾지 못했습니다")
+                    toast(state.error ?: "목적지 검색 실패")
                 }
                 is UiState.Success ->{
                     loadingDialog.dismiss()
@@ -200,7 +200,7 @@ class MapFragment : Fragment() {
                 }
                 is UiState.Failure -> {
                     loadingDialog.dismiss()
-                    toast("현재 주소를 찾지 못했습니다")
+                    toast(state.error ?: "알 수 없는 오류")
                 }
                 is UiState.Success ->{
                     // 채팅방 입장

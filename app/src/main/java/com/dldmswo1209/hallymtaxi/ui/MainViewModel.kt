@@ -61,12 +61,6 @@ class MainViewModel @Inject constructor(
     private var _monitoring = MutableLiveData<SignedIn>()
     val monitoring : LiveData<SignedIn> = _monitoring
 
-    private var _myRoom = MutableLiveData<UiState<CarPoolRoom>>()
-    val myRoom : LiveData<UiState<CarPoolRoom>> = _myRoom
-
-    private var _user = MutableLiveData<UiState<User>>()
-    val user : LiveData<UiState<User>> = _user
-
     private var _logout = MutableLiveData<UiState<String>>()
     val logout : LiveData<UiState<String>> = _logout
 
@@ -106,17 +100,8 @@ class MainViewModel @Inject constructor(
     private var _favorites = MutableLiveData<List<Place>>()
     val favorites : LiveData<List<Place>> = _favorites
 
-    private var _updateUserName = MutableLiveData<UiState<String>>()
-    val updateUserName : LiveData<UiState<String>> = _updateUserName
-
     private var _inAppUpdate = MutableLiveData<UiState<AppUpdateInfo>>()
     val inAppUpdate : LiveData<UiState<AppUpdateInfo>> = _inAppUpdate
-
-
-
-    fun getUserInfo(){
-        authRepository.getUserInfo { _user.postValue(it) }
-    }
 
     fun subscribeUser() = viewModelScope.launch {
         fireStoreRepository.subscribeUser().collect { user ->
@@ -152,10 +137,6 @@ class MainViewModel @Inject constructor(
     fun logout() {
         _logout.postValue(UiState.Loading)
         authRepository.logoutUser{ _logout.postValue(it) }
-    }
-
-    fun updateUserName(newName: String) {
-        authRepository.updateUserName(newName) { _updateUserName.postValue(it) }
     }
 
     fun updateFcmToken() {
@@ -208,13 +189,6 @@ class MainViewModel @Inject constructor(
             _subscribeMyRoom.value = it
         }
     }
-
-    fun getMyRoom() {
-        fireStoreRepository.getMyRoom {
-            _myRoom.postValue(it)
-        }
-    }
-
 
     fun exitRoom(room: CarPoolRoom) {
         _exitRoom.postValue(UiState.Loading)
@@ -297,12 +271,6 @@ class MainViewModel @Inject constructor(
     fun checkAppUpdate() {
         _inAppUpdate.postValue(UiState.Loading)
         inAppUpdateRepository.checkAppUpdate { _inAppUpdate.postValue(it) }
-    }
-
-    private fun networkErrorMessage(e: Exception){
-        Toast.makeText(this@MainViewModel.context, "네트워크 연결상태를 확인해주세요", Toast.LENGTH_SHORT)
-            .show()
-        e.printStackTrace()
     }
 
 }

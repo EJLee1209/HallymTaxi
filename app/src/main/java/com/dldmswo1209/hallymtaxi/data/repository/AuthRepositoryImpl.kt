@@ -1,13 +1,11 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
-import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.User
-import com.dldmswo1209.hallymtaxi.util.AuthResponse.EMAIL_EXIST
-import com.dldmswo1209.hallymtaxi.util.AuthResponse.EMAIL_VALID
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.SignedIn
 import com.dldmswo1209.hallymtaxi.data.model.TokenInfo
+import com.dldmswo1209.hallymtaxi.util.AuthResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
@@ -19,14 +17,14 @@ class AuthRepositoryImpl(
     override fun checkEmail(email: String, result: (UiState<String>) -> Unit) {
         auth.createUserWithEmailAndPassword(email, "123456").addOnSuccessListener {
             result.invoke(
-                UiState.Success(EMAIL_VALID)
+                UiState.Success(AuthResponse.EMAIL_VALID)
             )
 
             auth.currentUser?.delete()
 
         }.addOnFailureListener {
             result.invoke(
-                UiState.Failure(EMAIL_EXIST)
+                UiState.Failure(AuthResponse.EMAIL_EXIST)
             )
         }
     }
@@ -61,23 +59,23 @@ class AuthRepositoryImpl(
                         if(signedIn != null) {
                             if(signedIn.deviceId == deviceId) {
                                 result.invoke(
-                                    UiState.Success("로그인 가능")
+                                    UiState.Success(AuthResponse.LOGIN_POSSIBLE)
                                 )
                             }else{
                                 result.invoke(
-                                    UiState.Failure("다른 기기에서 이미 로그인 했습니다")
+                                    UiState.Failure(AuthResponse.LOGIN_IMPOSSIBLE)
                                 )
                             }
 
                         } else {
                             result.invoke(
-                                UiState.Success("로그인 가능")
+                                UiState.Success(AuthResponse.LOGIN_POSSIBLE)
                             )
                         }
                     }
                 } ?: kotlin.run {
                     result.invoke(
-                        UiState.Success("로그인 가능")
+                        UiState.Success(AuthResponse.LOGIN_POSSIBLE)
                     )
                 }
             }
@@ -86,13 +84,13 @@ class AuthRepositoryImpl(
     override fun loginUser(email: String, password: String, deviceId: String, result: (UiState<String>) -> Unit) {
         if(email.isEmpty() || password.isEmpty()){
             result.invoke(
-                UiState.Failure("모든 정보를 입력해주세요")
+                UiState.Failure(AuthResponse.LOGIN_EMPTY)
             )
             return
         }
         auth.signInWithEmailAndPassword("$email@hallym.ac.kr", password).addOnSuccessListener {
             result.invoke(
-                UiState.Success("로그인 성공")
+                UiState.Success(AuthResponse.LOGIN_SUCCESS)
             )
             fireStore.collection(FireStoreTable.SIGNEDIN).document(auth.currentUser!!.uid)
                 .set(SignedIn(
@@ -102,78 +100,26 @@ class AuthRepositoryImpl(
                 ))
         }.addOnFailureListener {
             result.invoke(
-                UiState.Failure("이메일 또는 비밀번호를 확인해주세요")
+                UiState.Failure(AuthResponse.LOGIN_FAILED)
             )
         }
     }
 
     override fun logoutUser(result: (UiState<String>) -> Unit) {
         fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
-            .update(mapOf("token" to ""))
+            .update(mapOf(FireStoreTable.FIELD_TOKEN to ""))
             .addOnSuccessListener {
                 result.invoke(
-                    UiState.Success("로그아웃 성공")
+                    UiState.Success(AuthResponse.LOGOUT_SUCCESS)
                 )
 
                 auth.signOut()
             }
             .addOnFailureListener {
                 result.invoke(
-                    UiState.Success("로그아웃 실패")
+                    UiState.Failure(AuthResponse.LOGOUT_FAILED)
                 )
             }
-    }
-
-    override fun getUserInfo(result: (UiState<User>) -> Unit) {
-        if (auth.currentUser == null) {
-            result.invoke(
-                UiState.Failure("로그인 필요")
-            )
-            return
-        }
-        fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
-            .get()
-            .addOnSuccessListener {
-                if(it == null){
-                    result.invoke(
-                        UiState.Failure("유저 정보가 없습니다")
-                    )
-                    return@addOnSuccessListener
-                }
-
-                it.toObject(User::class.java)?.let { user->
-                    result.invoke(
-                        UiState.Success(user)
-                    )
-                } ?: kotlin.run { result.invoke(UiState.Failure("유저 정보가 없습니다")) }
-            }
-            .addOnFailureListener {
-                result.invoke(
-                    UiState.Failure("유저 정보를 가져오지 못했습니다")
-                )
-            }
-    }
-
-    override fun updateUserName(newName: String, result: (UiState<String>) -> Unit) {
-        if (auth.currentUser == null) {
-            result.invoke(
-                UiState.Failure("로그인 필요")
-            )
-            return
-        }
-        fireStore.collection(FireStoreTable.USER).document(auth.currentUser!!.uid)
-            .update("name", newName)
-            .addOnSuccessListener {
-                result.invoke(
-                    UiState.Success("이름 변경 성공")
-                )
-            }
-            .addOnFailureListener {
-                result.invoke(
-                    UiState.Failure("이름 변경 실패")
-                )
-            }
-
     }
 
 }

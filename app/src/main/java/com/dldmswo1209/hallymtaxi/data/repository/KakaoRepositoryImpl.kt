@@ -3,6 +3,7 @@ package com.dldmswo1209.hallymtaxi.data.repository
 import com.dldmswo1209.hallymtaxi.data.model.ResultSearchKeyword
 import com.dldmswo1209.hallymtaxi.data.remote.KakaoApi
 import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.util.ServerResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,7 +19,7 @@ class KakaoRepositoryImpl(
             )
         } catch (e: Exception) {
             result.invoke(
-                UiState.Failure("키워드 검색 실패")
+                UiState.Failure(ServerResponse.SEARCH_KEYWORD_FAILED)
             )
         }
     }

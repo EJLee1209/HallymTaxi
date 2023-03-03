@@ -138,7 +138,7 @@ class PoolListBottomSheetFragment(
                     loadingDialog.dismiss()
                     val dialog = CustomDialog(
                         title = "채팅방 입장 실패",
-                        content = "채팅방 인원 초과 혹은\n마감된 채팅방 입니다"
+                        content = state.error ?: "채팅방 인원 초과 혹은\n마감된 채팅방 입니다"
                     ) {}
                     if (poolListAdapter.itemCount == 1) {
                         this@PoolListBottomSheetFragment.dialog?.dismiss()

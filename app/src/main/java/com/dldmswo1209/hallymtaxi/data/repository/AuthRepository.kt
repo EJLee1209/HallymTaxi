@@ -9,6 +9,4 @@ interface AuthRepository {
     fun checkLogged(email: String, deviceId: String, result: (UiState<String>) -> Unit)
     fun loginUser(email: String, password: String, deviceId: String, result: (UiState<String>) -> Unit)
     fun logoutUser(result: (UiState<String>)-> Unit)
-    fun getUserInfo(result: (UiState<User>) -> Unit)
-    fun updateUserName(newName: String, result: (UiState<String>) -> Unit)
 }
