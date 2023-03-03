@@ -26,9 +26,9 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_marginStart="9dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="3dp"
                 android:background="@null"
                 android:onClick="@{()->fragment.onClickBack()}"
                 android:src="@drawable/ic_left_arrow"
@@ -51,12 +51,12 @@
             <TextView
                 android:id="@+id/tv_edit"
                 style="@style/Text13.White"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="15dp"
                 android:onClick="@{()->fragment.onClickUpdate()}"
-                android:padding="10dp"
+                android:gravity="center"
                 android:text="@string/update"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
