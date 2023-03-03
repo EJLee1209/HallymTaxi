@@ -162,31 +162,14 @@ class SplashActivity : AppCompatActivity() {
                 }
                 is UiState.Success -> {
                     myApplication.setFcmToken(state.data)
-                    viewModel.getUserInfo()
-                }
-            }
-        }
-
-        viewModel.user.observe(this) { state ->
-            when (state) {
-                is UiState.Loading -> {}
-                is UiState.Failure -> {
-                    startActivity(Intent(this@SplashActivity, WelcomeActivity::class.java))
-                }
-                is UiState.Success -> {
-                    user = state.data
-                    myApplication.setUser(state.data)
                     startMainActivity()
                 }
             }
         }
-
     }
 
     private fun startMainActivity() {
-        val intent = Intent(this@SplashActivity, MainActivity::class.java).apply {
-            putExtra("userInfo", user)
-        }
+        val intent = Intent(this@SplashActivity, MainActivity::class.java)
         startActivity(intent)
         finish()
     }

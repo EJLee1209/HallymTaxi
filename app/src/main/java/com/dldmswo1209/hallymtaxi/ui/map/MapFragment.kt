@@ -37,7 +37,7 @@ class MapFragment : Fragment() {
     private lateinit var binding: FragmentMapBinding
     private lateinit var locationService : LocationService
     private lateinit var favoritesListAdapter: FavoritesListAdapter
-    private lateinit var user : User
+
     private lateinit var myApplication: MyApplication
     private lateinit var mapView: MapView
 
@@ -103,11 +103,6 @@ class MapFragment : Fragment() {
         moveCamera(place_hallym_univ.y, place_hallym_univ.x, 2f)
 
         myApplication = requireActivity().application as MyApplication
-        user = myApplication.getUser() ?: kotlin.run {
-            startActivity(Intent(requireActivity(), SplashActivity::class.java))
-            requireActivity().finish()
-            return
-        }
 
         favoritesListAdapter = FavoritesListAdapter { place ->
             locationService.getCurrentAddress()
@@ -117,10 +112,6 @@ class MapFragment : Fragment() {
     }
 
     private fun setObservers(){
-        myApplication.userLiveData.observe(viewLifecycleOwner) { user ->
-            this.user = user
-        }
-
         myApplication.myRoom.observe(viewLifecycleOwner){ room->
 
             if(room != null && room.roomId.isNotBlank()){

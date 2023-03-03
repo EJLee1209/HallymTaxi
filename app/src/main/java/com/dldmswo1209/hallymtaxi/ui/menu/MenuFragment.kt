@@ -50,16 +50,16 @@ class MenuFragment: Fragment() {
     }
     fun init(){
         myApplication = requireActivity().application as MyApplication
-        user = myApplication.getUser() ?: kotlin.run {
-            startActivity(Intent(requireContext(), SplashActivity::class.java))
-            requireActivity().finish()
-            return
-        }
 
         binding.user = user
         binding.fragment = this
     }
     private fun setObserver() {
+        myApplication.userLiveData.observe(viewLifecycleOwner) { user ->
+            this.user = user
+            binding.user = user
+        }
+
         viewModel.logout.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Loading -> {

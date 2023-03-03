@@ -29,16 +29,19 @@ class UserInfoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         init()
+        setObserver()
         registerBackPressedCallback()
     }
 
     private fun init() {
         binding.fragment = this
         myApplication = requireActivity().application as MyApplication
-        user = myApplication.getUser()
+    }
 
-        user?.let {
-            binding.user = it
+    private fun setObserver(){
+        myApplication.userLiveData.observe(viewLifecycleOwner) { user ->
+            this.user = user
+            binding.user = user
         }
     }
 

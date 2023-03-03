@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         myApplication = application as MyApplication
 
         requestPermission()
-        getIntentExtraData()
+//        getIntentExtraData()
         setObserver()
         bottomNavigationSetup()
     }
