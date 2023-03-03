@@ -19,9 +19,9 @@
         android:layout_height="wrap_content"
         android:background="@null"
         android:clickable="true"
+        app:cardBackgroundColor="@color/hallym_white_ffffff"
         app:cardCornerRadius="0dp"
-        app:cardElevation="0dp"
-        app:cardBackgroundColor="@color/hallym_white_ffffff">
+        app:cardElevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -30,8 +30,9 @@
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btn_delete"
                 isEditMode="@{isEditMode}"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="13dp"
                 android:background="@null"
                 android:src="@drawable/ic_x_circle"
                 android:visibility="gone"
@@ -46,7 +47,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
-                android:layout_marginStart="2dp"
+                android:layout_marginStart="13dp"
                 android:layout_marginTop="13dp"
                 android:ellipsize="end"
                 android:maxLines="1"
@@ -62,7 +63,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
-                android:layout_marginStart="2dp"
+                android:layout_marginStart="13dp"
                 android:layout_marginTop="7dp"
                 android:ellipsize="end"
                 android:maxLines="1"

@@ -3,6 +3,8 @@ package com.dldmswo1209.hallymtaxi.common
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageButton
+import androidx.core.view.marginStart
 import androidx.databinding.BindingAdapter
 import com.dldmswo1209.hallymtaxi.data.model.SEND_STATE_FAIL
 import com.dldmswo1209.hallymtaxi.data.model.SEND_STATE_SUCCESS
