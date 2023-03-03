@@ -11,18 +11,16 @@ import retrofit2.http.Query
 interface MainServerApi {
     // 인증 요청 생성
     @POST(API_EMAIL_CREATE)
-    fun sendVerifyMail(
+    suspend fun sendVerifyMail(
         @Query("email") email: String = ""
-    ): Call<VerifyInfo>
+    ): VerifyInfo
 
     // 인증 요청
     @POST(API_EMAIL_VERIFY)
-    fun requestVerify(
+    suspend fun requestVerify(
         @Query("email") email: String,
         @Query("code") code: String
-    ): Call<VerifyInfo>
-
-    // 인증 상태 확인
+    ): VerifyInfo
 
     // 푸시 메세지
     @POST(API_MESSAGE_PUSH)

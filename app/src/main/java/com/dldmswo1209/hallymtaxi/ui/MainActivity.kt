@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
         CheckNetwork(this)
     }
     var isNetworkActivate = false
-    private var user: User? = null
     private lateinit var myApplication: MyApplication
     private var room: CarPoolRoom? = null
 
@@ -53,20 +52,11 @@ class MainActivity : AppCompatActivity() {
         myApplication = application as MyApplication
 
         requestPermission()
-//        getIntentExtraData()
         setObserver()
         bottomNavigationSetup()
     }
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기
-    }
-
-    private fun getIntentExtraData(){
-        user = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra("userInfo", User::class.java) as User
-        }else{
-            intent.getSerializableExtra("userInfo") as User
-        }
     }
     private fun setObserver(){
         checkNetwork.isConnected.observe(this){

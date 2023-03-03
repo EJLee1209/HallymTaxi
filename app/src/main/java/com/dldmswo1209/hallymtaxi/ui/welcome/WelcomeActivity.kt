@@ -27,9 +27,7 @@ class WelcomeActivity : AppCompatActivity() {
         checkNetwork.isConnected.observe(this){
             isNetworkActivate = it
         }
-
     }
-
 
     override fun onPause() {
         super.onPause()

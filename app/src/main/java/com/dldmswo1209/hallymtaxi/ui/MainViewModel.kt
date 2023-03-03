@@ -164,18 +164,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun searchKeyword(keyword: String, isStartPoint: Boolean) = viewModelScope.launch {
-        try {
-            if (isStartPoint) {
-                _startPoint.postValue(UiState.Loading)
-                kakaoRepository.searchKeyword(keyword){ _startPoint.postValue(it) }
-            }
-            else {
-                _endPoint.postValue(UiState.Loading)
-                kakaoRepository.searchKeyword(keyword){ _endPoint.postValue(it) }
-            }
-        } catch (e: Exception) {
-            networkErrorMessage(e)
+    fun searchKeyword(keyword: String, isStartPoint: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        if (isStartPoint) {
+            _startPoint.postValue(UiState.Loading)
+            kakaoRepository.searchKeyword(keyword){ _startPoint.postValue(it) }
+        }
+        else {
+            _endPoint.postValue(UiState.Loading)
+            kakaoRepository.searchKeyword(keyword){ _endPoint.postValue(it) }
         }
     }
 

@@ -4,8 +4,8 @@ import com.dldmswo1209.hallymtaxi.data.model.VerifyInfo
 import com.dldmswo1209.hallymtaxi.data.UiState
 
 interface ServerRepository {
-    fun sendVerifyMail(email: String, result: (UiState<VerifyInfo>) -> Unit)
-    fun requestVerify(email: String, code: String, result: (UiState<VerifyInfo>) -> Unit)
+    suspend fun sendVerifyMail(email: String, result: (UiState<VerifyInfo>) -> Unit)
+    suspend fun requestVerify(email: String, code: String, result: (UiState<VerifyInfo>) -> Unit)
     suspend fun sendPushMessage(
         token: String,
         roomId: String,

@@ -40,7 +40,6 @@ class SplashActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
     private lateinit var myApplication: MyApplication
-    private lateinit var user: User
     private var email: String? = ""
     private var password: String? = ""
     private lateinit var sharedPreferences: SharedPreferences
