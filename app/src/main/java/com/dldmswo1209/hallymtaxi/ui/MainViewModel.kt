@@ -230,7 +230,7 @@ class MainViewModel @Inject constructor(
         fireStoreRepository.deactivateRoom(roomId){ _deactivateRoom.postValue(it) }
     }
 
-    fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) {
+    fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) = viewModelScope.launch(Dispatchers.IO) {
         _sendPush.postValue(UiState.Loading)
         if(receiveTokens.isEmpty()) chat.sendSuccess = SEND_STATE_SUCCESS
         saveChat(chat)

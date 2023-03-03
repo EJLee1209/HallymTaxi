@@ -107,10 +107,7 @@ class ChatRoomFragment: Fragment() {
     private fun setRecyclerAdapter(){
         chatListAdapter = ChatListAdapter(currentUser){ chatId->
             CoroutineScope(Dispatchers.Main).launch {
-                async {
-                    viewModel.deleteChat(chatId)
-                    delay(200)
-                }.await()
+                viewModel.deleteChat(chatId).join()
                 viewModel.detachChatList(room.roomId)
             }
         }
@@ -181,25 +178,19 @@ class ChatRoomFragment: Fragment() {
         }
 
         viewModel.sendPush.observe(viewLifecycleOwner){ state->
-            viewModel.detachChatList(room.roomId)
-
             when(state){
-                is UiState.Loading ->{}
+                is UiState.Loading ->{
+                    viewModel.detachChatList(room.roomId)
+                }
                 is UiState.Failure ->{
                     CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.Default) {
-                            viewModel.updateChatById(state.error!!, SEND_STATE_FAIL)
-                            delay(200)
-                        }
+                        viewModel.updateChatById(state.error!!, SEND_STATE_FAIL).join()
                         viewModel.detachChatList(room.roomId)
                     }
                 }
                 is UiState.Success ->{
                     CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.Default) {
-                            viewModel.updateChatById(state.data, SEND_STATE_SUCCESS)
-                            delay(200)
-                        }
+                        viewModel.updateChatById(state.data, SEND_STATE_SUCCESS).join()
                         viewModel.detachChatList(room.roomId)
                     }
                 }
@@ -224,10 +215,7 @@ class ChatRoomFragment: Fragment() {
                         messageType = CHAT_ETC
                     )
                     CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.Default) {
-                            viewModel.sendMessage(chat, currentUser.name, tokenList)
-                            delay(200)
-                        }
+                        viewModel.sendMessage(chat, currentUser.name, tokenList).join()
                         viewModel.detachChatList(room.roomId)
                     }
                 }

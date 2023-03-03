@@ -5,15 +5,15 @@ import com.dldmswo1209.hallymtaxi.data.model.Place
 import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 
 interface DatabaseRepository {
-    fun saveChat(chat: Chat)
-    fun updateChatById(id: String, sendSuccess: String)
-    fun deleteChat(id: String)
-    fun detachChatList(roomId: String) : List<Chat>?
-    fun insertRoomInfo(roomInfo: RoomInfo)
-    fun detachRoomInfo(roomId: String): RoomInfo?
-    fun updateRoomInfo(roomInfo: RoomInfo)
-    fun detachRoomInfoHistory() : List<RoomInfo>?
-    fun getFavorites() : List<Place>
+    suspend fun saveChat(chat: Chat)
+    suspend fun updateChatById(id: String, sendSuccess: String)
+    suspend fun deleteChat(id: String)
+    suspend fun detachChatList(roomId: String) : List<Chat>?
+    suspend fun insertRoomInfo(roomInfo: RoomInfo)
+    suspend fun detachRoomInfo(roomId: String): RoomInfo?
+    suspend fun updateRoomInfo(roomInfo: RoomInfo)
+    suspend fun detachRoomInfoHistory() : List<RoomInfo>?
+    suspend fun getFavorites() : List<Place>
     suspend fun saveFavorite(place: Place)
     suspend fun deleteFavorite(place: Place)
 

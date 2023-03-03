@@ -10,7 +10,7 @@ import com.dldmswo1209.hallymtaxi.data.model.Place
 @Dao
 interface FavoriteDao {
     @Query("SELECT * FROM favorite")
-    fun getFavorites() : List<Place>
+    suspend fun getFavorites() : List<Place>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveFavorite(place: Place)

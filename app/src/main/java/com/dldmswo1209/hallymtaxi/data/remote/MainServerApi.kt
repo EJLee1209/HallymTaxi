@@ -26,7 +26,7 @@ interface MainServerApi {
 
     // 푸시 메세지
     @POST(API_MESSAGE_PUSH)
-    fun sendPushMessage(
+    suspend fun sendPushMessage(
         @Query("token") token: String,
         @Query("id") id: String,
         @Query("roomId") roomId: String,
@@ -34,6 +34,6 @@ interface MainServerApi {
         @Query("userName") userName: String,
         @Query("message") message: String,
         @Query("messageType") messageType: String,
-    ) : Call<Boolean>
+    ) : Boolean
 
 }

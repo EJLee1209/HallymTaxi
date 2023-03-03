@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.provider.Settings.Global
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -17,10 +18,12 @@ import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.*
 
 class FcmService : FirebaseMessagingService() {
     private var broadcaster: LocalBroadcastManager? = null
     private var roomDB: AppDatabase? = null
+    private var myCoroutineScope = CoroutineScope(Dispatchers.IO)
     companion object {
         const val CHANNEL_ID = "com.dldmswo1209.hallymtaxi"
         const val CHANNEL_NAME = "com.dldmswo1209.hallymtaxi"
@@ -36,8 +39,6 @@ class FcmService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.d("testt", "onNewToken: $token")
-
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -67,29 +68,33 @@ class FcmService : FirebaseMessagingService() {
             messageType = messageType
         )
 
-        roomDB?.chatDao()?.saveChat(chat) // 채팅 저장
-        val pendingIntent = createPendingIntent(roomId)
+        myCoroutineScope.launch {
+            roomDB?.chatDao()?.saveChat(chat) // 채팅 저장
 
-        val builder: NotificationCompat.Builder =
-            NotificationCompat.Builder(applicationContext, CHANNEL_ID).apply {
-                setSmallIcon(R.mipmap.ic_launcher)
-                setContentTitle(userName)
-                setContentText(message)
-                setAutoCancel(true)
-                setContentIntent(pendingIntent)
-                setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority =
-                    NotificationCompat.PRIORITY_MAX
+            val pendingIntent = createPendingIntent(roomId)
+
+            val builder: NotificationCompat.Builder =
+                NotificationCompat.Builder(applicationContext, CHANNEL_ID).apply {
+                    setSmallIcon(R.mipmap.ic_launcher)
+                    setContentTitle(userName)
+                    setContentText(message)
+                    setAutoCancel(true)
+                    setContentIntent(pendingIntent)
+                    setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority =
+                        NotificationCompat.PRIORITY_MAX
+                }
+
+            if (!myApplication.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
+                notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
+                roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, true, isActivate = true))
+            } else {
+                roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, false, isActivate = true))
             }
 
-        if (!myApplication.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
-            notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
-            roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, true, isActivate = true))
-        } else {
-            roomDB?.roomInfoDao()?.insertRoomInfo(RoomInfo(roomId, message, dateTime, false, isActivate = true))
+            val notificationMessage = Intent("newMessage")
+            broadcaster?.sendBroadcast(notificationMessage) // 브로드 캐스트 리시버를 통해 노티가 온 경우 알려준다.
         }
 
-        val notificationMessage = Intent("newMessage")
-        broadcaster?.sendBroadcast(notificationMessage) // 브로드 캐스트 리시버를 통해 노티가 온 경우 알려준다.
     }
 
     private fun createPendingIntent(

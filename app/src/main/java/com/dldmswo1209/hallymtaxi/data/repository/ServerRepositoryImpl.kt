@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
+import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.VerifyInfo
 import com.dldmswo1209.hallymtaxi.data.remote.MainServerApi
 import com.dldmswo1209.hallymtaxi.data.UiState
@@ -9,9 +10,12 @@ import com.dldmswo1209.hallymtaxi.util.ServerResponse.MESSAGE_TIME_OUT
 import com.dldmswo1209.hallymtaxi.util.ServerResponse.MESSAGE_VERIFY_SUCCESS
 import com.dldmswo1209.hallymtaxi.util.ServerResponse.STATUS_FAIL
 import com.dldmswo1209.hallymtaxi.util.ServerResponse.STATUS_OK
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.net.UnknownHostException
 
 class ServerRepositoryImpl(
     private val client: MainServerApi,
@@ -106,7 +110,7 @@ class ServerRepositoryImpl(
     }
 
 
-    override fun sendPushMessage(
+    override suspend fun sendPushMessage(
         token: String,
         roomId: String,
         userId: String,
@@ -123,33 +127,17 @@ class ServerRepositoryImpl(
             return
         }
 
-        client.sendPushMessage(token, id, roomId, userId, userName, message, messageType)
-            .enqueue(object : Callback<Boolean> {
-                override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
-                    response.body()?.let { sent->
-                        if(sent){
-                            result.invoke(
-                                UiState.Success(id)
-                            )
-                        }else{
-                            result.invoke(
-                                UiState.Failure(id)
-                            )
-                        }
+        try{
+            val sent = client.sendPushMessage(token, id, roomId, userId, userName, message, messageType)
+            if(sent){
+                result.invoke(UiState.Success(id))
+            } else {
+                result.invoke(UiState.Failure(id))
+            }
+        } catch (e: Exception) {
+            result.invoke(UiState.Failure(id))
+            Log.e("testt", "sendPushMessage: $e", )
+        }
 
-                    }?: kotlin.run {
-                        result.invoke(
-                            UiState.Failure(id)
-                        )
-                    }
-
-                }
-
-                override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                    result.invoke(
-                        UiState.Failure(id)
-                    )
-                }
-            })
     }
 }

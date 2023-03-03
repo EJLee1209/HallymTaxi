@@ -6,16 +6,16 @@ import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 @Dao
 interface RoomInfoDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertRoomInfo(vararg roomInfo: RoomInfo)
-
     @Query("SELECT * FROM room_info WHERE roomId = :roomId LIMIT 1")
-    fun detachRoomInfo(roomId: String) : RoomInfo
+    suspend fun detachRoomInfo(roomId: String) : RoomInfo
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRoomInfo(vararg roomInfo: RoomInfo)
 
     @Update
-    fun updateRoomInfo(roomInfo: RoomInfo)
+    suspend fun updateRoomInfo(roomInfo: RoomInfo)
 
     @Query("SELECT * FROM room_info WHERE isActivate = :isActivate")
-    fun detachRoomInfoHistory(isActivate: Boolean = false) : List<RoomInfo>
+    suspend fun detachRoomInfoHistory(isActivate: Boolean = false) : List<RoomInfo>
 
 }
