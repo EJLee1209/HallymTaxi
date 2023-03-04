@@ -19,6 +19,7 @@ import com.dldmswo1209.hallymtaxi.databinding.FragmentLoginBinding
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
+import com.dldmswo1209.hallymtaxi.util.AuthResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -64,7 +65,7 @@ class LoginFragment: Fragment() {
                 is UiState.Failure -> {
                     // 로그인 불가능 (이미 로그인 되어 있는 기기가 있음)
                     loadingDialog.dismiss()
-                    if(state.error == "다른 기기에서 이미 로그인 했습니다") {
+                    if(state.error == AuthResponse.LOGIN_IMPOSSIBLE) {
                         val forceLoginDailog = CustomDialog(
                             "로그인",
                             content = "다른 기기에서 로그인 하셨군요!\n접송 중인 모든 기기의 연결을 끊고\n로그인 하시겠습니까?",
@@ -109,6 +110,31 @@ class LoginFragment: Fragment() {
                 }
             }
         }
+
+        viewModel.sendPasswordResetMail.observe(viewLifecycleOwner) { state ->
+            when(state) {
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                    val sendFailureDialog = CustomDialog(
+                        title = "비밀번호 재설정",
+                        content = state.error ?: AuthResponse.SEND_PASSWORD_RESET_UNKNOWN_ERROR,
+                    )
+                    sendFailureDialog.show(parentFragmentManager, sendFailureDialog.tag)
+                }
+                is UiState.Success -> {
+                    loadingDialog.dismiss()
+                    val sendSuccessDialog = CustomDialog(
+                        title = "비밀번호 재설정",
+                        content = state.data,
+                    )
+                    sendSuccessDialog.show(parentFragmentManager, sendSuccessDialog.tag)
+                }
+            }
+
+        }
     }
 
     private fun savePreferencesLoggedInfo() {
@@ -120,14 +146,14 @@ class LoginFragment: Fragment() {
             .apply()
     }
 
-    fun clickLoginBtn(){
+    private fun clearFocusAll() {
         binding.etEmail.clearFocusAndHideKeyboard(requireActivity())
         binding.etPassword.clearFocusAndHideKeyboard(requireActivity())
+    }
 
-        if(!getNetworkAvailable()){
-            checkNetworkDialog(parentFragmentManager)
-            return
-        }
+    fun clickLoginBtn(){
+        clearFocusAll()
+
         email = binding.etEmail.text.toString()
         password = binding.etPassword.text.toString()
 
@@ -136,24 +162,13 @@ class LoginFragment: Fragment() {
 
     fun clickBackBtn(){
         findNavController().popBackStack()
-        binding.etEmail.clearFocusAndHideKeyboard(requireActivity())
-        binding.etPassword.clearFocusAndHideKeyboard(requireActivity())
+        clearFocusAll()
     }
 
     fun onClickForgotPassword() {
-        val forgotPasswordDialog = CustomDialog(
-            title = "안내 메세지",
-            content = "아직 개발 중인 기능 입니다\n연락 주시면 도와드리겠습니다",
-            positiveButton = "연락 하기",
-            positiveCallback = {
-                var intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/s2SRy56e"))
-                startActivity(intent)
-            }
-        )
-        forgotPasswordDialog.show(parentFragmentManager, forgotPasswordDialog.tag)
+        viewModel.sendPasswordResetMail(binding.etEmail.text.toString())
+        clearFocusAll()
     }
-
-    private fun getNetworkAvailable() : Boolean = (activity as WelcomeActivity).isNetworkActivate
 
 
     override fun onDetach() {

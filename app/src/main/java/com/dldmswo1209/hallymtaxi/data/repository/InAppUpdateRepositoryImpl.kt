@@ -2,6 +2,7 @@ package com.dldmswo1209.hallymtaxi.data.repository
 
 import android.content.Context
 import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.util.ServerResponse
 import com.google.android.gms.tasks.Task
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -21,11 +22,11 @@ class InAppUpdateRepositoryImpl(
             ) { // 업데이트 있음
                 result.invoke(UiState.Success(appUpdateInfo))
             } else {
-                result.invoke(UiState.Failure("업데이트 없음"))
+                result.invoke(UiState.Failure(ServerResponse.CHECK_UPDATE_NOTHING))
             }
         }
             .addOnFailureListener {
-                result.invoke(UiState.Failure("업데이트 정보를 가져오지 못했습니다"))
+                result.invoke(UiState.Failure(ServerResponse.CHECK_UPDATE_FAILED))
             }
     }
 

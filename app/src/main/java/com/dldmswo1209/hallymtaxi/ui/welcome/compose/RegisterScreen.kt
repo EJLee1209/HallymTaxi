@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dldmswo1209.hallymtaxi.R
+import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_FEMALE
 import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_MALE
 import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_NONE
@@ -53,7 +54,6 @@ fun RegisterScreen(
     val guideText = viewModel.guideText.value
     val nextButtonVisible = viewModel.nextButtonVisible.value
     val registerButtonVisible = viewModel.registerButtonVisible.value
-    var dialogVisible by remember { mutableStateOf(false) }
 
     val passwordVisibilityIcon = if (passwordState.valueVisible) {
         R.drawable.ic_visible_on
@@ -71,20 +71,14 @@ fun RegisterScreen(
 
     val focusManager = LocalFocusManager.current
 
-    if (dialogVisible) {
-        MyAlertDialog(
-            visible = dialogVisible,
-            onDismissRequest = { onDismissRequest() },
-            title = "회원가입",
-            content = "회원가입이 완료되었습니다.",
-            description = "새 정보로 로그인 해주세요.",
-            positiveText = "확인"
-        )
-    }
-
-    if (isCreated) {
-        dialogVisible = true
-    }
+    MyAlertDialog(
+        visible = isCreated,
+        onDismissRequest = { onDismissRequest() },
+        title = "회원가입",
+        content = "회원가입이 완료되었습니다.",
+        description = "새 정보로 로그인 해주세요.",
+        positiveText = "확인"
+    )
 
     Box(
         modifier = Modifier

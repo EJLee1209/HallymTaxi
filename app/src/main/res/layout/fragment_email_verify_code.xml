@@ -100,12 +100,11 @@
 
             <TextView
                 android:id="@+id/tv_error_code"
+                style="@style/Text13.Red"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="@string/incorrect_code"
-                android:textColor="@color/hallym_red_E43429"
-                android:textSize="13sp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -72,15 +72,22 @@ class EmailVerifyFragment: Fragment() {
                 }
                 is UiState.Failure -> {
                     loadingDialog?.dismiss()
-                    val dialog = CustomDialog(
-                        title = "재학생 인증",
-                        content = state.error ?: AuthResponse.EMAIL_EXIST
-                    ){
-                        // 초기화면으로 이동
-                        clickBackBtn()
+                    when(state.error) {
+                        AuthResponse.EMAIL_EXIST -> {
+                            val dialog = CustomDialog(
+                                title = "재학생 인증",
+                                content = state.error
+                            ){
+                                // 초기화면으로 이동
+                                clickBackBtn()
+                            }
+                            dialog.isCancelable = false
+                            dialog.show(parentFragmentManager, dialog.tag)
+                        }
+                        else -> {
+                            binding.tvErrorMessage.text = state.error
+                        }
                     }
-                    dialog.isCancelable = false
-                    dialog.show(parentFragmentManager, dialog.tag)
                 }
                 is UiState.Success ->{
                     loadingDialog?.dismiss()
@@ -123,10 +130,6 @@ class EmailVerifyFragment: Fragment() {
     fun clickVerifyBtn(){
         binding.etEmail.clearFocusAndHideKeyboard(requireContext())
 
-        if(!getNetworkAvailable()){
-            CustomDialog.checkNetworkDialog(parentFragmentManager)
-            return
-        }
         email = "${binding.etEmail.text}@hallym.ac.kr"
         viewModel.checkEmail(email)
         isFirst = true
@@ -136,8 +139,6 @@ class EmailVerifyFragment: Fragment() {
         binding.etEmail.clearFocusAndHideKeyboard(requireContext())
         findNavController().popBackStack()
     }
-
-    private fun getNetworkAvailable() : Boolean = (activity as WelcomeActivity).isNetworkActivate
 
     override fun onDetach() {
         super.onDetach()

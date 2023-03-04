@@ -1,12 +1,18 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
+import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.SignedIn
 import com.dldmswo1209.hallymtaxi.data.model.TokenInfo
 import com.dldmswo1209.hallymtaxi.util.AuthResponse
+import com.dldmswo1209.hallymtaxi.util.ServerResponse
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 
@@ -23,9 +29,20 @@ class AuthRepositoryImpl(
             auth.currentUser?.delete()
 
         }.addOnFailureListener {
-            result.invoke(
-                UiState.Failure(AuthResponse.EMAIL_EXIST)
-            )
+            when(it) {
+                is FirebaseAuthInvalidCredentialsException -> {
+                    result.invoke(UiState.Failure(AuthResponse.MAIL_BADLY_FORMATTED))
+                }
+                is FirebaseNetworkException -> {
+                    result.invoke(UiState.Failure(ServerResponse.NETWORK_ERROR))
+                }
+                is FirebaseAuthUserCollisionException -> {
+                    result.invoke(UiState.Failure(AuthResponse.EMAIL_EXIST))
+                }
+                else -> {
+                    result.invoke(UiState.Failure(ServerResponse.NETWORK_ERROR))
+                }
+            }
         }
     }
 
@@ -41,7 +58,6 @@ class AuthRepositoryImpl(
                 } ?: kotlin.run {
                     result.invoke(false)
                 }
-
             }else{
                 result.invoke(false)
             }
@@ -79,6 +95,9 @@ class AuthRepositoryImpl(
                     )
                 }
             }
+            .addOnFailureListener {
+                result.invoke(UiState.Failure(ServerResponse.NETWORK_ERROR))
+            }
     }
 
     override fun loginUser(email: String, password: String, deviceId: String, result: (UiState<String>) -> Unit) {
@@ -99,9 +118,20 @@ class AuthRepositoryImpl(
                     deviceId = deviceId
                 ))
         }.addOnFailureListener {
-            result.invoke(
-                UiState.Failure(AuthResponse.LOGIN_FAILED)
-            )
+            when(it) {
+                is FirebaseAuthInvalidCredentialsException -> {
+                    result.invoke(UiState.Failure(AuthResponse.LOGIN_FAILED))
+                }
+                is FirebaseAuthInvalidUserException -> {
+                    result.invoke(UiState.Failure(AuthResponse.MAIL_NO_USER_RECORD))
+                }
+                is FirebaseNetworkException -> {
+                    result.invoke(UiState.Failure(ServerResponse.NETWORK_ERROR))
+                }
+                else -> {
+                    result.invoke(UiState.Failure(AuthResponse.LOGIN_FAILED))
+                }
+            }
         }
     }
 
@@ -119,6 +149,34 @@ class AuthRepositoryImpl(
                 result.invoke(
                     UiState.Failure(AuthResponse.LOGOUT_FAILED)
                 )
+            }
+    }
+
+    override fun sendPasswordResetMail(email: String, result: (UiState<String>) -> Unit) {
+        if(email.isEmpty()) {
+            result.invoke(UiState.Failure(AuthResponse.SEND_PASSWORD_RESET_MAIL_EMPTY))
+            return
+        }
+
+        auth.sendPasswordResetEmail("$email@hallym.ac.kr")
+            .addOnSuccessListener {
+                result.invoke(UiState.Success(AuthResponse.SEND_PASSWORD_RESET_MAIL_SUCCESS))
+            }
+            .addOnFailureListener {
+                when(it) {
+                    is FirebaseAuthInvalidCredentialsException -> {
+                        result.invoke(UiState.Failure(AuthResponse.MAIL_BADLY_FORMATTED))
+                    }
+                    is FirebaseAuthInvalidUserException -> {
+                        result.invoke(UiState.Failure(AuthResponse.MAIL_NO_USER_RECORD))
+                    }
+                    is FirebaseNetworkException -> {
+                        result.invoke(UiState.Failure(ServerResponse.NETWORK_ERROR))
+                    }
+                    else -> {
+                        result.invoke(UiState.Failure(AuthResponse.SEND_PASSWORD_RESET_UNKNOWN_ERROR))
+                    }
+                }
             }
     }
 

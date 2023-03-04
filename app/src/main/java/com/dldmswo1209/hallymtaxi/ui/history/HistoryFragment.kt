@@ -22,6 +22,7 @@ import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.MainViewModel
+import com.dldmswo1209.hallymtaxi.util.Keys
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -107,7 +108,7 @@ class HistoryFragment : Fragment() {
                     joinedRoom?.let { viewModel.detachRoomInfo(it.roomId) }// 채팅 내역 조회
                 }
 
-            }, IntentFilter("newMessage"))
+            }, IntentFilter(Keys.INTENT_FILTER_NEW_MESSAGE))
     }
     private fun sortedWithDate(poolList: List<RoomInfo>) : List<RoomInfo>{
         return poolList.sortedWith(compareBy<RoomInfo> {

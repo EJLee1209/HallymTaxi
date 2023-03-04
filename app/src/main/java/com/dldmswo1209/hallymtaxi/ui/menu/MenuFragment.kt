@@ -21,7 +21,9 @@ import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.ui.MainViewModel
+import com.dldmswo1209.hallymtaxi.util.AuthResponse
 import com.dldmswo1209.hallymtaxi.util.PRIVACY_POLICY_URL
+import com.dldmswo1209.hallymtaxi.util.ServerResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -69,7 +71,7 @@ class MenuFragment: Fragment() {
                     loadingDialog.dismiss()
                     val failToLogoutDialog = CustomDialog(
                         title = state.error ?: "로그아웃 실패",
-                        content = "네트워크 상태를 확인해주세요",
+                        content = ServerResponse.NETWORK_ERROR,
                     )
                     failToLogoutDialog.show(parentFragmentManager, failToLogoutDialog.tag)
                 }
@@ -95,13 +97,13 @@ class MenuFragment: Fragment() {
                 is UiState.Failure -> {
                     loadingDialog.dismiss()
                     when(state.error) {
-                        "업데이트 없음" -> {
-                            binding.tvVersion.text = "최신 버전 입니다."
+                        ServerResponse.CHECK_UPDATE_NOTHING -> {
+                            binding.tvVersion.text = state.error
                         }
                         else -> {
                             val failToCheckUpdate = CustomDialog(
-                                title = state.error ?: "알 수 없는 오류",
-                                content = "네트워크 상태를 확인해주세요",
+                                title = "앱 버전 확인",
+                                content = state.error ?: ServerResponse.CHECK_UPDATE_FAILED,
                             )
                             failToCheckUpdate.show(parentFragmentManager, failToCheckUpdate.tag)
                         }

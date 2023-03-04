@@ -41,6 +41,9 @@ class AuthViewModel @Inject constructor(
     private var _checkLogged = MutableLiveData<UiState<String>>()
     val checkLogged : LiveData<UiState<String>> = _checkLogged
 
+    private var _sendPasswordResetMail = MutableLiveData<UiState<String>>()
+    val sendPasswordResetMail : LiveData<UiState<String>> = _sendPasswordResetMail
+
 
     var codeEffectiveTime = 300
 
@@ -88,6 +91,13 @@ class AuthViewModel @Inject constructor(
         _checkLogged.postValue(UiState.Loading)
         authRepository.checkLogged(email, deviceId) {
             _checkLogged.postValue(it)
+        }
+    }
+
+    fun sendPasswordResetMail(email: String) {
+        _sendPasswordResetMail.postValue(UiState.Loading)
+        authRepository.sendPasswordResetMail(email) {
+            _sendPasswordResetMail.postValue(it)
         }
     }
 

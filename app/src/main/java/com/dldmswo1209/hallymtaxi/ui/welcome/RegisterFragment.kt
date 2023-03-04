@@ -85,7 +85,6 @@ class RegisterFragment: Fragment() {
 
     private fun composeViewSetContent(){
         binding.composeViewRegisterArea.setContent {
-
             val isCreated = viewModel.isCreatedUser.observeAsState(initial = false)
 
             if(isCreated.value){

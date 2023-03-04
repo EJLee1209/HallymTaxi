@@ -158,11 +158,11 @@ class MainViewModel @Inject constructor(
 
     fun detachRoomPaging(genderOption: String) : Flow<PagingData<CarPoolRoom>> {
         val query = fireStore.collection(FireStoreTable.ROOM)
-            .whereEqualTo("closed", false) // 이미 마감한 방 필터링
-            .whereIn("genderOption", listOf(genderOption, GENDER_OPTION_NONE)) // 성별 옵션에 부합하지 않는 방 필터링
-            .whereGreaterThanOrEqualTo("departureTime", LocalDateTime.now().toString()) // 출발시간이 이미 지난 방 필터링
-            .orderBy("departureTime", Query.Direction.ASCENDING)// 출발 시간 기준 오름차순
-            .orderBy("created", Query.Direction.DESCENDING) // 방 생성 기준 내림차순
+            .whereEqualTo(FireStoreTable.FIELD_CLOSED, false) // 이미 마감한 방 필터링
+            .whereIn(FireStoreTable.FIELD_GENDER_OPTION, listOf(genderOption, GENDER_OPTION_NONE)) // 성별 옵션에 부합하지 않는 방 필터링
+            .whereGreaterThanOrEqualTo(FireStoreTable.FIELD_DEPARTURE_TIME, LocalDateTime.now().toString()) // 출발시간이 이미 지난 방 필터링
+            .orderBy(FireStoreTable.FIELD_DEPARTURE_TIME, Query.Direction.ASCENDING)// 출발 시간 기준 오름차순
+            .orderBy(FireStoreTable.FIELD_CREATED, Query.Direction.DESCENDING) // 방 생성 기준 내림차순
             .limit(PAGE_SIZE.toLong())
 
         return Pager(

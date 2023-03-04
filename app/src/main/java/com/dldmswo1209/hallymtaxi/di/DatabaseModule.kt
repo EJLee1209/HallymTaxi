@@ -3,6 +3,7 @@ package com.dldmswo1209.hallymtaxi.di
 import android.content.Context
 import androidx.room.Room
 import com.dldmswo1209.hallymtaxi.data.local.AppDatabase
+import com.dldmswo1209.hallymtaxi.util.Keys
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +20,7 @@ object DatabaseModule {
     fun provideRoomDatabase(
         @ApplicationContext context: Context
     ): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "hallymTaxi.db")
+        Room.databaseBuilder(context, AppDatabase::class.java, Keys.DATABASE_NAME)
             .fallbackToDestructiveMigration()
             .build()
 
