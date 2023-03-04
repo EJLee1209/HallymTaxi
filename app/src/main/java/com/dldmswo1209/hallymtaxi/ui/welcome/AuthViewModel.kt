@@ -32,9 +32,6 @@ class AuthViewModel @Inject constructor(
     private var _isVerified = MutableLiveData<UiState<VerifyInfo>>()
     val isVerified : LiveData<UiState<VerifyInfo>> = _isVerified
 
-    private var _isCreatedUser = MutableLiveData<Boolean>()
-    val isCreatedUser : LiveData<Boolean> = _isCreatedUser
-
     private var _login = MutableLiveData<UiState<String>>()
     val login : LiveData<UiState<String>> = _login
 
@@ -73,13 +70,6 @@ class AuthViewModel @Inject constructor(
             _isVerified.postValue(it)
         }
     }
-
-    fun createUser(user: User, password: String){
-        authRepository.registerUser(user, password){
-            _isCreatedUser.postValue(it)
-        }
-    }
-
     fun login(email: String, password: String, deviceId: String){
         _login.postValue(UiState.Loading)
         authRepository.loginUser(email, password, deviceId){

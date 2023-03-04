@@ -7,6 +7,7 @@ import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.SignedIn
 import com.dldmswo1209.hallymtaxi.data.model.TokenInfo
 import com.dldmswo1209.hallymtaxi.util.AuthResponse
+import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
 import com.dldmswo1209.hallymtaxi.util.ServerResponse
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
@@ -46,22 +47,44 @@ class AuthRepositoryImpl(
         }
     }
 
-    override fun registerUser(user: User, password: String, result: (Boolean) -> Unit) {
-        auth.createUserWithEmailAndPassword(user.email, password).addOnCompleteListener {
-            if(it.isSuccessful){
+    override fun registerUser(user: User, password: String, result: (UiState<String>) -> Unit) {
+        result.invoke(UiState.Loading)
+
+        auth.createUserWithEmailAndPassword(user.email, password)
+            .addOnSuccessListener {
                 auth.currentUser?.let {firebaseUser ->
                     user.uid = firebaseUser.uid
 
-                    fireStore.collection(FireStoreTable.USER).document(user.uid).set(user)
-                    fireStore.collection(FireStoreTable.FCMTOKENS).document(user.uid).set(TokenInfo())
-                    result.invoke(true)
+                    fireStore.collection(FireStoreTable.USER).document(user.uid)
+                        .set(user)
+                        .addOnSuccessListener {
+                            fireStore.collection(FireStoreTable.FCMTOKENS).document(user.uid)
+                                .set(TokenInfo())
+                                .addOnSuccessListener {
+                                    result.invoke(UiState.Success(AuthResponse.REGISTER_SUCCESS))
+                                }
+                                .addOnFailureListener {
+                                    result.invoke(UiState.Failure(AuthResponse.SAVE_TOKEN_FAILED))
+                                }
+                        }
+                        .addOnFailureListener {
+                            result.invoke(UiState.Failure(AuthResponse.SAVE_USER_INFO_FAILED))
+                        }
+
                 } ?: kotlin.run {
-                    result.invoke(false)
+                    result.invoke(UiState.Failure(FireStoreResponse.SUBSCRIBE_USER_ERROR))
                 }
-            }else{
-                result.invoke(false)
             }
-        }
+            .addOnFailureListener {
+                when(it) {
+                    is FirebaseNetworkException -> {
+                        result.invoke(UiState.Failure(ServerResponse.NETWORK_ERROR))
+                    }
+                    else -> {
+                        result.invoke(UiState.Failure(AuthResponse.REGISTER_FAILED))
+                    }
+                }
+            }
     }
 
     override fun checkLogged(email: String, deviceId: String, result: (UiState<String>) -> Unit) {

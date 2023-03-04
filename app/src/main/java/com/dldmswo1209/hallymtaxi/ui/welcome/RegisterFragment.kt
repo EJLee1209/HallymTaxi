@@ -28,8 +28,6 @@ class RegisterFragment: Fragment() {
 
     private lateinit var binding: FragmentRegisterBinding
     private var email = ""
-    private val viewModel : AuthViewModel by viewModels()
-    private lateinit var callback: OnBackPressedCallback
 
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
         ViewMarginDynamicChanger(requireActivity())
@@ -40,9 +38,6 @@ class RegisterFragment: Fragment() {
                 changeConstraintMarginTopBottom(binding.tvRegisterTitle,0,0,86.dp,5.dp, isVisible)
             }
         }
-    }
-    private val loadingDialog by lazy{
-        LoadingDialog(requireActivity())
     }
 
     override fun onCreateView(
@@ -58,11 +53,10 @@ class RegisterFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.fragment = this
 
+        registerBackPressedCallback(R.id.action_navigation_register_to_navigation_welcome)
         getArgsFromPreviousDestination() // 이전 fragment로부터 데이터 가져오기
         keyboardInit() // 키보드 상태 리스너 세팅
-        backPressedSetCallback() // back key 가 눌렸을 때 이벤트 처리
         composeViewSetContent() // composeView setContent
-
     }
 
     private fun getArgsFromPreviousDestination(){
@@ -74,32 +68,9 @@ class RegisterFragment: Fragment() {
         KeyboardUtils.addKeyboardToggleListener((activity as WelcomeActivity), keyboardStateListener)
     }
 
-    private fun backPressedSetCallback(){
-        callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                clickBackBtn()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
-    }
-
     private fun composeViewSetContent(){
         binding.composeViewRegisterArea.setContent {
-            val isCreated = viewModel.isCreatedUser.observeAsState(initial = false)
-
-            if(isCreated.value){
-                loadingDialog.dismiss()
-            }
-            val registerButtonClickCallback : (User, String)->(Unit) = { user, password->
-                if(!getNetworkAvailable()){
-                    checkNetworkDialog(parentFragmentManager)
-                }else {
-                    viewModel.createUser(user, password)
-                    loadingDialog.show()
-                }
-            }
-
-            RegisterScreen(email = email, isCreated = isCreated.value, onClickRegister = registerButtonClickCallback, onClickPrivacyPolicyViewContent = onClickPrivacyPolicyViewContent) {
+            RegisterScreen(email = email, onClickPrivacyPolicyViewContent = onClickPrivacyPolicyViewContent) {
                 // 회원가입 완료시 초기 화면으로 이동
                 clickBackBtn()
             }
@@ -115,11 +86,8 @@ class RegisterFragment: Fragment() {
         findNavController().navigate(R.id.action_navigation_register_to_navigation_welcome)
     }
 
-    private fun getNetworkAvailable() : Boolean = (activity as WelcomeActivity).isNetworkActivate
-
     override fun onDetach() {
         super.onDetach()
-        callback.remove()
         KeyboardUtils.removeKeyboardToggleListener(keyboardStateListener)
     }
 }

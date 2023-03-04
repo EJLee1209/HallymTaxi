@@ -113,6 +113,8 @@ dependencies {
 
     // lottie
     implementation 'com.airbnb.android:lottie:5.0.2'
+    // lottie for compose
+    implementation "com.airbnb.android:lottie-compose:5.0.2"
 
     // room
     implementation "androidx.room:room-runtime:$room_version"

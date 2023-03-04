@@ -1,9 +1,10 @@
 package com.dldmswo1209.hallymtaxi.ui.welcome.compose
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -11,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel
 @Inject constructor(
-
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private var _password = mutableStateOf(
@@ -53,12 +54,27 @@ class RegisterViewModel
     private var _registerButtonVisible = mutableStateOf(false)
     val registerButtonVisible: State<Boolean> = _registerButtonVisible
 
+    private var _loadingDialogVisible = mutableStateOf(false)
+    val loadingDialogVisible: State<Boolean> = _loadingDialogVisible
+
+    private var _failedDialogVisible = mutableStateOf(false)
+    val failedDialogVisible: State<Boolean> = _failedDialogVisible
+
+    private var _successDialogVisible = mutableStateOf(false)
+    val successDialogVisible: State<Boolean> = _successDialogVisible
+
+    private var _registerResult = mutableStateOf("")
+    val registerResult : State<String> = _registerResult
+
     fun onEvent(event: RegisterEvent) {
         when (event) {
             is RegisterEvent.EnteredPassword -> {
                 _password.value = password.value.copy(
                     text = event.value,
                     isValid = isValidPassword(event.value)
+                )
+                _passwordConfirm.value = passwordConfirm.value.copy(
+                    isValid = event.value == passwordConfirm.value.text
                 )
                 _nextButtonVisible.value = password.value.isValid && nextCount.value == 0
             }
@@ -114,7 +130,25 @@ class RegisterViewModel
                     valueVisible = !passwordConfirm.value.valueVisible
                 )
             }
-
+            is RegisterEvent.OnClickRegister -> {
+                authRepository.registerUser(event.user, event.password) {
+                    when(it) {
+                        is UiState.Loading -> {
+                            _loadingDialogVisible.value = true
+                        }
+                        is UiState.Failure -> {
+                            _loadingDialogVisible.value = false
+                            _failedDialogVisible.value = true
+                            _registerResult.value = it.error ?: "회원가입 실패"
+                        }
+                        is UiState.Success -> {
+                            _loadingDialogVisible.value = false
+                            _successDialogVisible.value = true
+                            _registerResult.value = it.data
+                        }
+                    }
+                }
+            }
             is RegisterEvent.Next -> {
                 _nextCount.value = nextCount.value + 1
 
@@ -145,6 +179,9 @@ class RegisterViewModel
                     }
                 }
                 _nextButtonVisible.value = false
+            }
+            is RegisterEvent.OnClickDialogPositiveBotton -> {
+                _failedDialogVisible.value = !failedDialogVisible.value
             }
 
         }

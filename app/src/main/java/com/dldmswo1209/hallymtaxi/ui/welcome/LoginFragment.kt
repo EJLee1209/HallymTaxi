@@ -54,6 +54,8 @@ class LoginFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.fragment = this
 
+        registerBackPressedCallback()
+
         KeyboardUtils.addKeyboardToggleListener((activity as WelcomeActivity), keyboardStateListener)
         binding.etEmail.setFocusAndShowKeyboard(requireContext())
 
@@ -161,7 +163,7 @@ class LoginFragment: Fragment() {
     }
 
     fun clickBackBtn(){
-        findNavController().popBackStack()
+        findNavController().navigateUp()
         clearFocusAll()
     }
 

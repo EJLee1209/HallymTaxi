@@ -60,6 +60,7 @@ class EmailVerifyCodeFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.fragment = this
 
+        registerBackPressedCallback()
         getArgsFromPreviousDestination()
         keyboardInit()
         setObserver()
@@ -141,7 +142,7 @@ class EmailVerifyCodeFragment: Fragment() {
     }
 
     fun clickBackBtn(){
-        findNavController().popBackStack()
+        findNavController().navigateUp()
     }
 
     fun clickSendAgainBtn(){

@@ -1,6 +1,7 @@
 package com.dldmswo1209.hallymtaxi.ui.welcome
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +31,13 @@ class WelcomeFragment: Fragment() {
     }
 
     fun clickLoginBtn(){
-        findNavController().navigate(R.id.action_navigation_welcome_to_loginFragment)
+        try{
+            findNavController().navigate(R.id.action_navigation_welcome_to_loginFragment)
+        } catch (e: Exception) {
+            Log.e("testt", "clickLoginBtn: ${e}", )
+            Log.e("testt", "current back stack: ${findNavController().currentBackStack}")
+            Log.e("testt", "current destination: ${findNavController().currentDestination}")
+        }
     }
     fun clickRegisterBtn(){
         findNavController().navigate(R.id.action_navigation_welcome_to_navigation_email_verify)

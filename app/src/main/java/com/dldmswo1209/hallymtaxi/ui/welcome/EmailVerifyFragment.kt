@@ -52,6 +52,7 @@ class EmailVerifyFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.fragment = this
         loadingDialog = LoadingDialog(requireActivity())
+        registerBackPressedCallback()
         keyboardInit()
         setObserver()
         etTextWatcher()
@@ -137,16 +138,12 @@ class EmailVerifyFragment: Fragment() {
 
     fun clickBackBtn(){
         binding.etEmail.clearFocusAndHideKeyboard(requireContext())
-        findNavController().popBackStack()
+        findNavController().navigateUp()
     }
 
     override fun onDetach() {
         super.onDetach()
         KeyboardUtils.removeKeyboardToggleListener(keyboardStateListener)
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
 }

@@ -40,10 +40,8 @@ import com.dldmswo1209.hallymtaxi.data.model.User
 @Composable
 fun RegisterScreen(
     email: String,
-    isCreated: Boolean,
     viewModel: RegisterViewModel = hiltViewModel(),
     onClickPrivacyPolicyViewContent: () -> Unit,
-    onClickRegister: (User, String) -> (Unit),
     onDismissRequest: () -> Unit,
 ) {
     val passwordState = viewModel.password.value
@@ -54,6 +52,13 @@ fun RegisterScreen(
     val guideText = viewModel.guideText.value
     val nextButtonVisible = viewModel.nextButtonVisible.value
     val registerButtonVisible = viewModel.registerButtonVisible.value
+    val registerResult = viewModel.registerResult.value
+    val loadingDialogVisible = viewModel.loadingDialogVisible.value
+    val failedDialogVisible = viewModel.failedDialogVisible.value
+    val successDialogVisible = viewModel.successDialogVisible.value
+
+    val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
 
     val passwordVisibilityIcon = if (passwordState.valueVisible) {
         R.drawable.ic_visible_on
@@ -67,15 +72,23 @@ fun RegisterScreen(
         R.drawable.ic_visible_off
     }
 
-    val scrollState = rememberScrollState()
-
-    val focusManager = LocalFocusManager.current
+    LoadingDialog(
+        isVisible = loadingDialogVisible
+    )
 
     MyAlertDialog(
-        visible = isCreated,
+        visible = failedDialogVisible,
+        onDismissRequest = { viewModel.onEvent(RegisterEvent.OnClickDialogPositiveBotton) },
+        title = "회원가입",
+        content = registerResult,
+        positiveText = "확인"
+    )
+
+    MyAlertDialog(
+        visible = successDialogVisible,
         onDismissRequest = { onDismissRequest() },
         title = "회원가입",
-        content = "회원가입이 완료되었습니다.",
+        content = registerResult,
         description = "새 정보로 로그인 해주세요.",
         positiveText = "확인"
     )
@@ -360,7 +373,8 @@ fun RegisterScreen(
                             }
                         }
                     )
-                    onClickRegister(user, passwordState.text)
+
+                    viewModel.onEvent(RegisterEvent.OnClickRegister(user, passwordState.text))
                 },
                 modifier = Modifier
                     .fillMaxWidth()

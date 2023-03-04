@@ -5,7 +5,7 @@ import com.dldmswo1209.hallymtaxi.data.UiState
 
 interface AuthRepository {
     fun checkEmail(email: String, result: (UiState<String>) -> Unit)
-    fun registerUser(user: User, password: String, result: (Boolean) -> Unit)
+    fun registerUser(user: User, password: String, result: (UiState<String>) -> Unit)
     fun checkLogged(email: String, deviceId: String, result: (UiState<String>) -> Unit)
     fun loginUser(email: String, password: String, deviceId: String, result: (UiState<String>) -> Unit)
     fun logoutUser(result: (UiState<String>)-> Unit)

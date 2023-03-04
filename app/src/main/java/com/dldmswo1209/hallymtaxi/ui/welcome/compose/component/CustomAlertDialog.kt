@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,6 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dldmswo1209.hallymtaxi.R
 
 
@@ -39,7 +44,7 @@ fun CustomAlertDialog(
 @Composable
 fun MyAlertDialog(
     visible: Boolean,
-    onDismissRequest: () -> Unit,
+    onDismissRequest: () -> Unit ,
     title: String,
     content: String,
     description: String? = null,
@@ -96,6 +101,41 @@ fun MyAlertDialog(
 
 }
 
+@Composable
+fun LoadingDialog(
+    isVisible: Boolean
+) {
+    if(isVisible){
+        CustomAlertDialog(onDismissRequest = { }) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(color = colorResource(id = R.color.hallym_white_ffffff))
+                    .padding(vertical = 18.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Loader()
+                Spacer(modifier = Modifier.size(5.dp))
+                Text(text = "로딩 중...")
+            }
+        }
+    }
+}
+
+@Composable
+fun Loader() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.taxi_anim))
+    val progress by animateLottieCompositionAsState(composition)
+    LottieAnimation(
+        composition = composition,
+        progress = progress,
+        modifier = Modifier.size(120.dp)
+    )
+}
+
 @Preview
 @Composable
 fun MyAlertDialog(){
@@ -106,4 +146,10 @@ fun MyAlertDialog(){
         content = "이미 계정이 존재합니다.",
         positiveText = "확인"
     )
+}
+
+@Preview
+@Composable
+fun LoadingDialogPreview(){
+    LoadingDialog(isVisible = true)
 }
