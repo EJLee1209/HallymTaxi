@@ -1,11 +1,11 @@
 
 # 🔥 한림대학교 택시 카풀 앱 프로젝트(베타 테스트 진행 중) 🔥
+## Google Play Store 에서 다운로드(베타 테스트) 👍
+[플레이 스토어에서 다운 받기](https://play.google.com/store/apps/details?id=com.dldmswo1209.hallymtaxi)
+
 ![appImage](https://user-images.githubusercontent.com/101651909/222206006-85cef596-67f3-4583-a5b4-1d35cdccd68b.jpg)
 
 학생들의 택시비를 절약해주기 위한 택시 카풀 프로젝트 림카 입니다.
-
-# Google Play Store 에서 다운로드(베타 테스트) 👍
-[플레이 스토어에서 다운 받기](https://play.google.com/store/apps/details?id=com.dldmswo1209.hallymtaxi)
 
 # 📝 학생들 대상 설문조사
 <img src="https://user-images.githubusercontent.com/101651909/215445083-988a6676-8e69-4f2f-b496-de60b7ead792.png" width="50%"/>
