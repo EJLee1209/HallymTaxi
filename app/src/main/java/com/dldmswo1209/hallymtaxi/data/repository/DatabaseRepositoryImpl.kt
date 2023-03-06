@@ -21,11 +21,9 @@ class DatabaseRepositoryImpl(
     override suspend fun detachRoomInfo(roomId: String): RoomInfo = roomInfoDao.detachRoomInfo(roomId)
     override suspend fun detachRoomInfoHistory(): List<RoomInfo> = roomInfoDao.detachRoomInfoHistory()
     override suspend fun getFavorites(): List<Place> = favoriteDao.getFavorites()
-
     override suspend fun saveFavorite(place: Place) {
         favoriteDao.saveFavorite(place)
     }
-
     override suspend fun deleteFavorite(place: Place) {
         favoriteDao.deleteFavorite(place)
     }

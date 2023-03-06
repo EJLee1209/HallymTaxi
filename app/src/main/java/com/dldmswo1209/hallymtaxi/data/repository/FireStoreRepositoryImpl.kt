@@ -147,7 +147,12 @@ class FireStoreRepositoryImpl(
             .addOnSuccessListener {
                 fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
                     .update(mapOf(FireStoreTable.FIELD_ROOM_ID to room.roomId))
-                result.invoke(UiState.Success(room))
+                    .addOnSuccessListener {
+                        result.invoke(UiState.Success(room))
+                    }
+                    .addOnFailureListener {
+                        result.invoke(UiState.Failure(FireStoreResponse.CREATE_ROOM_FAILED))
+                    }
             }
             .addOnFailureListener {
                 result.invoke(UiState.Failure(FireStoreResponse.CREATE_ROOM_FAILED))
@@ -185,20 +190,29 @@ class FireStoreRepositoryImpl(
                             transaction.update(docRef, FireStoreTable.FIELD_USER_COUNT, FieldValue.increment(1))
                             transaction.update(docRef, FireStoreTable.FIELD_PARTICIPANTS, FieldValue.arrayUnion(auth.currentUser!!.uid))
                         }else{
-                            throw FirebaseFirestoreException("userCount limit over or closed room", FirebaseFirestoreException.Code.ABORTED)
+                            if(closed)
+                                throw FirebaseFirestoreException(FireStoreResponse.JOIN_ROOM_INACTIVE, FirebaseFirestoreException.Code.ABORTED)
+                            else if(newCount > room.userMaxCount)
+                                throw FirebaseFirestoreException(FireStoreResponse.JOIN_ROOM_COUNT_OVER, FirebaseFirestoreException.Code.ABORTED)
                         }
                     }
                         .addOnSuccessListener {
                             // 입장 성공
                             fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
                                 .update(mapOf(FireStoreTable.FIELD_ROOM_ID to room.roomId))
-
-                            result.invoke(UiState.Success(FireStoreResponse.JOIN_ROOM_SUCCESS))
+                                .addOnSuccessListener {
+                                    result.invoke(UiState.Success(FireStoreResponse.JOIN_ROOM_SUCCESS))
+                                }
+                                .addOnFailureListener {
+                                    result.invoke(
+                                        UiState.Failure(FireStoreResponse.JOIN_ROOM_FAILED)
+                                    )
+                                }
                         }
                         .addOnFailureListener {
                             // 입장 실패
                             result.invoke(
-                                UiState.Failure(FireStoreResponse.JOIN_ROOM_COUNT_OVER)
+                                UiState.Failure(it.message)
                             )
                         }
                 }
@@ -222,12 +236,15 @@ class FireStoreRepositoryImpl(
                 transaction.update(docRef, FireStoreTable.FIELD_PARTICIPANTS, FieldValue.arrayRemove(auth.currentUser!!.uid))
             }else{
                 fireStore.collection(FireStoreTable.ROOM).document(room.roomId).delete()
+                result.invoke(UiState.Success(FireStoreResponse.EXIT_ROOM_SUCCESS))
             }
-            result.invoke(UiState.Success(FireStoreResponse.EXIT_ROOM_SUCCESS))
         }
             .addOnSuccessListener {
                 fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
                     .update(mapOf(FireStoreTable.FIELD_ROOM_ID to ""))
+                    .addOnSuccessListener {
+                        result.invoke(UiState.Success(FireStoreResponse.EXIT_ROOM_SUCCESS))
+                    }
             }
     }
 
@@ -296,7 +313,6 @@ class FireStoreRepositoryImpl(
                     val signedIn = snapshot?.toObject<SignedIn>()
                     signedIn?.let { trySend(it) }
                 }
-
             awaitClose {
                 listenerRegistration.remove()
             }

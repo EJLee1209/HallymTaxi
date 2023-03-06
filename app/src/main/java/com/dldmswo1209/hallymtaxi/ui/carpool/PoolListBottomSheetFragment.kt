@@ -120,7 +120,6 @@ class PoolListBottomSheetFragment(
                             msg = "${user.name}님이 입장하셨습니다",
                             messageType = CHAT_JOIN
                         )
-                        Log.d("testt", "입장 메세지 전송 : ${tokens}")
                         viewModel.sendMessage(chat = chat, userName = user.name, receiveTokens = tokens)
                         joinRoomCallback(room)
                     }
@@ -181,7 +180,6 @@ class PoolListBottomSheetFragment(
             if (it.roomId.isNotBlank()) {
                 // 이미 참여중인 채팅방이 존재함
                 if(it == room) {
-                    Log.d("testt", "recyclerItemClickEvent: ")
                     viewModel.joinRoom(room)
                 }else{
                     val dialog = CustomDialog(

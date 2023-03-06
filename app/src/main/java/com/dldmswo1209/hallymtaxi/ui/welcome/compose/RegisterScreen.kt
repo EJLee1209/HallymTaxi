@@ -329,7 +329,7 @@ fun RegisterScreen(
                     },
                     autoFocus = true
                 )
-                Spacer(modifier = Modifier.size(100.dp))
+                Spacer(modifier = Modifier.height(600.dp))
             }
         }
 

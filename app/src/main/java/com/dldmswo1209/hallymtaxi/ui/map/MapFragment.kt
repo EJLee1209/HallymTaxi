@@ -1,15 +1,13 @@
 package com.dldmswo1209.hallymtaxi.ui.map
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.R
@@ -17,23 +15,20 @@ import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.dp
 import com.dldmswo1209.hallymtaxi.common.location.LocationService
 import com.dldmswo1209.hallymtaxi.common.toast
+import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentMapBinding
-import com.dldmswo1209.hallymtaxi.ui.SplashActivity
+import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import com.dldmswo1209.hallymtaxi.ui.carpool.PoolListBottomSheetFragment
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
-import com.dldmswo1209.hallymtaxi.data.UiState
-import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import net.daum.mf.map.api.CameraPosition
-import net.daum.mf.map.api.CameraUpdateFactory
-import net.daum.mf.map.api.MapPOIItem
-import net.daum.mf.map.api.MapPoint
-import net.daum.mf.map.api.MapView
+import net.daum.mf.map.api.*
+import net.daum.mf.map.api.MapView.MapViewEventListener
+
 
 @AndroidEntryPoint
-class MapFragment : Fragment() {
+class MapFragment : Fragment(), MapViewEventListener{
     private lateinit var binding: FragmentMapBinding
     private lateinit var locationService : LocationService
     private lateinit var favoritesListAdapter: FavoritesListAdapter
@@ -43,10 +38,14 @@ class MapFragment : Fragment() {
 
     private var isSearching = false
     private var isStartPointSearching = false
+    private var isTab = false
     private var startPlaceMarker = MapPOIItem()
     private var endPlaceMarker = MapPOIItem()
+    private var tabMarker = MapPOIItem()
+
     private var startPlace : Place? = null
     private var endPlace: Place? = null
+    private var tabPlace: Place? = null
     private var searchResultBottomSheet : SearchResultBottomSheetFragment? = null
     private var poolListBottomSheet : PoolListBottomSheetFragment? = null
     private var joinedRoom: CarPoolRoom? = null
@@ -77,6 +76,25 @@ class MapFragment : Fragment() {
         poolListBottomSheet?.dialog?.dismiss()
     }
 
+    private val markerEventListener : MarkerEventListener by lazy{
+        MarkerEventListener(
+            requireContext(),
+            onClickSetStart = {
+                tabPlace?.let {
+                    searchResultClickEvent(it, true)
+                    mapView.removePOIItem(tabMarker)
+                }
+            },
+            onClickSetEnd = {
+                tabPlace?.let {
+                    if(startPlace == null) locationService.getCurrentAddress()
+                    searchResultClickEvent(it, false)
+                    mapView.removePOIItem(tabMarker)
+                }
+            }
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -96,7 +114,11 @@ class MapFragment : Fragment() {
     private fun init(){
         binding.fragment = this
 
-        mapView = MapView(requireActivity())
+        mapView = MapView(requireActivity()).apply {
+            setMapViewEventListener(this@MapFragment)
+            setCalloutBalloonAdapter(CustomBalloonAdapter(layoutInflater))
+            setPOIItemEventListener(markerEventListener)
+        }
         binding.mapview.addView(mapView)
 
         locationService = LocationService(requireActivity())
@@ -105,8 +127,13 @@ class MapFragment : Fragment() {
         myApplication = requireActivity().application as MyApplication
 
         favoritesListAdapter = FavoritesListAdapter { place ->
-            locationService.getCurrentAddress()
-            searchResultClickEvent(place, false)
+            isTab = false
+            if (binding.etStartPoint.isFocused) {
+                searchResultClickEvent(place, true)
+            } else {
+                if(startPlace == null) locationService.getCurrentAddress()
+                searchResultClickEvent(place, false)
+            }
         }
         binding.rvFavorites.adapter = favoritesListAdapter
     }
@@ -246,7 +273,7 @@ class MapFragment : Fragment() {
     private fun searchResultClickEvent(place: Place, isStartPoint: Boolean){
         val newMarker = MapPOIItem().apply {
             // 마커 생성
-            itemName = place.place_name
+            itemName = "${place.place_name}/${place.address_name}"
             mapPoint = MapPoint.mapPointWithGeoCoord(place.y,place.x)
             markerType = MapPOIItem.MarkerType.CustomImage
             isCustomImageAutoscale = false
@@ -254,13 +281,22 @@ class MapFragment : Fragment() {
         }
 
         if(isStartPoint){
-            binding.etStartPoint.setText(place.road_address_name)
-            startPlace = place
-            mapView.removePOIItem(startPlaceMarker) // 이전 마커 제거
-            newMarker.customImageResourceId = R.drawable.start_marker
-            startPlaceMarker = newMarker
-            mapView.addPOIItem(startPlaceMarker) // 마커 추가
-
+            if(isTab){
+                newMarker.markerType = MapPOIItem.MarkerType.BluePin
+                tabPlace = place
+                mapView.removePOIItem(tabMarker)
+                tabMarker = newMarker
+                mapView.addPOIItem(tabMarker)
+                mapView.selectPOIItem(tabMarker, true)
+                isTab = false
+            }else {
+                binding.etStartPoint.setText(place.road_address_name)
+                startPlace = place
+                mapView.removePOIItem(startPlaceMarker) // 이전 마커 제거
+                newMarker.customImageResourceId = R.drawable.start_marker
+                startPlaceMarker = newMarker
+                mapView.addPOIItem(startPlaceMarker) // 마커 추가
+            }
         }else{
             binding.etEndPoint.setText(place.road_address_name)
             endPlace = place
@@ -271,7 +307,6 @@ class MapFragment : Fragment() {
         }
         if(mapView.poiItems.size == 2){ // 출발지, 목적지 모두 입력 완료
             if(startPlace != null && endPlace != null){
-                mapView.selectPOIItem(endPlaceMarker, true)
                 setCameraCenterAllPOIItems()
                 showCarPoolListBottomSheet()
             }
@@ -398,4 +433,27 @@ class MapFragment : Fragment() {
         super.onPause()
         searchResultBottomSheet?.dialog?.dismiss()
     }
+
+    override fun onMapViewInitialized(p0: MapView?) {}
+
+    override fun onMapViewCenterPointMoved(p0: MapView?, p1: MapPoint?) {}
+
+    override fun onMapViewZoomLevelChanged(p0: MapView?, p1: Int) {}
+
+    override fun onMapViewSingleTapped(p0: MapView?, mapPoint: MapPoint) {
+        isTab = true
+        locationService.reverseGeocorder(mapPoint)
+    }
+
+    override fun onMapViewDoubleTapped(p0: MapView?, p1: MapPoint?) {}
+
+    override fun onMapViewLongPressed(p0: MapView?, mapPoint: MapPoint) {}
+
+    override fun onMapViewDragStarted(p0: MapView?, p1: MapPoint?) {}
+
+    override fun onMapViewDragEnded(p0: MapView?, p1: MapPoint?) {}
+
+    override fun onMapViewMoveFinished(p0: MapView?, p1: MapPoint?) {}
+
+
 }

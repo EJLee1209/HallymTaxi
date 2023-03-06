@@ -53,13 +53,19 @@ class LocationService(private val activity: Activity) {
                 // Got last known location. In some rare situations this can be null.
                 location?.let {
                     val mapPoint = MapPoint.mapPointWithGeoCoord(it.latitude, it.longitude)
-                    val reverseGeoCoder = MapReverseGeoCoder(API_KEY, mapPoint, reverseGeocodeListener, activity)
-                    reverseGeoCoder.startFindingAddress()
+                    reverseGeocorder(mapPoint)
                 } ?: kotlin.run {
                     _address.value = ""
                 }
             }
     }
+
+    fun reverseGeocorder(mapPoint: MapPoint?) {
+        val reverseGeoCoder =
+            MapReverseGeoCoder(API_KEY, mapPoint, reverseGeocodeListener, activity)
+        reverseGeoCoder.startFindingAddress()
+    }
+
 
     // 위치 권한 확인
     fun isPermitted(): Boolean {

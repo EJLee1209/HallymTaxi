@@ -60,6 +60,7 @@ class ChatRoomFragment: Fragment() {
 
     private var isFirst = true
     private var mLastClickTime = 0L
+    private var performExit = false
 
     private val keyboardStateListener = object: KeyboardUtils.SoftKeyboardToggleListener{ // 키보드 상태(true/false)
         override fun onToggleSoftKeyboard(isVisible: Boolean) {
@@ -129,6 +130,8 @@ class ChatRoomFragment: Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     private fun setObserver(){
         myApplication.myRoom.observe(viewLifecycleOwner){ room->
+            if(performExit) return@observe
+
             if(room.roomId.isBlank()) {
                 val deletedRoomDialog = CustomDialog(
                     title = "채팅방 입장 오류",
@@ -225,6 +228,7 @@ class ChatRoomFragment: Fragment() {
         viewModel.exitRoom.observe(viewLifecycleOwner) { state ->
             when(state){
                 is UiState.Loading -> {
+                    performExit = true
                     loadingDialog.show()
                     messages.forEachIndexed { idx, chat ->
                         if (chat.messageType == CHAT_NORMAL && chat.userId == currentUser.uid) {

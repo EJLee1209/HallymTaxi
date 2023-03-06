@@ -16,8 +16,8 @@ android {
         applicationId "com.dldmswo1209.hallymtaxi"
         minSdk 26
         targetSdk 33
-        versionCode 6
-        versionName "0.9.1"
+        versionCode 7
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
