@@ -120,8 +120,13 @@ class PoolListBottomSheetFragment(
                             msg = "${user.name}님이 입장하셨습니다",
                             messageType = CHAT_JOIN
                         )
-                        viewModel.sendMessage(chat = chat, userName = user.name, receiveTokens = tokens)
-                        joinRoomCallback(room)
+                        Log.d("testt", "푸시 보냄 : ${tokens}")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            viewModel.sendMessage(chat = chat, userName = user.name, receiveTokens = tokens).join()
+                            withContext(Dispatchers.Main){
+                                joinRoomCallback(room)
+                            }
+                        }
                     }
 
                 }

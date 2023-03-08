@@ -247,23 +247,26 @@ class ChatRoomFragment: Fragment() {
                 }
                 is UiState.Failure ->{ }
                 is UiState.Success ->{
-                    loadingDialog.dismiss()
-
-                    viewModel.sendMessage(
-                        Chat(
-                            roomId = room.roomId,
-                            userId = currentUser.uid,
-                            msg = "${currentUser.name}님이 나갔습니다",
-                            messageType = CHAT_EXIT
-                        ),
-                        currentUser.name,
-                        tokenList
-                    )
-                    if(room.participants.first() == currentUser.uid && room.userCount >= 2){
-                        // 방장이 나감
-                        viewModel.findUserName(room.participants[1]) // 방장을 위임받을 사람의 이름을 가져옴
-                    }else {
-                        onClickBack()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        viewModel.sendMessage(
+                            Chat(
+                                roomId = room.roomId,
+                                userId = currentUser.uid,
+                                msg = "${currentUser.name}님이 나갔습니다",
+                                messageType = CHAT_EXIT
+                            ),
+                            currentUser.name,
+                            tokenList
+                        ).join()
+                        if(room.participants.first() == currentUser.uid && room.userCount >= 2){
+                            // 방장이 나감
+                            viewModel.findUserName(room.participants[1]) // 방장을 위임받을 사람의 이름을 가져옴
+                        }else {
+                            withContext(Dispatchers.Main){
+                                loadingDialog.dismiss()
+                                onClickBack()
+                            }
+                        }
                     }
                 }
             }
@@ -271,7 +274,9 @@ class ChatRoomFragment: Fragment() {
 
         viewModel.findUserName.observe(viewLifecycleOwner) { state ->
             when(state) {
-                is UiState.Loading -> {}
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
                 is UiState.Failure -> {}
                 is UiState.Success -> {
                     val name = state.data
@@ -281,12 +286,17 @@ class ChatRoomFragment: Fragment() {
                         msg = "$name 님이 방장 입니다",
                         messageType = CHAT_ETC
                     )
-                    viewModel.sendMessage(
-                        chat = chat,
-                        userName = currentUser.name,
-                        receiveTokens = tokenList
-                    )
-                    onClickBack()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        viewModel.sendMessage(
+                            chat = chat,
+                            userName = currentUser.name,
+                            receiveTokens = tokenList
+                        ).join()
+                        withContext(Dispatchers.Main){
+                            loadingDialog.dismiss()
+                            onClickBack()
+                        }
+                    }
                 }
             }
         }
@@ -373,7 +383,9 @@ class ChatRoomFragment: Fragment() {
         if(msg.isBlank()) return
 
         val chat = Chat(roomId = room.roomId, userId = currentUser.uid, userName = currentUser.name ,msg= msg, messageType = CHAT_NORMAL)
-        viewModel.sendMessage(chat, currentUser.name, tokenList)
+        CoroutineScope(Dispatchers.IO).launch {
+            viewModel.sendMessage(chat, currentUser.name, tokenList)
+        }
         binding.etMsg.text.clear()
     }
 
