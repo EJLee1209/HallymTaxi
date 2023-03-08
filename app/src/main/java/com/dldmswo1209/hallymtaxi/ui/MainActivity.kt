@@ -1,6 +1,8 @@
 package com.dldmswo1209.hallymtaxi.ui
 
 import android.Manifest
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -13,15 +15,14 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
-import com.dldmswo1209.hallymtaxi.common.CheckNetwork
-import com.dldmswo1209.hallymtaxi.common.MyApplication
-import com.dldmswo1209.hallymtaxi.common.getDeviceId
+import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     var isNetworkActivate = false
     private lateinit var myApplication: MyApplication
     private var room: CarPoolRoom? = null
+    private lateinit var sharedPreferences : SharedPreferences
 
     //권한 가져오기
     companion object{
@@ -49,15 +51,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        myApplication = application as MyApplication
-
+        init()
         requestPermission()
         setObserver()
         bottomNavigationSetup()
-
-        Log.d("testt", "current date time: ${LocalDateTime.now()}")
+//        requestReview()
     }
+
+    private fun init() {
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        myApplication = application as MyApplication
+    }
+
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기
     }
@@ -119,6 +124,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+//    private fun requestReview() {
+//        sharedPreferences = getSharedPreferences("requestReview", MODE_PRIVATE)
+//        val lastRequestReview = sharedPreferences.getString("lastRequestReview", null)
+//        lastRequestReview?.let {
+//            val currentDate = LocalDate.now().toString().dateToFormattedDate()
+//            val lastRequest = it.dateToFormattedDate()
+//
+//            if (currentDate != null && lastRequest != null) {
+//                val diff = TimeService.calcDateDiff(currentDate, lastRequest)
+//                if (diff >= 10) viewModel.requestReview(this)
+//            }
+//
+//        } ?: kotlin.run {
+//            sharedPreferences.edit().apply {
+//                val currentDate = LocalDate.now().toString()
+//                putString("lastRequestReview", currentDate)
+//            }
+//        }
+//    }
 
     override fun onResume() {
         super.onResume()

@@ -58,6 +58,6 @@ object RepositoryModule {
     @Singleton
     fun provideInAppUpdateRepository(
         @ApplicationContext context: Context
-    ) : InAppUpdateRepository = InAppUpdateRepositoryImpl(context)
+    ) : InAppRepository = InAppRepositoryImpl(context)
 
 }

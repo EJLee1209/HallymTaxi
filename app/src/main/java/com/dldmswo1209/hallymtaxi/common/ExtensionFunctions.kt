@@ -139,3 +139,9 @@ fun Activity.getDeviceId(): String {
 fun Int.intToStringWithFillZero() : String {
     return "%02d".format(this)
 }
+
+@SuppressLint("SimpleDateFormat")
+fun String.dateToFormattedDate(): Date? {
+    val sf = SimpleDateFormat("yyyy-MM-dd")
+    return sf.parse(this)
+}

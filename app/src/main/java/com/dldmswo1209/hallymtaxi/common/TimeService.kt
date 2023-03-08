@@ -1,6 +1,8 @@
 package com.dldmswo1209.hallymtaxi.common
 
+import java.lang.Math.abs
 import java.time.LocalDateTime
+import java.util.Date
 
 
 object TimeService {
@@ -58,5 +60,9 @@ object TimeService {
                 -1
             }
         }
+    }
+
+    fun calcDateDiff(date1: Date, date2: Date) : Long {
+        return kotlin.math.abs(date1.time - date2.time) / (60 * 60 * 24 * 1000)
     }
 }

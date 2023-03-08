@@ -1,14 +1,12 @@
 package com.dldmswo1209.hallymtaxi.ui
 
+import android.app.Activity
 import android.app.Application
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.dldmswo1209.hallymtaxi.common.context
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.data.repository.*
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
@@ -16,17 +14,11 @@ import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.remote.FirestorePagingSource
 import com.dldmswo1209.hallymtaxi.data.remote.PAGE_SIZE
 import com.google.android.play.core.appupdate.AppUpdateInfo
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -38,7 +30,7 @@ class MainViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val kakaoRepository: KakaoRepository,
     private val serverRepository: ServerRepository,
-    private val inAppUpdateRepository: InAppUpdateRepository,
+    private val inAppRepository: InAppRepository,
     private val fireStore: FirebaseFirestore,
     application: Application
 ) : AndroidViewModel(application) {
@@ -270,7 +262,11 @@ class MainViewModel @Inject constructor(
 
     fun checkAppUpdate() {
         _inAppUpdate.postValue(UiState.Loading)
-        inAppUpdateRepository.checkAppUpdate { _inAppUpdate.postValue(it) }
+        inAppRepository.checkAppUpdate { _inAppUpdate.postValue(it) }
+    }
+
+    fun requestReview(activity: Activity) {
+        inAppRepository.requestReview(activity)
     }
 
 }

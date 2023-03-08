@@ -31,6 +31,7 @@ import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
+import com.google.android.play.core.review.ReviewManagerFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
@@ -104,6 +105,7 @@ class ChatRoomFragment: Fragment() {
         KeyboardUtils.addKeyboardToggleListener(requireActivity(), keyboardStateListener)
         setRecyclerAdapter()
         editTextWatcher()
+
     }
     private fun setRecyclerAdapter(){
         chatListAdapter = ChatListAdapter(currentUser){ chatId->
