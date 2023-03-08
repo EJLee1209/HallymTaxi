@@ -296,36 +296,35 @@ class MapFragment : Fragment(), MapViewEventListener{
             setCustomImageAnchor(0.5f, 1.0f)
         }
 
-        if(isStartPoint){
-            if(isTab){
-                newMarker.markerType = MapPOIItem.MarkerType.BluePin
-                tabPlace = place
-                mapView.removePOIItem(tabMarker)
-                tabMarker = newMarker
-                mapView.addPOIItem(tabMarker)
-                mapView.selectPOIItem(tabMarker, false)
-                isTab = false
-            }else {
+        if(isTab){
+            newMarker.markerType = MapPOIItem.MarkerType.BluePin
+            tabPlace = place
+            mapView.removePOIItem(tabMarker)
+            tabMarker = newMarker
+            mapView.addPOIItem(tabMarker)
+            mapView.selectPOIItem(tabMarker, false)
+            isTab = false
+        } else {
+            if(isStartPoint){
                 binding.etStartPoint.setText(place.road_address_name)
                 startPlace = place
                 mapView.removePOIItem(startPlaceMarker) // 이전 마커 제거
                 newMarker.customImageResourceId = R.drawable.start_marker
                 startPlaceMarker = newMarker
                 mapView.addPOIItem(startPlaceMarker) // 마커 추가
+            }else{
+                binding.etEndPoint.setText(place.road_address_name)
+                endPlace = place
+                mapView.removePOIItem(endPlaceMarker) // 이전 마커 제거
+                newMarker.customImageResourceId = R.drawable.end_marker
+                endPlaceMarker = newMarker
+                mapView.addPOIItem(endPlaceMarker) // 마커 추가
             }
-        }else{
-            binding.etEndPoint.setText(place.road_address_name)
-            endPlace = place
-            mapView.removePOIItem(endPlaceMarker) // 이전 마커 제거
-            newMarker.customImageResourceId = R.drawable.end_marker
-            endPlaceMarker = newMarker
-            mapView.addPOIItem(endPlaceMarker) // 마커 추가
         }
-        if(mapView.poiItems.size == 2){ // 출발지, 목적지 모두 입력 완료
-            if(startPlace != null && endPlace != null){
-                setCameraCenterAllPOIItems()
-                showCarPoolListBottomSheet()
-            }
+
+        if(startPlace != null && endPlace != null){
+            setCameraCenterAllPOIItems()
+            showCarPoolListBottomSheet()
         }else{
             setCameraCenterAllPOIItems()
         }
