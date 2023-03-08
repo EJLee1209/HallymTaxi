@@ -31,8 +31,14 @@ class MarkerEventListener(
             builder.setTitle(placeName)
             builder.setItems(itemList) { dialog, which ->
                 when(which) {
-                    0 -> onClickSetStart()
-                    1 -> onClickSetEnd()
+                    0 -> {
+                        onClickSetStart()
+                        dialog.dismiss()
+                    }
+                    1 -> {
+                        onClickSetEnd()
+                        dialog.dismiss()
+                    }
                     2 -> dialog.dismiss()
                 }
             }

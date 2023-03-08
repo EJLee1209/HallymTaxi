@@ -10,9 +10,9 @@ object TimeService {
 
         val realTime : String = if(hour.toInt() >= 12){
             val realHour = if(hour.toInt()-12 == 0) 12 else hour.toInt()-12
-            "오후 ${realHour}:$min"
+            "오후 ${realHour.intToStringWithFillZero()}:${min.toInt().intToStringWithFillZero()}"
         }else{
-            "오전 ${hour.toInt()}:$min"
+            "오전 ${hour.toInt().intToStringWithFillZero()}:${min.toInt().intToStringWithFillZero()}"
         }
 
         return realTime

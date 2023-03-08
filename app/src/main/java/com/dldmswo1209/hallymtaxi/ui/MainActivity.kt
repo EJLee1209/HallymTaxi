@@ -22,6 +22,7 @@ import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.time.LocalDateTime
 
 
 @AndroidEntryPoint
@@ -54,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         requestPermission()
         setObserver()
         bottomNavigationSetup()
+
+        Log.d("testt", "current date time: ${LocalDateTime.now()}")
     }
     private fun requestPermission(){
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE) // 위치권한 요청하기

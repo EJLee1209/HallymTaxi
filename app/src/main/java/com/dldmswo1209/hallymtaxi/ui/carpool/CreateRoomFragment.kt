@@ -12,10 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.dldmswo1209.hallymtaxi.common.MyApplication
-import com.dldmswo1209.hallymtaxi.common.TimeService
-import com.dldmswo1209.hallymtaxi.common.registerBackPressedCallback
-import com.dldmswo1209.hallymtaxi.common.setMinutePicker
+import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_NONE
@@ -241,8 +238,8 @@ class CreateRoomFragment: Fragment() {
         if(isClicked) return
 
         val maxCount = binding.tvMaxCount.text.toString().toInt()
-        var hour = binding.timePicker.hour
-        val min = binding.timePicker.minute * 5
+        var hour = binding.timePicker.hour.intToStringWithFillZero()
+        val min = (binding.timePicker.minute * 5).intToStringWithFillZero()
         val genderOption = if(binding.checkboxGenderOption.isChecked){
             currentUser.gender
         }else{

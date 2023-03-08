@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.ui.map
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -10,9 +11,10 @@ import net.daum.mf.map.api.MapPOIItem
 class CustomBalloonAdapter(
     inflater: LayoutInflater
 ) : CalloutBalloonAdapter {
-    val mCalloutBalloon: View = inflater.inflate(R.layout.balloon_layout, null)
-    val name: TextView = mCalloutBalloon.findViewById(R.id.tv_place_name)
-    val address: TextView = mCalloutBalloon.findViewById(R.id.tv_place_address)
+    @SuppressLint("InflateParams")
+    private val mCalloutBalloon: View = inflater.inflate(R.layout.balloon_layout, null)
+    private val name: TextView = mCalloutBalloon.findViewById(R.id.tv_place_name)
+    private val address: TextView = mCalloutBalloon.findViewById(R.id.tv_place_address)
 
     override fun getCalloutBalloon(poiItem: MapPOIItem?): View {
         poiItem?.let { item ->

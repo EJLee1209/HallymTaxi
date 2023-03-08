@@ -1,6 +1,7 @@
 package com.dldmswo1209.hallymtaxi.ui.map
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,6 +82,13 @@ class MapFragment : Fragment(), MapViewEventListener{
             requireContext(),
             onClickSetStart = {
                 tabPlace?.let {
+                    startPlace?.let { startPlace->
+                        if(startPlace.place_name == it.place_name &&
+                            startPlace.address_name == it.address_name){
+                            setCameraCenterAllPOIItems()
+                            return@MarkerEventListener
+                        }
+                    }
                     searchResultClickEvent(it, true)
                     mapView.removePOIItem(tabMarker)
                 }
@@ -88,6 +96,14 @@ class MapFragment : Fragment(), MapViewEventListener{
             onClickSetEnd = {
                 tabPlace?.let {
                     if(startPlace == null) locationService.getCurrentAddress()
+
+                    endPlace?.let { endPlace->
+                        if(endPlace.place_name == it.place_name &&
+                            endPlace.address_name == it.address_name){
+                            setCameraCenterAllPOIItems()
+                            return@MarkerEventListener
+                        }
+                    }
                     searchResultClickEvent(it, false)
                     mapView.removePOIItem(tabMarker)
                 }
@@ -287,7 +303,7 @@ class MapFragment : Fragment(), MapViewEventListener{
                 mapView.removePOIItem(tabMarker)
                 tabMarker = newMarker
                 mapView.addPOIItem(tabMarker)
-                mapView.selectPOIItem(tabMarker, true)
+                mapView.selectPOIItem(tabMarker, false)
                 isTab = false
             }else {
                 binding.etStartPoint.setText(place.road_address_name)
@@ -441,8 +457,25 @@ class MapFragment : Fragment(), MapViewEventListener{
     override fun onMapViewZoomLevelChanged(p0: MapView?, p1: Int) {}
 
     override fun onMapViewSingleTapped(p0: MapView?, mapPoint: MapPoint) {
+        val mapPointGeoCord = mapPoint.mapPointGeoCoord
+        if((mapPointGeoCord.latitude == startPlace?.y && mapPointGeoCord.longitude == startPlace?.x) ||
+                mapPointGeoCord.latitude == endPlace?.y && mapPointGeoCord.longitude == endPlace?.x) {
+            return
+        }
+        if(startPlace != null && endPlace != null){
+            clearStartEndPlace()
+        }
+
         isTab = true
         locationService.reverseGeocorder(mapPoint)
+    }
+
+    private fun clearStartEndPlace() {
+        startPlace = null
+        endPlace = null
+        mapView.removeAllPOIItems()
+        binding.etEndPoint.text.clear()
+        binding.etStartPoint.text.clear()
     }
 
     override fun onMapViewDoubleTapped(p0: MapView?, p1: MapPoint?) {}

@@ -135,3 +135,7 @@ fun Activity.requestUpdate(
 fun Activity.getDeviceId(): String {
     return Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 }
+
+fun Int.intToStringWithFillZero() : String {
+    return "%02d".format(this)
+}
