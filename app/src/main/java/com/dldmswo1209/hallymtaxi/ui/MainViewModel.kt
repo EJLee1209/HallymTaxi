@@ -3,24 +3,13 @@ package com.dldmswo1209.hallymtaxi.ui
 import android.app.Activity
 import android.app.Application
 import androidx.lifecycle.*
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.data.repository.*
-import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
-import com.dldmswo1209.hallymtaxi.data.remote.FirestorePagingSource
-import com.dldmswo1209.hallymtaxi.data.remote.PAGE_SIZE
 import com.google.android.play.core.appupdate.AppUpdateInfo
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,7 +20,6 @@ class MainViewModel @Inject constructor(
     private val kakaoRepository: KakaoRepository,
     private val serverRepository: ServerRepository,
     private val inAppRepository: InAppRepository,
-    private val fireStore: FirebaseFirestore,
     application: Application
 ) : AndroidViewModel(application) {
 
@@ -43,6 +31,10 @@ class MainViewModel @Inject constructor(
 
     private var _subscribeParticipantsTokens = MutableLiveData<List<String>>()
     val subscribeParticipantsTokens : LiveData<List<String>> = _subscribeParticipantsTokens
+
+    private var _carPoolList = MutableLiveData<UiState<List<CarPoolRoom>>>()
+    val carPoolList : LiveData<UiState<List<CarPoolRoom>>> = _carPoolList
+
 
     private var _findUserName = MutableLiveData<UiState<String>>()
     val findUserName: LiveData<UiState<String>> = _findUserName
@@ -148,22 +140,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun detachRoomPaging(genderOption: String) : Flow<PagingData<CarPoolRoom>> {
-        val query = fireStore.collection(FireStoreTable.ROOM)
-            .whereEqualTo(FireStoreTable.FIELD_CLOSED, false) // 이미 마감한 방 필터링
-            .whereIn(FireStoreTable.FIELD_GENDER_OPTION, listOf(genderOption, GENDER_OPTION_NONE)) // 성별 옵션에 부합하지 않는 방 필터링
-            .whereGreaterThanOrEqualTo(FireStoreTable.FIELD_DEPARTURE_TIME, LocalDateTime.now().toString()) // 출발시간이 이미 지난 방 필터링
-            .orderBy(FireStoreTable.FIELD_DEPARTURE_TIME, Query.Direction.ASCENDING)// 출발 시간 기준 오름차순
-            .orderBy(FireStoreTable.FIELD_CREATED, Query.Direction.DESCENDING) // 방 생성 기준 내림차순
-            .limit(PAGE_SIZE.toLong())
-
-        return Pager(
-            PagingConfig(
-                pageSize = PAGE_SIZE
-            )
-        ){
-            FirestorePagingSource(query)
-        }.flow.cachedIn(viewModelScope)
+    fun getAllRoom(genderOption: String) {
+        fireStoreRepository.getAllRoom(genderOption) {
+            _carPoolList.postValue(it)
+        }
     }
 
     fun createRoom(room: CarPoolRoom) {

@@ -3,8 +3,8 @@ package com.dldmswo1209.hallymtaxi.ui.carpool
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.location.DistanceManager
@@ -18,7 +18,7 @@ class PoolListAdapter(
     val fragment: PoolListBottomSheetFragment,
     val endPlace: Place,
     val onClickRoom: (CarPoolRoom)->Unit,
-    ): PagingDataAdapter<CarPoolRoom, PoolListAdapter.ViewHolder>(diffUtil) {
+    ): ListAdapter<CarPoolRoom, PoolListAdapter.ViewHolder>(diffUtil) {
 
     private val myApplication = activity.application as MyApplication
     var roomId = myApplication.getMyRoomId()

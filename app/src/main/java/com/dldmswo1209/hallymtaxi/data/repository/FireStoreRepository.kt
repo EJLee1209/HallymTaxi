@@ -9,6 +9,7 @@ interface FireStoreRepository {
     fun subscribeMyRoom(): Flow<CarPoolRoom>
     fun subscribeParticipantsTokens(roomId: String): Flow<List<String>>
     fun monitoringLoggedIn() : Flow<SignedIn>
+    fun getAllRoom(genderOption: String, result: (UiState<List<CarPoolRoom>>) -> Unit)
     fun findUserName(uid: String, result: (UiState<String>) -> Unit)
     fun getParticipantsTokens(roomId: String, result: (UiState<List<String>>) -> Unit)
     fun createRoom(room: CarPoolRoom, result: (UiState<CarPoolRoom>) -> Unit)

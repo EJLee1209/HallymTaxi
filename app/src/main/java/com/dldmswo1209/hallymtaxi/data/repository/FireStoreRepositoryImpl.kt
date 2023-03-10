@@ -6,6 +6,7 @@ import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
 import com.dldmswo1209.hallymtaxi.data.UiState
+import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_NONE
 import com.dldmswo1209.hallymtaxi.data.model.SignedIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -17,6 +18,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import java.time.LocalDateTime
 
 class FireStoreRepositoryImpl(
     private val fireStore: FirebaseFirestore,
@@ -317,5 +319,27 @@ class FireStoreRepositoryImpl(
                 listenerRegistration.remove()
             }
         }
+    }
+
+    override fun getAllRoom(genderOption: String, result: (UiState<List<CarPoolRoom>>) -> Unit) {
+        fireStore.collection(FireStoreTable.ROOM)
+            .whereEqualTo(FireStoreTable.FIELD_CLOSED, false) // 이미 마감한 방 필터링
+            .whereIn(FireStoreTable.FIELD_GENDER_OPTION, listOf(genderOption, GENDER_OPTION_NONE)) // 성별 옵션에 부합하지 않는 방 필터링
+            .whereGreaterThanOrEqualTo(FireStoreTable.FIELD_DEPARTURE_TIME, LocalDateTime.now().toString()) // 출발시간이 이미 지난 방 필터링
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if(querySnapshot == null) {
+                    result.invoke(UiState.Failure("빈 쿼리 입니다"))
+                    return@addOnSuccessListener
+                }
+                val rooms = mutableListOf<CarPoolRoom>()
+                querySnapshot.forEach { queryDocumentSnapshot ->
+                    rooms.add(queryDocumentSnapshot.toObject())
+                }
+                result.invoke(UiState.Success(rooms))
+            }
+            .addOnFailureListener {
+                result.invoke(UiState.Failure("채팅방 목록을 가져오지 못했습니다"))
+            }
     }
 }

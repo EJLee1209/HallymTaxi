@@ -3,15 +3,13 @@ package com.dldmswo1209.hallymtaxi.ui.carpool
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
 import com.dldmswo1209.hallymtaxi.common.BottomSheetBehaviorSetting
 import com.dldmswo1209.hallymtaxi.common.MyApplication
+import com.dldmswo1209.hallymtaxi.common.location.DistanceManager
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.databinding.FragmentPoolListBottomSheetBinding
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
@@ -24,7 +22,6 @@ import com.dldmswo1209.hallymtaxi.util.FireStoreResponse.JOIN_ROOM_ALREADY_JOINE
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class PoolListBottomSheetFragment(
@@ -64,7 +61,6 @@ class PoolListBottomSheetFragment(
 
         init()
         setObserver()
-        pagingDataLoadFlow()
     }
 
     private fun init() {
@@ -92,13 +88,21 @@ class PoolListBottomSheetFragment(
             poolListAdapter.roomId = room?.roomId
         }
 
-        lifecycleScope.launch {
-            viewModel.detachRoomPaging(user.gender).collectLatest {
-                poolListAdapter.submitData(it) // submitData는 무효화 또는 새로고침 전까지 반환되지 않는 정지 함수
-                // 여기부터 실행이 중단됨.
-                loadingDialog.dismiss() // 새로고침이 완료 되면, 로딩 다이얼로그 숨김
+        viewModel.carPoolList.observe(viewLifecycleOwner) { state ->
+            when(state){
+                is UiState.Loading -> {
+                    loadingDialog.show()
+                }
+                is UiState.Failure -> {
+                    loadingDialog.dismiss()
+                }
+                is UiState.Success ->{
+                    loadingDialog.dismiss()
+                    poolListAdapter.submitList(orderedCarPoolList(state.data))
+                }
             }
         }
+        viewModel.getAllRoom(user.gender)
 
         viewModel.getParticipantsTokens.observe(viewLifecycleOwner) { state ->
             when(state){
@@ -120,10 +124,11 @@ class PoolListBottomSheetFragment(
                             msg = "${user.name}님이 입장하셨습니다",
                             messageType = CHAT_JOIN
                         )
-                        Log.d("testt", "푸시 보냄 : ${tokens}")
+
                         CoroutineScope(Dispatchers.IO).launch {
                             viewModel.sendMessage(chat = chat, userName = user.name, receiveTokens = tokens).join()
                             withContext(Dispatchers.Main){
+                                loadingDialog.dismiss()
                                 joinRoomCallback(room)
                             }
                         }
@@ -144,11 +149,7 @@ class PoolListBottomSheetFragment(
                         title = "채팅방 입장 실패",
                         content = state.error ?: "채팅방 인원 초과 혹은\n마감된 채팅방 입니다"
                     ) {}
-                    if (poolListAdapter.itemCount == 1) {
-                        this@PoolListBottomSheetFragment.dialog?.dismiss()
-                    }
                     dialog.show(parentFragmentManager, dialog.tag)
-                    poolListAdapter.refresh()
                 }
                 is UiState.Success ->{
                     loadingDialog.dismiss()
@@ -169,13 +170,11 @@ class PoolListBottomSheetFragment(
         }
     }
 
-    private fun pagingDataLoadFlow() {
-        lifecycleScope.launch {
-            poolListAdapter.loadStateFlow.collectLatest {
-                if (it.append is LoadState.Loading) loadingDialog.show()
-                else loadingDialog.dismiss()
-            }
-        }
+    private fun orderedCarPoolList(poolList: List<CarPoolRoom>): MutableList<CarPoolRoom> {
+        // 유저가 설정한 목적지 기준 오름차순 정렬
+        return poolList.sortedWith(compareBy {
+            DistanceManager.getDistance(endPlace.y, endPlace.x, it.endPlace.y, it.endPlace.x)
+        }).toMutableList()
     }
 
     private fun recyclerItemClickEvent(room: CarPoolRoom) {
@@ -218,7 +217,7 @@ class PoolListBottomSheetFragment(
     }
 
     fun onClickRefreshRoomList() {
-        poolListAdapter.refresh()
+        viewModel.getAllRoom(user.gender)
         loadingDialog.show()
     }
 
