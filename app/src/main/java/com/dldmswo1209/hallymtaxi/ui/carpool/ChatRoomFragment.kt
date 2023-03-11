@@ -349,7 +349,7 @@ class ChatRoomFragment: Fragment() {
 
                     true
                 }
-                else->{
+                R.id.menu_deactivate -> {
                     val deactivateDialog = CustomDialog(
                         title = "카풀 마감하기",
                         content = "마감하기를 하면\n인원을 더이상 추가할 수 없습니다.\n마감할까요?",
@@ -361,6 +361,16 @@ class ChatRoomFragment: Fragment() {
 
                     true
                 }
+                R.id.menu_share -> {
+                    val shareText = "${room.startPlace.place_name} -> ${room.endPlace.place_name}\n\n택시 같이 탈 사람 구합니다!\n출발시간 : ${TimeService.parsingDepartureTime(room.departureTime)}\n현재 인원 : ${room.userCount}/${room.userMaxCount}\n\n한림대학교 카풀 앱 서비스 림카를 통해 실시간 채팅으로 약속을 잡아보세요!\n이 글은 림카에 의해 작성되었습니다."
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, shareText)
+                    }
+                    startActivity(Intent.createChooser(intent, "카풀 정보 공유"))
+                    true
+                }
+                else -> true
             }
         }
     }

@@ -1,6 +1,8 @@
 package com.dldmswo1209.hallymtaxi.common
 
+import android.widget.TextView
 import java.lang.Math.abs
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Date
 
@@ -22,6 +24,25 @@ object TimeService {
 
     fun currentDate(timestamp: String, delimiter: String) : String{
         return timestamp.split(delimiter)[0]
+    }
+
+    fun parsingDepartureTime(timestamp: String) : String {
+        val day = currentDate(timestamp, "T").split("-")[2].toInt()
+        val time = currentTime(timestamp, "T")
+        val localDay = currentDate(LocalDate.now().toString(), "T").split("-")[2].toInt()
+
+        return when (day) {
+            localDay -> {
+                "오늘 $time"
+            }
+            localDay+1 -> {
+                "내일 $time"
+            }
+            else -> {
+                val date = timestamp.split("T")[0]
+                "$date $time"
+            }
+        }
     }
 
     fun isBefore(timestamp: String, delimiter: String) : Boolean{

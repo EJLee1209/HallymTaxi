@@ -122,9 +122,6 @@ dependencies {
     kapt("androidx.room:room-compiler:$room_version")
     implementation "androidx.room:room-ktx:$room_version"
 
-    // paging3
-    implementation "androidx.paging:paging-runtime:$paging_version"
-
     // This dependency is downloaded from the Google’s Maven repository.
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation 'com.google.android.play:app-update:2.0.1'

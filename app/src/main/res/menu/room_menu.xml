@@ -6,4 +6,7 @@
     <item
         android:id="@+id/menu_deactivate"
         android:title="카풀 마감하기"/>
+    <item
+        android:id="@+id/menu_share"
+        android:title="공유하기"/>
 </menu>
