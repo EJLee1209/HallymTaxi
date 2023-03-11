@@ -58,5 +58,8 @@ MVVM Pattern 적용
  
 <br>
 
+## 림카 톺아보기
+[림카 설명서](https://opposite-mandevilla-887.notion.site/400030390e5a486695c44e930347e600)
+
 ## 🏃🏻 프로젝트의 험난한 여정 기록
 [확인하기](https://opposite-mandevilla-887.notion.site/Android-761fa109e0d74f47a997afc6a85f6bf2)
