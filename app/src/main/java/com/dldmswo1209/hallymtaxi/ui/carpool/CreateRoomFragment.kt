@@ -16,6 +16,7 @@ import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.GENDER_OPTION_NONE
+import com.dldmswo1209.hallymtaxi.data.model.MapBrain.Companion.SEARCH_RESULT_BOTTOM_SHEET_TAG
 import com.dldmswo1209.hallymtaxi.data.model.Place
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.databinding.FragmentCreateRoomBinding
@@ -23,10 +24,8 @@ import com.dldmswo1209.hallymtaxi.ui.MainViewModel
 import com.dldmswo1209.hallymtaxi.ui.SplashActivity
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
 import com.dldmswo1209.hallymtaxi.ui.dialog.LoadingDialog
-import com.dldmswo1209.hallymtaxi.ui.map.MapFragment.Companion.SEARCH_RESULT_BOTTOM_SHEET_TAG
 import com.dldmswo1209.hallymtaxi.ui.map.SearchResultBottomSheetFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 

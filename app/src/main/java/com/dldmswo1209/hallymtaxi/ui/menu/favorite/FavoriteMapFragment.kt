@@ -9,6 +9,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.clearFocusAndHideKeyboard
 import com.dldmswo1209.hallymtaxi.common.location.LocationService
 import com.dldmswo1209.hallymtaxi.common.registerBackPressedCallback
@@ -165,7 +166,9 @@ class FavoriteMapFragment : Fragment() {
             // 마커 생성
             itemName = place.place_name
             mapPoint = MapPoint.mapPointWithGeoCoord(place.y, place.x)
-            markerType = MapPOIItem.MarkerType.BluePin
+            markerType = MapPOIItem.MarkerType.CustomImage
+            customImageResourceId = R.drawable.map_pin
+            isCustomImageAutoscale = false
             setCustomImageAnchor(0.5f, 1.0f)
         }
         mapView.removeAllPOIItems()
