@@ -203,12 +203,12 @@
             app:layout_constraintBottom_toBottomOf="@id/time_picker"
             android:selectionDividerHeight="0dp"
             android:theme="@style/NumberPickerStyle"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             app:layout_constraintStart_toStartOf="@id/view_picker"/>
 
         <TimePicker
             android:id="@+id/time_picker"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="100dp"
             android:selectionDividerHeight="0dp"
             android:theme="@style/NumberPickerStyle"

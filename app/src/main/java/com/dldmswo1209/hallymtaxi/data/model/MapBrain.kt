@@ -31,7 +31,7 @@ class MapBrain(
     var joinedRoom: CarPoolRoom? = null,
     var locationService: LocationService? = null,
     val fragment: Fragment,
-    var binding: FragmentMapBinding,
+    val binding: FragmentMapBinding,
     var mapView: MapView
 ) {
     init {
