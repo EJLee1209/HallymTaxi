@@ -16,7 +16,7 @@ import com.dldmswo1209.hallymtaxi.data.model.Place
 class PoolListAdapter(
     val activity: Activity,
     val fragment: PoolListBottomSheetFragment,
-    val endPlace: Place,
+    val startPlace: Place,
     val onClickRoom: (CarPoolRoom)->Unit,
     ): ListAdapter<CarPoolRoom, PoolListAdapter.ViewHolder>(diffUtil) {
 
@@ -26,7 +26,7 @@ class PoolListAdapter(
     inner class ViewHolder(private val binding: ItemPoolBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(room: CarPoolRoom){
             binding.room = room
-            binding.distance = DistanceManager.getDistance(room.endPlace.y, room.endPlace.x, endPlace.y, endPlace.x)
+            binding.distance = DistanceManager.getDistance(room.startPlace.y, room.startPlace.x, startPlace.y, startPlace.x)
             if(roomId == room.roomId){ // 현재 참여하고 있는 방
                 currentJoinedRoom()
             }else{

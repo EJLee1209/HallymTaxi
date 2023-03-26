@@ -188,10 +188,10 @@ class MapBrain(
         }
     }
 
-    fun showCarPoolListBottomSheet() {
+    private fun showCarPoolListBottomSheet() {
         if(!isOpenBottomSheetFragment(POOL_LIST_BOTTOM_SHEET_TAG)) {
             if(startPlace != null && endPlace != null) {
-                poolListBottomSheet = PoolListBottomSheetFragment(onClickCreateRoom, joinCallback, endPlace!!)
+                poolListBottomSheet = PoolListBottomSheetFragment(onClickCreateRoom, joinCallback, startPlace!!, endPlace!!)
                 poolListBottomSheet?.show(fragment.parentFragmentManager,
                     POOL_LIST_BOTTOM_SHEET_TAG
                 )

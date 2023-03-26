@@ -27,6 +27,7 @@ import kotlinx.coroutines.*
 class PoolListBottomSheetFragment(
     private val onCreateRoomBtnClick: () -> Unit,
     private val joinRoomCallback: (CarPoolRoom) -> Unit,
+    private val startPlace: Place,
     private val endPlace: Place,
 ) : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentPoolListBottomSheetBinding
@@ -77,7 +78,7 @@ class PoolListBottomSheetFragment(
         poolListAdapter = PoolListAdapter(
             requireActivity(),
             this@PoolListBottomSheetFragment,
-            endPlace
+            startPlace
         ) { room -> recyclerItemClickEvent(room) }
         binding.rvPool.adapter = poolListAdapter
     }
@@ -171,10 +172,12 @@ class PoolListBottomSheetFragment(
     }
 
     private fun orderedCarPoolList(poolList: List<CarPoolRoom>): MutableList<CarPoolRoom> {
-        // 유저가 설정한 목적지 기준 오름차순 정렬
-        return poolList.sortedWith(compareBy {
+        // 유저가 설정한 출발지, 목적지를 기준으로 가장 근접한 검색 결과순으로 정렬
+        return poolList.sortedWith(compareBy<CarPoolRoom> {
+            DistanceManager.getDistance(startPlace.y, startPlace.x, it.startPlace.y, it.startPlace.x)
+        }.then(compareBy {
             DistanceManager.getDistance(endPlace.y, endPlace.x, it.endPlace.y, it.endPlace.x)
-        }).toMutableList()
+        })).toMutableList()
     }
 
     private fun recyclerItemClickEvent(room: CarPoolRoom) {
