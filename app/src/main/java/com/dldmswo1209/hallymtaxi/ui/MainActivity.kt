@@ -1,6 +1,7 @@
 package com.dldmswo1209.hallymtaxi.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +18,7 @@ import com.dldmswo1209.hallymtaxi.common.*
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
+import com.dldmswo1209.hallymtaxi.ui.welcome.WelcomeActivity
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import dagger.hilt.android.AndroidEntryPoint
@@ -100,14 +102,18 @@ class MainActivity : AppCompatActivity() {
                 // 다른 기기로 강제 로그인 시도함
                 val forcedLoggedInDialog = CustomDialog(
                     title = "시스템 메세지",
-                    content = "다른 기기에서 로그인을 했습니다\n잠시 후 앱이 종료됩니다",
-                    positiveCallback = { finish() },
+                    content = "다른 기기에서 로그인을 했습니다\n잠시 후 자동으로 로그아웃 됩니다.",
+                    positiveCallback = {
+                        startActivity(Intent(this, SplashActivity::class.java))
+                        finish()
+                    },
                 )
                 CoroutineScope(Dispatchers.Main).launch {
                     withContext(Dispatchers.Default) {
                         forcedLoggedInDialog.show(supportFragmentManager, forcedLoggedInDialog.tag)
-                        delay(3000)
+                        delay(2000)
                     }
+                    startActivity(Intent(this@MainActivity, SplashActivity::class.java))
                     finish()
                 }
 
