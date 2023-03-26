@@ -34,10 +34,8 @@ class MapFragment : Fragment(), MapViewEventListener{
     private lateinit var favoritesListAdapter: FavoritesListAdapter
     private lateinit var myApplication: MyApplication
     private lateinit var mapView: MapView
+    private lateinit var mapBrain: MapBrain
 
-    private val mapBrain by lazy{
-        MapBrain(fragment = this, binding = binding, mapView = mapView)
-    }
     private val loadingDialog by lazy{
         LoadingDialog(requireActivity())
     }
@@ -63,6 +61,7 @@ class MapFragment : Fragment(), MapViewEventListener{
         binding.fragment = this
 
         mapView = MapView(requireActivity())
+        mapBrain = MapBrain(fragment = this, binding = binding, mapView = mapView)
         mapView.apply {
             setMapViewEventListener(this@MapFragment)
             setCalloutBalloonAdapter(CustomBalloonAdapter(layoutInflater))
@@ -302,6 +301,5 @@ class MapFragment : Fragment(), MapViewEventListener{
     override fun onMapViewDragEnded(p0: MapView?, p1: MapPoint?) {}
 
     override fun onMapViewMoveFinished(p0: MapView?, p1: MapPoint?) {}
-
 
 }
