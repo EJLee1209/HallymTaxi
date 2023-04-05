@@ -49,6 +49,12 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         start()
+
+        val extraData = intent.getStringExtra("roomId")
+        extraData?.let {
+            Log.d("testt", it)
+        }
+
     }
 
     private fun start() {

@@ -1,10 +1,13 @@
 package com.dldmswo1209.hallymtaxi.ui
 
 import android.Manifest
+import android.app.ActivityManager
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.*
+import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.databinding.ActivityMainBinding
 import com.dldmswo1209.hallymtaxi.ui.dialog.CustomDialog
@@ -173,6 +177,11 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         checkNetwork.unRegisterNetworkListener()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        KeyboardUtils.forceCloseKeyboard(this)
+        return super.dispatchTouchEvent(ev)
     }
 
 }

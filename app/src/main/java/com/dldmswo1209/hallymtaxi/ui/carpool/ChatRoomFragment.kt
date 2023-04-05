@@ -46,7 +46,7 @@ class ChatRoomFragment: Fragment() {
     private var messages: MutableList<Chat> = mutableListOf()
     private lateinit var currentUser: User
     private var myToken = ""
-    private var tokenList = mutableListOf<String?>()
+    private var tokenMap = mutableMapOf<String,String>()
     private lateinit var chatListAdapter: ChatListAdapter
 
     private val viewMarginDynamicChanger : ViewMarginDynamicChanger by lazy{
@@ -165,8 +165,8 @@ class ChatRoomFragment: Fragment() {
             isFirst = false
         }
         viewModel.subscribeParticipantsTokens.observe(viewLifecycleOwner) { tokens ->
-            tokenList = tokens.toMutableList()
-            tokenList.remove(myToken)
+            tokenMap = tokens.toMutableMap()
+            tokenMap.remove(myToken)
         }
 
         viewModel.chatList.observe(viewLifecycleOwner){
@@ -220,7 +220,7 @@ class ChatRoomFragment: Fragment() {
                         messageType = CHAT_ETC
                     )
                     CoroutineScope(Dispatchers.Main).launch {
-                        viewModel.sendMessage(chat, currentUser.name, tokenList).join()
+                        viewModel.sendMessage(chat, currentUser.name, tokenMap).join()
                         viewModel.detachChatList(room.roomId)
                     }
                 }
@@ -258,7 +258,7 @@ class ChatRoomFragment: Fragment() {
                                 messageType = CHAT_EXIT
                             ),
                             currentUser.name,
-                            tokenList
+                            tokenMap
                         ).join()
                         if(room.participants.first() == currentUser.uid && room.userCount >= 2){
                             // 방장이 나감
@@ -292,7 +292,7 @@ class ChatRoomFragment: Fragment() {
                         viewModel.sendMessage(
                             chat = chat,
                             userName = currentUser.name,
-                            receiveTokens = tokenList
+                            receiveTokens = tokenMap
                         ).join()
                         withContext(Dispatchers.Main){
                             loadingDialog.dismiss()
@@ -362,7 +362,13 @@ class ChatRoomFragment: Fragment() {
                     true
                 }
                 R.id.menu_share -> {
-                    val shareText = "${room.startPlace.place_name} -> ${room.endPlace.place_name}\n\n택시 같이 탈 사람 구합니다!\n출발시간 : ${TimeService.parsingDepartureTime(room.departureTime)}\n현재 인원 : ${room.userCount}/${room.userMaxCount}\n\n한림대학교 카풀 앱 서비스 림카를 통해 실시간 채팅으로 약속을 잡아보세요!\n이 글은 림카에 의해 작성되었습니다."
+                    val shareText = getString(R.string.chat_room_share)
+                        .format(
+                            room.startPlace.place_name,
+                            room.endPlace.place_name,
+                            TimeService.parsingDepartureTime(room.departureTime),
+                            "${room.userCount}/${room.userMaxCount}"
+                        )
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
                         putExtra(Intent.EXTRA_TEXT, shareText)
@@ -396,7 +402,7 @@ class ChatRoomFragment: Fragment() {
 
         val chat = Chat(roomId = room.roomId, userId = currentUser.uid, userName = currentUser.name ,msg= msg, messageType = CHAT_NORMAL)
         CoroutineScope(Dispatchers.IO).launch {
-            viewModel.sendMessage(chat, currentUser.name, tokenList)
+            viewModel.sendMessage(chat, currentUser.name, tokenMap)
         }
         binding.etMsg.text.clear()
     }

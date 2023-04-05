@@ -65,7 +65,6 @@ class FireStoreRepositoryImpl(
                                 this.trySend(CarPoolRoom())
                             }
                         }
-
                     }
                 awaitClose {
                     listenerRegistration.remove()
@@ -76,7 +75,7 @@ class FireStoreRepositoryImpl(
         }
     }
 
-    override fun subscribeParticipantsTokens(roomId: String): Flow<List<String>> {
+    override fun subscribeParticipantsTokens(roomId: String): Flow<Map<String,String>> {
         return callbackFlow {
             val listenerRegistration = fireStore.collection(FireStoreTable.FCMTOKENS)
                 .whereEqualTo(FireStoreTable.FIELD_ROOM_ID, roomId)
@@ -89,10 +88,12 @@ class FireStoreRepositoryImpl(
                         return@addSnapshotListener
                     }
                     value?.let { querySnapshot ->
-                        val tokens = mutableListOf<String>()
+                        val tokens = mutableMapOf<String,String>()
                         querySnapshot.documents.forEach { document ->
-                            document.getString(FireStoreTable.FIELD_TOKEN)?.let {
-                                tokens.add(it)
+                            document.getString(FireStoreTable.FIELD_TOKEN)?.let { token->
+                                document.getString(FireStoreTable.FIELD_PLATFORM)?.let { platform ->
+                                    tokens[token] = platform
+                                }
                             }
                         }
                         trySend(tokens)
@@ -120,16 +121,18 @@ class FireStoreRepositoryImpl(
             }
     }
 
-    override fun getParticipantsTokens(roomId: String, result: (UiState<List<String>>) -> Unit) {
+    override fun getParticipantsTokens(roomId: String, result: (UiState<Map<String,String>>) -> Unit) {
         fireStore.collection(FireStoreTable.FCMTOKENS)
             .whereEqualTo(FireStoreTable.FIELD_ROOM_ID, roomId)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 querySnapshot?.let {
-                    val tokens = mutableListOf<String>()
+                    val tokens = mutableMapOf<String,String>()
                     it.documents.forEach { document ->
                         document.getString(FireStoreTable.FIELD_TOKEN)?.let { token ->
-                            tokens.add(token)
+                            document.getString(FireStoreTable.FIELD_PLATFORM)?.let { platform ->
+                                tokens[token] = platform
+                            }
                         }
                     }
                     result.invoke(UiState.Success(tokens))
@@ -279,9 +282,12 @@ class FireStoreRepositoryImpl(
                 )
                 return@addOnCompleteListener
             }
-
+            val updateMap = mapOf(
+                FireStoreTable.FIELD_TOKEN to task.result,
+                FireStoreTable.FIELD_PLATFORM to "android"
+            )
             fireStore.collection(FireStoreTable.FCMTOKENS).document(auth.currentUser!!.uid)
-                .update(mapOf(FireStoreTable.FIELD_TOKEN to task.result))
+                .update(updateMap)
                 .addOnSuccessListener {
                     result.invoke(
                         UiState.Success(task.result)

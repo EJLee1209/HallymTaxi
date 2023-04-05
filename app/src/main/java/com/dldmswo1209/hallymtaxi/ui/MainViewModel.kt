@@ -2,6 +2,7 @@ package com.dldmswo1209.hallymtaxi.ui
 
 import android.app.Activity
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.dldmswo1209.hallymtaxi.data.model.*
 import com.dldmswo1209.hallymtaxi.data.repository.*
@@ -29,8 +30,8 @@ class MainViewModel @Inject constructor(
     private var _subscribeMyRoom = MutableLiveData<CarPoolRoom>()
     val subscribeMyRoom : LiveData<CarPoolRoom> = _subscribeMyRoom
 
-    private var _subscribeParticipantsTokens = MutableLiveData<List<String>>()
-    val subscribeParticipantsTokens : LiveData<List<String>> = _subscribeParticipantsTokens
+    private var _subscribeParticipantsTokens = MutableLiveData<Map<String,String>>()
+    val subscribeParticipantsTokens : LiveData<Map<String,String>> = _subscribeParticipantsTokens
 
     private var _carPoolList = MutableLiveData<UiState<List<CarPoolRoom>>>()
     val carPoolList : LiveData<UiState<List<CarPoolRoom>>> = _carPoolList
@@ -39,14 +40,18 @@ class MainViewModel @Inject constructor(
     private var _findUserName = MutableLiveData<UiState<String>>()
     val findUserName: LiveData<UiState<String>> = _findUserName
 
-    private var _getParticipantsTokens = MutableLiveData<UiState<List<String>>>()
-    val getParticipantsTokens : LiveData<UiState<List<String>>> = _getParticipantsTokens
+    private var _getParticipantsTokens = MutableLiveData<UiState<Map<String,String>>>()
+    val getParticipantsTokens : LiveData<UiState<Map<String,String>>> = _getParticipantsTokens
 
     private var _monitoring = MutableLiveData<SignedIn>()
     val monitoring : LiveData<SignedIn> = _monitoring
 
     private var _logout = MutableLiveData<UiState<String>>()
     val logout : LiveData<UiState<String>> = _logout
+
+    private var _deleteAccount = MutableLiveData<UiState<String>>()
+    val deleteAccount : LiveData<UiState<String>> = _deleteAccount
+
 
     private var _updateToken = MutableLiveData<UiState<String>>()
     val updateToken : LiveData<UiState<String>> = _updateToken
@@ -123,6 +128,11 @@ class MainViewModel @Inject constructor(
         authRepository.logoutUser{ _logout.postValue(it) }
     }
 
+    fun deleteAccount() {
+        _deleteAccount.postValue(UiState.Loading)
+        authRepository.deleteAccount { _deleteAccount.postValue(it) }
+    }
+
     fun updateFcmToken() {
         fireStoreRepository.updateFcmToken{
             _updateToken.postValue(it)
@@ -172,15 +182,27 @@ class MainViewModel @Inject constructor(
         fireStoreRepository.deactivateRoom(roomId){ _deactivateRoom.postValue(it) }
     }
 
-    suspend fun sendMessage(chat: Chat, userName: String, receiveTokens: List<String?>) = viewModelScope.launch(Dispatchers.IO) {
+    suspend fun sendMessage(chat: Chat, userName: String, receiveTokens: Map<String,String>) = viewModelScope.launch(Dispatchers.IO) {
         _sendPush.postValue(UiState.Loading)
         if(receiveTokens.isEmpty()) chat.sendSuccess = SEND_STATE_SUCCESS
         saveChat(chat)
 
-        receiveTokens.forEachIndexed { index, token->
-            if(token != null){
-                serverRepository.sendPushMessage(token, chat.roomId, chat.userId, userName, chat.msg, chat.messageType, chat.id){
-                    if(receiveTokens.last() == token) _sendPush.postValue(it)
+        var count = 0
+        receiveTokens.forEach { (token, platform) ->
+            serverRepository.sendPushMessage(
+                token = token,
+                id = chat.id,
+                roomId = chat.roomId,
+                userId = chat.userId,
+                userName = userName,
+                message = chat.msg,
+                messageType = chat.messageType,
+                target = platform
+            ) {
+
+                count++
+                if(count == receiveTokens.size) {
+                    _sendPush.postValue(it)
                 }
             }
         }

@@ -56,9 +56,6 @@ fun VerifyCodeTextField(
                             .height(60.dp)
                     )
                 }
-                LaunchedEffect(Unit) {
-                    focusRequester.requestFocus()
-                }
             }
         },
     )

@@ -10,4 +10,5 @@ interface AuthRepository {
     fun loginUser(email: String, password: String, deviceId: String, result: (UiState<String>) -> Unit)
     fun logoutUser(result: (UiState<String>)-> Unit)
     fun sendPasswordResetMail(email: String, result: (UiState<String>) -> Unit)
+    fun deleteAccount(result: (UiState<String>) -> Unit)
 }

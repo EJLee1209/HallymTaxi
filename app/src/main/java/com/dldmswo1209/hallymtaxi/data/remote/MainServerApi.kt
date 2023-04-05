@@ -32,6 +32,7 @@ interface MainServerApi {
         @Query("userName") userName: String,
         @Query("message") message: String,
         @Query("messageType") messageType: String,
+        @Query("target") target: String
     ) : Boolean
 
 }

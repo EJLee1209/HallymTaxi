@@ -71,7 +71,7 @@ class FcmService : FirebaseMessagingService() {
         )
 
         myCoroutineScope.launch {
-            roomDB?.chatDao()?.saveChat(chat) // 채팅 저장
+            roomDB?.chatDao()?.saveChat(chat)
 
             val pendingIntent = createPendingIntent(roomId)
 
@@ -83,7 +83,7 @@ class FcmService : FirebaseMessagingService() {
                     setAutoCancel(true)
                     setContentIntent(pendingIntent)
                     setVisibility(NotificationCompat.VISIBILITY_PUBLIC).priority =
-                        NotificationCompat.PRIORITY_MAX
+                        NotificationCompat.PRIORITY_HIGH
                 }
 
             if (!myApplication.getIsViewChatRoom()) { // 채팅방을 보고 있지 않은 경우에만 notification 생성
@@ -112,6 +112,4 @@ class FcmService : FirebaseMessagingService() {
         },
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT
     )
-
-
 }

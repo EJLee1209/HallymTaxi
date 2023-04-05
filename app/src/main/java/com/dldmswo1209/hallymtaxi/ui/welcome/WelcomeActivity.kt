@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.CheckNetwork
 import com.dldmswo1209.hallymtaxi.common.getDeviceId
+import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
 import com.dldmswo1209.hallymtaxi.data.UiState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -37,5 +39,10 @@ class WelcomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         checkNetwork.registerNetworkListener()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        KeyboardUtils.forceCloseKeyboard(this)
+        return super.dispatchTouchEvent(ev)
     }
 }

@@ -98,10 +98,10 @@ class KeyboardUtils private constructor(act: Activity, listener: SoftKeyboardTog
          * Force closes the soft keyboard
          * @param activeView the view with the keyboard focus
          */
-        fun forceCloseKeyboard(activeView: View) {
+        fun forceCloseKeyboard(activity: Activity) {
             val inputMethodManager =
-                activeView.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager?.hideSoftInputFromWindow(activeView.windowToken, 0)
+                activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
         }
     }
 }

@@ -48,7 +48,7 @@
         <activity
             android:name=".ui.welcome.WelcomeActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
@@ -61,7 +61,8 @@
             android:exported="false"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"/>
+            tools:ignore="LockedOrientationActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
     </application>
 
 </manifest>

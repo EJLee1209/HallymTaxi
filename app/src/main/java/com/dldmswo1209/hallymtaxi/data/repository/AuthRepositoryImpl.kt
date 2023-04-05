@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
+import android.content.Context
 import android.util.Log
 import com.dldmswo1209.hallymtaxi.data.model.User
 import com.dldmswo1209.hallymtaxi.util.FireStoreTable
@@ -11,15 +12,22 @@ import com.dldmswo1209.hallymtaxi.util.FireStoreResponse
 import com.dldmswo1209.hallymtaxi.util.ServerResponse
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class AuthRepositoryImpl(
     private val auth: FirebaseAuth,
-    private val fireStore: FirebaseFirestore
+    private val fireStore: FirebaseFirestore,
+    private val context: Context
 ) : AuthRepository {
     override fun checkEmail(email: String, result: (UiState<String>) -> Unit) {
         auth.createUserWithEmailAndPassword(email, "123456").addOnSuccessListener {
@@ -203,4 +211,54 @@ class AuthRepositoryImpl(
             }
     }
 
+    override fun deleteAccount(result: (UiState<String>) -> Unit) {
+        auth.currentUser?.let { user ->
+            val uid = user.uid
+
+            CoroutineScope(Dispatchers.IO).launch {
+                async {
+                    fireStore.collection(FireStoreTable.USER)
+                        .document(uid)
+                        .delete()
+                    fireStore.collection(FireStoreTable.SIGNEDIN)
+                        .document(uid)
+                        .delete()
+                    fireStore.collection(FireStoreTable.FCMTOKENS)
+                        .document(uid)
+                        .delete()
+                }.join()
+
+                user.delete()
+                    .addOnSuccessListener {
+                        result.invoke(UiState.Success("계정 삭제 성공"))
+                    }
+                    .addOnFailureListener {
+                        when(it) {
+                            is FirebaseAuthRecentLoginRequiredException -> {
+                                val sharedPreferences = context.getSharedPreferences("loggedInfo", Context.MODE_PRIVATE)
+                                val email = sharedPreferences.getString("email", null) ?: return@addOnFailureListener
+                                val password = sharedPreferences.getString("password", null) ?: return@addOnFailureListener
+
+                                auth.signInWithEmailAndPassword("${email}@hallym.ac.kr", password)
+                                    .addOnSuccessListener {
+                                        user.delete()
+                                            .addOnSuccessListener {
+                                                result.invoke(UiState.Success("계정 삭제 성공"))
+                                            }
+                                    }
+                                    .addOnFailureListener {
+                                        result.invoke(UiState.Failure("계정 삭제 실패"))
+                                    }
+                            }
+                        }
+                    }
+            }
+
+        } ?: kotlin.run {
+            result.invoke(UiState.Failure("로그인이 필요합니다"))
+        }
+
+
+
+    }
 }

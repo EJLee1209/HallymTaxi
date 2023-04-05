@@ -8,12 +8,13 @@ interface ServerRepository {
     suspend fun requestVerify(email: String, code: String, result: (UiState<VerifyInfo>) -> Unit)
     suspend fun sendPushMessage(
         token: String,
+        id: String,
         roomId: String,
         userId: String,
         userName: String,
         message: String,
         messageType: String,
-        id: String,
+        target: String,
         result: (UiState<String>) -> Unit
     )
 }

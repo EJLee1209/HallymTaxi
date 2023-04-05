@@ -12,7 +12,6 @@ import com.dldmswo1209.hallymtaxi.util.ServerResponse.MESSAGE_TIME_OUT
 import com.dldmswo1209.hallymtaxi.util.ServerResponse.MESSAGE_VERIFY_SUCCESS
 import com.dldmswo1209.hallymtaxi.util.ServerResponse.STATUS_FAIL
 import com.dldmswo1209.hallymtaxi.util.ServerResponse.STATUS_OK
-import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import retrofit2.Call
 import retrofit2.Callback
@@ -90,15 +89,16 @@ class ServerRepositoryImpl(
 
     override suspend fun sendPushMessage(
         token: String,
+        id: String,
         roomId: String,
         userId: String,
         userName: String,
         message: String,
         messageType: String,
-        id: String,
+        target: String,
         result: (UiState<String>) -> Unit
     ) {
-        if(token.isEmpty()) {
+        if(id.isEmpty()) {
             result.invoke(
                 UiState.Success(id)
             )
@@ -106,7 +106,17 @@ class ServerRepositoryImpl(
         }
 
         try{
-            val sent = client.sendPushMessage(token, id, roomId, userId, userName, message, messageType)
+            val sent = client.sendPushMessage(
+                token = token,
+                id = id,
+                roomId = roomId,
+                userId = userId,
+                userName = userName,
+                message = message,
+                messageType = messageType,
+                target = target
+            )
+
             if(sent){
                 result.invoke(UiState.Success(id))
             } else {

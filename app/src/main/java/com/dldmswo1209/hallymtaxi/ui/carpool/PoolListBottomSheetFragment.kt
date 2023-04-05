@@ -114,7 +114,7 @@ class PoolListBottomSheetFragment(
                     loadingDialog.dismiss()
                 }
                 is UiState.Success ->{
-                    val tokens = state.data.toMutableList()
+                    val tokens = state.data.toMutableMap()
                     tokens.remove(myToken)
 
                     room?.let { room ->
