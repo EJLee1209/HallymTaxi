@@ -72,12 +72,24 @@ class ChatRoomFragment: Fragment() {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentChatRoomBinding.inflate(inflater, container, false)
+        binding.parentLayout.setOnTouchListener { p0, event ->
+            KeyboardUtils.forceCloseKeyboard(requireActivity())
+            Log.d("testt", "touch screen")
+            true
+        }
+        binding.rvMessage.setOnTouchListener { p0, event ->
+            KeyboardUtils.forceCloseKeyboard(requireActivity())
+            Log.d("testt", "touch screen")
+            true
+        }
+
         return binding.root
     }
 

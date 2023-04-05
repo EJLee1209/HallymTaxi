@@ -1,9 +1,12 @@
 package com.dldmswo1209.hallymtaxi.ui.map
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -14,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import com.dldmswo1209.hallymtaxi.R
 import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.common.dp
+import com.dldmswo1209.hallymtaxi.common.keyboard.KeyboardUtils
 import com.dldmswo1209.hallymtaxi.common.location.LocationService
 import com.dldmswo1209.hallymtaxi.common.toast
 import com.dldmswo1209.hallymtaxi.data.UiState
@@ -41,6 +45,7 @@ class MapFragment : Fragment(), MapViewEventListener{
     }
     private val viewModel : MainViewModel by viewModels()
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -301,5 +306,6 @@ class MapFragment : Fragment(), MapViewEventListener{
     override fun onMapViewDragEnded(p0: MapView?, p1: MapPoint?) {}
 
     override fun onMapViewMoveFinished(p0: MapView?, p1: MapPoint?) {}
+
 
 }

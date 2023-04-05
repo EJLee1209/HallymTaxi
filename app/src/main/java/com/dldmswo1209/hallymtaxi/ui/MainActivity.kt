@@ -179,9 +179,5 @@ class MainActivity : AppCompatActivity() {
         checkNetwork.unRegisterNetworkListener()
     }
 
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        KeyboardUtils.forceCloseKeyboard(this)
-        return super.dispatchTouchEvent(ev)
-    }
 
 }
