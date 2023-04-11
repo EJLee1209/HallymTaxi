@@ -51,10 +51,12 @@
         android:label="CreateRoomFragment" >
         <argument
             android:name="start_place"
-            app:argType="com.dldmswo1209.hallymtaxi.data.model.Place" />
+            app:argType="com.dldmswo1209.hallymtaxi.data.model.Place"
+            app:nullable="true" />
         <argument
             android:name="end_place"
-            app:argType="com.dldmswo1209.hallymtaxi.data.model.Place" />
+            app:argType="com.dldmswo1209.hallymtaxi.data.model.Place"
+            app:nullable="true" />
         <action
             android:id="@+id/action_navigation_create_room_to_chatRoomFragment"
             app:destination="@id/chatRoomFragment" />

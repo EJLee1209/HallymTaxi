@@ -36,8 +36,8 @@ class CreateRoomFragment: Fragment() {
     private val viewModel : MainViewModel by viewModels()
 
     private var maxCount = 4
-    private lateinit var startPlace: Place
-    private lateinit var endPlace: Place
+    private var startPlace: Place? = null
+    private var endPlace: Place? = null
     private lateinit var currentUser : User
     private var isClicked = false
     private lateinit var gender : String
@@ -98,8 +98,8 @@ class CreateRoomFragment: Fragment() {
     }
 
     private fun etTextUpdate() {
-        binding.etStartPoint.setText(startPlace.place_name)
-        binding.etEndPoint.setText(endPlace.place_name)
+        binding.etStartPoint.setText(startPlace?.place_name)
+        binding.etEndPoint.setText(endPlace?.place_name)
     }
 
     private fun setObserver(){
@@ -235,6 +235,7 @@ class CreateRoomFragment: Fragment() {
 
     fun onClickCreate(){
         if(isClicked) return
+        if(startPlace == null || endPlace == null) return
 
         val maxCount = binding.tvMaxCount.text.toString().toInt()
         var hour = binding.timePicker.hour.intToStringWithFillZero()
@@ -262,8 +263,8 @@ class CreateRoomFragment: Fragment() {
             participants = mutableListOf(currentUser.uid),
             userMaxCount = maxCount,
             departureTime = departureDateTime,
-            startPlace = startPlace,
-            endPlace = endPlace,
+            startPlace = startPlace!!,
+            endPlace = endPlace!!,
             created = LocalDateTime.now().toString(),
             genderOption = genderOption
         )

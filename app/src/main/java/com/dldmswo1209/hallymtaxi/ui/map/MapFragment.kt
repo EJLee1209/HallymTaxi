@@ -106,6 +106,13 @@ class MapFragment : Fragment(), MapViewEventListener{
                     ConstraintSet.TOP,
                     2.dp
                 )
+                mapBrain.constraintDynamicChange(
+                    startId = binding.btnViewPoolList.id,
+                    startSide = ConstraintSet.BOTTOM,
+                    endId = binding.viewCurrentMyRoom.id,
+                    ConstraintSet.TOP,
+                    10.dp
+                )
             }else{
                 binding.viewCurrentMyRoom.visibility = View.GONE
 
@@ -115,6 +122,14 @@ class MapFragment : Fragment(), MapViewEventListener{
                     endId = binding.parentConstraintLayout.id,
                     ConstraintSet.BOTTOM,
                     92.dp
+                )
+
+                mapBrain.constraintDynamicChange(
+                    startId = binding.btnViewPoolList.id,
+                    startSide = ConstraintSet.BOTTOM,
+                    endId = binding.parentConstraintLayout.id,
+                    ConstraintSet.BOTTOM,
+                    102.dp
                 )
             }
             mapBrain.joinedRoom = room
@@ -254,6 +269,10 @@ class MapFragment : Fragment(), MapViewEventListener{
     fun onClickInitSearchIcon() {
         val keyword = binding.etInitSearch.text.toString()
         searchAddressFromKeyword(keyword, isStartPoint = false, getCurrentAddress = true)
+    }
+
+    fun onClickViewPoolListButton() {
+        mapBrain.showCarPoolListBottomSheet()
     }
 
     override fun onResume() {

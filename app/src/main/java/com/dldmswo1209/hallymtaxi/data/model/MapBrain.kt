@@ -47,8 +47,8 @@ class MapBrain(
         // 채팅방 생성 버튼 클릭 콜백
         val action =
             MapFragmentDirections.actionNavigationMapToNavigationCreateRoom(
-                startPlace!!,
-                endPlace!!
+                startPlace,
+                endPlace
             )
         fragment.findNavController().navigate(action)
     }
@@ -188,14 +188,16 @@ class MapBrain(
         }
     }
 
-    private fun showCarPoolListBottomSheet() {
+    fun showCarPoolListBottomSheet() {
         if(!isOpenBottomSheetFragment(POOL_LIST_BOTTOM_SHEET_TAG)) {
-            if(startPlace != null && endPlace != null) {
-                poolListBottomSheet = PoolListBottomSheetFragment(onClickCreateRoom, joinCallback, startPlace!!, endPlace!!)
-                poolListBottomSheet?.show(fragment.parentFragmentManager,
-                    POOL_LIST_BOTTOM_SHEET_TAG
-                )
+            startPlace?.let {
+                poolListBottomSheet = PoolListBottomSheetFragment(onClickCreateRoom, joinCallback, startPlace!!, endPlace)
+            } ?: kotlin.run {
+                poolListBottomSheet = PoolListBottomSheetFragment(onClickCreateRoom, joinCallback, place_hallym_univ, endPlace)
             }
+            poolListBottomSheet?.show(fragment.parentFragmentManager,
+                POOL_LIST_BOTTOM_SHEET_TAG
+            )
         }
     }
 

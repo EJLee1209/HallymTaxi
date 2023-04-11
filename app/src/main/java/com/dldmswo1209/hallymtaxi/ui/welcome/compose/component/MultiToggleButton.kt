@@ -26,7 +26,7 @@ fun MultiToggleButton(
 ){
     Column(
         verticalArrangement = Arrangement.spacedBy(3.dp),
-        horizontalAlignment = Alignment.End
+        horizontalAlignment = Alignment.End,
     ) {
         Row(
             modifier = Modifier

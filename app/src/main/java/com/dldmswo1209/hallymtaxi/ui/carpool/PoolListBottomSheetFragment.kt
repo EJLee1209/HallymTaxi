@@ -28,11 +28,10 @@ class PoolListBottomSheetFragment(
     private val onCreateRoomBtnClick: () -> Unit,
     private val joinRoomCallback: (CarPoolRoom) -> Unit,
     private val startPlace: Place,
-    private val endPlace: Place,
+    private val endPlace: Place? = null,
 ) : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentPoolListBottomSheetBinding
     private val viewModel: MainViewModel by viewModels()
-
     private var joinedRoom: CarPoolRoom? = null // 참여 중인 방
     private var room: CarPoolRoom? = null // 참여하려는 방
     private lateinit var user: User
@@ -176,7 +175,9 @@ class PoolListBottomSheetFragment(
         return poolList.sortedWith(compareBy<CarPoolRoom> {
             DistanceManager.getDistance(startPlace.y, startPlace.x, it.startPlace.y, it.startPlace.x)
         }.then(compareBy {
-            DistanceManager.getDistance(endPlace.y, endPlace.x, it.endPlace.y, it.endPlace.x)
+            endPlace?.let { endPlace->
+                DistanceManager.getDistance(endPlace.y, endPlace.x, it.endPlace.y, it.endPlace.x)
+            }
         })).toMutableList()
     }
 

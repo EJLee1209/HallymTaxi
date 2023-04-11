@@ -17,6 +17,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.net.UnknownHostException
+import kotlin.math.log
 
 class ServerRepositoryImpl(
     private val client: MainServerApi,

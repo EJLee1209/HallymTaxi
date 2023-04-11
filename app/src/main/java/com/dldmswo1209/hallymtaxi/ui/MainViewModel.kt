@@ -36,7 +36,6 @@ class MainViewModel @Inject constructor(
     private var _carPoolList = MutableLiveData<UiState<List<CarPoolRoom>>>()
     val carPoolList : LiveData<UiState<List<CarPoolRoom>>> = _carPoolList
 
-
     private var _findUserName = MutableLiveData<UiState<String>>()
     val findUserName: LiveData<UiState<String>> = _findUserName
 
@@ -51,7 +50,6 @@ class MainViewModel @Inject constructor(
 
     private var _deleteAccount = MutableLiveData<UiState<String>>()
     val deleteAccount : LiveData<UiState<String>> = _deleteAccount
-
 
     private var _updateToken = MutableLiveData<UiState<String>>()
     val updateToken : LiveData<UiState<String>> = _updateToken

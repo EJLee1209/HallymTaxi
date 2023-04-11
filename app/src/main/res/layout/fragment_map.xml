@@ -155,6 +155,32 @@
             tools:listitem="@layout/item_favorite"/>
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btn_view_pool_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/view_current_my_room"
+            android:layout_marginBottom="102dp"
+            android:backgroundTint="@color/hallym_white_ffffff"
+            android:clickable="true"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="10dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/hallym_blue_3351b9"
+            android:onClick="@{()->fragment.onClickViewPoolListButton()}">
+
+            <TextView
+                style="@style/Text13.Blue.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/view_pool_list"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="15dp"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/view_current_my_room"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -169,7 +195,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="visible">
+            tools:visibility="gone">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

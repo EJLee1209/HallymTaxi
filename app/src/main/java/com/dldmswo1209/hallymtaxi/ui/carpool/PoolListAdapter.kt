@@ -12,6 +12,7 @@ import com.dldmswo1209.hallymtaxi.common.MyApplication
 import com.dldmswo1209.hallymtaxi.databinding.ItemPoolBinding
 import com.dldmswo1209.hallymtaxi.data.model.CarPoolRoom
 import com.dldmswo1209.hallymtaxi.data.model.Place
+import com.dldmswo1209.hallymtaxi.data.model.place_hallym_univ
 
 class PoolListAdapter(
     val activity: Activity,
