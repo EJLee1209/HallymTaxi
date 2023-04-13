@@ -1,5 +1,5 @@
 
-# 🔥 한림대학교 택시 카풀 앱 프로젝트(베타 테스트 진행 중) 🔥
+# 🔥 한림대학교 택시 카풀 앱 프로젝트 🔥
 ## Google Play Store 에서 다운로드👍
 [플레이 스토어에서 다운 받기](https://play.google.com/store/apps/details?id=com.dldmswo1209.hallymtaxi)
 
