@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.FilterChip
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -113,6 +114,7 @@ class MainActivity : AppCompatActivity() {
                     content = "다른 기기에서 로그인을 했습니다\n잠시 후 자동으로 로그아웃 됩니다.",
                     positiveCallback = {
                         forceLogout()
+                        viewModel.clearAllTables()
                     },
                 )
                 CoroutineScope(Dispatchers.Main).launch {
@@ -121,12 +123,12 @@ class MainActivity : AppCompatActivity() {
                         delay(2000)
                     }
                     forceLogout()
+                    viewModel.clearAllTables()
                 }
 
             }
         }
         viewModel.monitoringLoggedIn()
-
         viewModel.subscribeMyRoom()
         viewModel.subscribeUser()
     }

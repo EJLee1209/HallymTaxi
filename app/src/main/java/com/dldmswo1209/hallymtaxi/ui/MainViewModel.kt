@@ -91,24 +91,28 @@ class MainViewModel @Inject constructor(
     private var _inAppUpdate = MutableLiveData<UiState<AppUpdateInfo>>()
     val inAppUpdate : LiveData<UiState<AppUpdateInfo>> = _inAppUpdate
 
+    // 유저 데이터 구독
     fun subscribeUser() = viewModelScope.launch {
         fireStoreRepository.subscribeUser().collect { user ->
             _subscribeUser.value = user
         }
     }
 
+    // 채팅방의 모든 참여자 fcm token 구독
     fun subscribeParticipantsTokens(roomId: String) = viewModelScope.launch {
         fireStoreRepository.subscribeParticipantsTokens(roomId).collect { tokens ->
             _subscribeParticipantsTokens.postValue( tokens)
         }
     }
 
+    // get 유저 이름
     fun findUserName(uid: String) = viewModelScope.launch {
         fireStoreRepository.findUserName(uid) {
             _findUserName.postValue(it)
         }
     }
 
+    // 채팅방의 모든 참여자 fcm token 가져오기(채팅방 입장시 입장 메세지 보내기 위한 일회용임)
     fun getParticipantsTokens(roomId: String) = viewModelScope.launch {
         _getParticipantsTokens.postValue(UiState.Loading)
         fireStoreRepository.getParticipantsTokens(roomId) {
@@ -116,28 +120,33 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // 현재 내 계정에 로그인하는 사람이 있는지 감시
     fun monitoringLoggedIn() = viewModelScope.launch {
         fireStoreRepository.monitoringLoggedIn().collect{
             _monitoring.postValue(it)
         }
     }
 
+    // 로그아웃
     fun logout() {
         _logout.postValue(UiState.Loading)
         authRepository.logoutUser{ _logout.postValue(it) }
     }
 
+    // 계정 탈퇴
     fun deleteAccount() {
         _deleteAccount.postValue(UiState.Loading)
         authRepository.deleteAccount { _deleteAccount.postValue(it) }
     }
 
+    // fcmtoken 업데이트
     fun updateFcmToken() {
         fireStoreRepository.updateFcmToken{
             _updateToken.postValue(it)
         }
     }
 
+    // 키워드로 주소 검색
     fun searchKeyword(keyword: String, isStartPoint: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         if (isStartPoint) {
             _startPoint.postValue(UiState.Loading)
@@ -149,38 +158,45 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // 모든 카풀 목록 가져오기
     fun getAllRoom(genderOption: String) {
         fireStoreRepository.getAllRoom(genderOption) {
             _carPoolList.postValue(it)
         }
     }
 
+    // 카풀 생성
     fun createRoom(room: CarPoolRoom) {
         _createRoom.postValue(UiState.Loading)
         fireStoreRepository.createRoom(room){ _createRoom.postValue(it) }
     }
 
+    // 카풀 참여
     fun joinRoom(room: CarPoolRoom) {
         _joinRoom.postValue(UiState.Loading)
         fireStoreRepository.joinRoom(room){ _joinRoom.postValue(it) }
     }
 
+    // 참여 중인 카풀 구독
     fun subscribeMyRoom() = viewModelScope.launch {
         fireStoreRepository.subscribeMyRoom().collect {
             _subscribeMyRoom.value = it
         }
     }
 
+    // 카풀 퇴장
     fun exitRoom(room: CarPoolRoom) {
         _exitRoom.postValue(UiState.Loading)
         fireStoreRepository.exitRoom(room){ _exitRoom.postValue(it) }
     }
 
+    // 카풀 마감하기
     fun deactivateRoom(roomId: String) {
         _deactivateRoom.postValue(UiState.Loading)
         fireStoreRepository.deactivateRoom(roomId){ _deactivateRoom.postValue(it) }
     }
 
+    // 메세지 전송
     suspend fun sendMessage(chat: Chat, userName: String, receiveTokens: Map<String,String>) = viewModelScope.launch(Dispatchers.IO) {
         _sendPush.postValue(UiState.Loading)
         if(receiveTokens.isEmpty()) chat.sendSuccess = SEND_STATE_SUCCESS
@@ -207,6 +223,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // 메세지 저장
     private fun saveChat(chat: Chat) = viewModelScope.launch(Dispatchers.IO) {
         databaseRepository.saveChat(chat)
         val roomInfo = RoomInfo(
@@ -221,46 +238,57 @@ class MainViewModel @Inject constructor(
          }
     }
 
-    fun updateChatById(id: String, sendSuccess: String) = viewModelScope.launch(Dispatchers.IO) {
-        databaseRepository.updateChatById(id, sendSuccess)
+    // 메세지 상태 업데이트 (로딩 -> 전송완료 or 전송 실패)
+    fun updateChatById(id: String, result: String) = viewModelScope.launch(Dispatchers.IO) {
+        databaseRepository.updateChatById(id, result)
     }
 
+    // 메세지 삭제
     fun deleteChat(id: String) = viewModelScope.launch(Dispatchers.IO) {
         databaseRepository.deleteChat(id)
     }
 
+    // 채팅방 정보 데이터 저장
     fun insertRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
         databaseRepository.insertRoomInfo(roomInfo)
     }
 
+    // 채팅방 정보 가져오기
     fun detachRoomInfo(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
         _roomInfo.postValue(databaseRepository.detachRoomInfo(roomId))
     }
 
+    // 채팅방 정보 업데이트
     fun updateRoomInfo(roomInfo: RoomInfo) = viewModelScope.launch(Dispatchers.IO) {
         databaseRepository.updateRoomInfo(roomInfo)
     }
 
+    // 히스토리 가져오기
     fun detachRoomInfoHistory() = viewModelScope.launch(Dispatchers.IO) {
         _roomHistory.postValue(databaseRepository.detachRoomInfoHistory())
     }
 
+    // 히스토리 채팅방 메세지 가져오기
     fun detachChatList(roomId: String) = viewModelScope.launch(Dispatchers.IO) {
         _chatList.postValue(databaseRepository.detachChatList(roomId))
     }
 
+    // 즐겨찾기 가져오기
     fun getFavorites() = viewModelScope.launch(Dispatchers.IO) {
         _favorites.postValue(databaseRepository.getFavorites())
     }
 
+    // 즐겨찾기 저장
     fun saveFavorite(place: Place) = viewModelScope.launch(Dispatchers.IO) {
         databaseRepository.saveFavorite(place)
     }
 
+    // 즐겨찾기 삭제
     fun deleteFavorite(place: Place) = viewModelScope.launch(Dispatchers.IO) {
         databaseRepository.deleteFavorite(place)
     }
 
+    // 모든 테이블 삭제
     fun clearAllTables() = viewModelScope.launch(Dispatchers.IO) {
         async {
             databaseRepository.clearAllTables()
@@ -270,6 +298,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // 업데이트 확인
     fun checkAppUpdate() {
         _inAppUpdate.postValue(UiState.Loading)
         inAppRepository.checkAppUpdate { _inAppUpdate.postValue(it) }
