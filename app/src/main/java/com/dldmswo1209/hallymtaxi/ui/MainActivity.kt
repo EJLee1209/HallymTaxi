@@ -2,6 +2,7 @@ package com.dldmswo1209.hallymtaxi.ui
 
 import android.Manifest
 import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
@@ -11,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.FilterChip
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
@@ -40,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     }
     var isNetworkActivate = false
     private lateinit var myApplication: MyApplication
+    private lateinit var sharedPreferences: SharedPreferences
     private var room: CarPoolRoom? = null
 
     //권한 가져오기
@@ -63,6 +66,7 @@ class MainActivity : AppCompatActivity() {
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         myApplication = application as MyApplication
+        sharedPreferences = getSharedPreferences("loggedInfo", Context.MODE_PRIVATE)
     }
 
     private fun requestPermission(){
@@ -108,8 +112,7 @@ class MainActivity : AppCompatActivity() {
                     title = "시스템 메세지",
                     content = "다른 기기에서 로그인을 했습니다\n잠시 후 자동으로 로그아웃 됩니다.",
                     positiveCallback = {
-                        startActivity(Intent(this, SplashActivity::class.java))
-                        finish()
+                        forceLogout()
                     },
                 )
                 CoroutineScope(Dispatchers.Main).launch {
@@ -117,8 +120,7 @@ class MainActivity : AppCompatActivity() {
                         forcedLoggedInDialog.show(supportFragmentManager, forcedLoggedInDialog.tag)
                         delay(2000)
                     }
-                    startActivity(Intent(this@MainActivity, SplashActivity::class.java))
-                    finish()
+                    forceLogout()
                 }
 
             }
@@ -127,6 +129,16 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.subscribeMyRoom()
         viewModel.subscribeUser()
+    }
+
+    private fun forceLogout() {
+        sharedPreferences.edit().apply {
+            putString("email", null)
+            putString("password", null)
+            apply()
+        }
+        startActivity(Intent(this, SplashActivity::class.java))
+        finish()
     }
 
     private fun bottomNavigationSetup() {
