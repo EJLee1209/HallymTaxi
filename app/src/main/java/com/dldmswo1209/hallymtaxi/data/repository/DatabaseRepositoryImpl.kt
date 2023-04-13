@@ -1,5 +1,6 @@
 package com.dldmswo1209.hallymtaxi.data.repository
 
+import com.dldmswo1209.hallymtaxi.data.local.AppDatabase
 import com.dldmswo1209.hallymtaxi.data.local.dao.ChatDao
 import com.dldmswo1209.hallymtaxi.data.local.dao.FavoriteDao
 import com.dldmswo1209.hallymtaxi.data.local.dao.RoomInfoDao
@@ -10,7 +11,8 @@ import com.dldmswo1209.hallymtaxi.data.model.RoomInfo
 class DatabaseRepositoryImpl(
     private val chatDao: ChatDao,
     private val roomInfoDao: RoomInfoDao,
-    private val favoriteDao: FavoriteDao
+    private val favoriteDao: FavoriteDao,
+    private val db: AppDatabase
 ) : DatabaseRepository {
     override suspend fun saveChat(chat: Chat) { chatDao.saveChat(chat) }
     override suspend fun updateChatById(id: String, sendSuccess: String) { chatDao.updateChatById(id, sendSuccess) }
@@ -26,5 +28,9 @@ class DatabaseRepositoryImpl(
     }
     override suspend fun deleteFavorite(place: Place) {
         favoriteDao.deleteFavorite(place)
+    }
+
+    override suspend fun clearAllTables() {
+        db.clearAllTables()
     }
 }

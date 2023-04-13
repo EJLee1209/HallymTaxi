@@ -46,7 +46,7 @@ fun CustomEditText(
     label: String = "",
     labelStyle: TextStyle = TextStyle(fontSize = 14.sp, color = Color.Black, fontWeight = FontWeight.Bold),
     subLabel: String = "",
-    subLabelStyle: TextStyle = TextStyle(fontSize = 11.sp, color = colorResource(id = R.color.hallym_black_000000)),
+    subLabelStyle: TextStyle = TextStyle(fontSize = 11.sp, color = colorResource(id = R.color.hallym_red_E43429)),
     isVisibleText : Boolean = true,
     trailingIcon: @Composable (()->Unit)? = null,// 오른쪽 아이콘
     trailingText: @Composable (()->Unit)? = null,// 오른쪽 텍스트
@@ -93,7 +93,7 @@ fun CustomEditText(
                 .focusRequester(focusRequester)
                 .onFocusChanged { onFocusChange(it) }
             ,
-            value = value,
+            value = value.trim(),
             onValueChange = { onValueChange(it) },
             textStyle = textStyle,
             keyboardOptions = keyboardOptions,
@@ -130,11 +130,8 @@ fun CustomEditText(
                     trailingText?.let {
                         it()
                     }
-
                 }
-
             }
         )
-
     }
 }

@@ -18,4 +18,6 @@ interface RoomInfoDao {
     @Query("SELECT * FROM room_info WHERE isActivate = :isActivate")
     suspend fun detachRoomInfoHistory(isActivate: Boolean = false) : List<RoomInfo>
 
+
+
 }

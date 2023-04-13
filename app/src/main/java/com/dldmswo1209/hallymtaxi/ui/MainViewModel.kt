@@ -10,6 +10,7 @@ import com.dldmswo1209.hallymtaxi.data.UiState
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -258,6 +259,15 @@ class MainViewModel @Inject constructor(
 
     fun deleteFavorite(place: Place) = viewModelScope.launch(Dispatchers.IO) {
         databaseRepository.deleteFavorite(place)
+    }
+
+    fun clearAllTables() = viewModelScope.launch(Dispatchers.IO) {
+        async {
+            databaseRepository.clearAllTables()
+        }.join()
+        defaultFavorites.forEach { place ->
+            saveFavorite(place)
+        }
     }
 
     fun checkAppUpdate() {

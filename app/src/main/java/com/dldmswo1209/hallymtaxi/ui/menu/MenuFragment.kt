@@ -120,7 +120,16 @@ class MenuFragment: Fragment() {
 
     fun onClickLogout(){
         user?.let {
-            viewModel.logout()
+            val failToLogoutDialog = CustomDialog(
+                title = "로그아웃",
+                content = "로그아웃시 모든\n채팅내역과 즐겨찾기가 삭제됩니다",
+                negativeButtonVisible = true,
+                positiveCallback = {
+                    viewModel.logout()
+                    viewModel.clearAllTables()
+                }
+            )
+            failToLogoutDialog.show(parentFragmentManager, failToLogoutDialog.tag)
         }
     }
 

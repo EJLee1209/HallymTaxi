@@ -16,5 +16,6 @@ interface DatabaseRepository {
     suspend fun getFavorites() : List<Place>
     suspend fun saveFavorite(place: Place)
     suspend fun deleteFavorite(place: Place)
+    suspend fun clearAllTables()
 
 }

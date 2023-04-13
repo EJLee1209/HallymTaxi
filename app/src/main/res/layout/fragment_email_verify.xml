@@ -98,6 +98,7 @@
                 android:hint="@string/hint_mail"
                 android:maxLength="16"
                 android:maxLines="1"
+                android:inputType="text"
                 android:paddingHorizontal="17dp"
                 android:textColorHint="@color/hallym_grey_D9D9D9"
                 app:layout_constraintBottom_toBottomOf="parent"

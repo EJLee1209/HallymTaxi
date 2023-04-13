@@ -1,6 +1,7 @@
 package com.dldmswo1209.hallymtaxi.di
 
 import android.content.Context
+import com.dldmswo1209.hallymtaxi.data.local.AppDatabase
 import com.dldmswo1209.hallymtaxi.data.local.dao.ChatDao
 import com.dldmswo1209.hallymtaxi.data.local.dao.FavoriteDao
 import com.dldmswo1209.hallymtaxi.data.local.dao.RoomInfoDao
@@ -8,6 +9,7 @@ import com.dldmswo1209.hallymtaxi.data.repository.*
 import com.dldmswo1209.hallymtaxi.data.remote.KakaoApi
 import com.dldmswo1209.hallymtaxi.data.remote.MainServerApi
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.internal.common.AppData
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -46,8 +48,9 @@ object RepositoryModule {
     fun provideRoomRepository(
         chatDao: ChatDao,
         roomInfoDao: RoomInfoDao,
-        favoriteDao: FavoriteDao
-    ) : DatabaseRepository = DatabaseRepositoryImpl(chatDao, roomInfoDao, favoriteDao)
+        favoriteDao: FavoriteDao,
+        db: AppDatabase
+    ) : DatabaseRepository = DatabaseRepositoryImpl(chatDao, roomInfoDao, favoriteDao, db)
 
     @Provides
     @Singleton
