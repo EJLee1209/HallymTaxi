@@ -35,6 +35,7 @@ class MenuFragment: Fragment() {
     private val loadingDialog by lazy{
         LoadingDialog(requireActivity())
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
