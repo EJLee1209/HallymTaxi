@@ -44,6 +44,8 @@
             app:layout_constraintEnd_toStartOf="@id/btn_menu"
             app:layout_constraintStart_toEndOf="@id/btn_back"
             app:layout_constraintTop_toTopOf="parent"
+            android:maxLines="1"
+            android:ellipsize="end"
             tools:text="한림대학교 - 춘천역 경춘선" />
 
         <androidx.appcompat.widget.AppCompatImageButton

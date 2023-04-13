@@ -234,8 +234,15 @@ class CreateRoomFragment: Fragment() {
     }
 
     fun onClickCreate(){
-        if(isClicked) return
-        if(startPlace == null || endPlace == null) return
+        if(isClicked || startPlace == null || endPlace == null) return
+        if(startPlace == endPlace) {
+            val equalPlaceDialog = CustomDialog(
+                title = "채팅방 생성 실패",
+                content = "출발지와 목적지가 같습니다",
+            )
+            equalPlaceDialog.show(parentFragmentManager, equalPlaceDialog.tag)
+            return
+        }
 
         val maxCount = binding.tvMaxCount.text.toString().toInt()
         var hour = binding.timePicker.hour.intToStringWithFillZero()

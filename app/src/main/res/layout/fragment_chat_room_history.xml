@@ -42,6 +42,8 @@
             app:layout_constraintTop_toTopOf="parent"
             android:text="@{@string/room_title_format(roomInfo.startPlaceName, roomInfo.endPlaceName)}"
             tools:text="한림대학교 - 춘천역 경춘선"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:gravity="center"/>
 
         <View
