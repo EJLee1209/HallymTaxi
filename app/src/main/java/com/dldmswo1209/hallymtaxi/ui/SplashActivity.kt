@@ -117,7 +117,6 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-
     private fun setObserver() {
         authViewModel.checkLogged.observe(this) { state ->
             when (state) {
